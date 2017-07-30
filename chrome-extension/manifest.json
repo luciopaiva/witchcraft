@@ -1,0 +1,23 @@
+{
+  "name": "dot.js",
+  "manifest_version": 2,
+  "version": "2.0",
+  "description": "~/.js",
+  "icons": {
+    "32": "witch-64.png",
+    "128": "witch-128.png"
+  },
+  "content_scripts": [{
+    "all_frames": true,
+    "run_at":     "document_start",
+    "matches":    ["http://*/*", "https://*/*"],
+    "js":         ["content-script.js"]
+  }],
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": false
+  },
+  "permissions": [
+    "tabs"
+  ]
+}
