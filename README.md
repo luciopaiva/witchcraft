@@ -13,7 +13,7 @@ On subdomains such as http://gist.github.com, dot.js will try to load `~/.js/gis
 
 GreaseMonkey user scripts are great, but you need to publish them somewhere and re-publish after making modifications. With dot.js, just add or edit files in `~/.js`. Script changes will immediately be seen by the extension; no need to reload anything.
 
-*Note: this is my rendition of [defunkt](https://github.com/defunkt)'s original tool, [dot.js](https://github.com/defunkt/dotjs). Although I never got to actually use his implementation, I really wanted something like that. My approach works just the same as his, but it's way easier to install and should work for any platform that is able to run Node.js.*
+*Note: this is my rendition of [defunkt](https://github.com/defunkt)'s original tool, [dotjs](https://github.com/defunkt/dotjs). Although I never got to actually use his implementation, I really wanted something like that. My approach works just the same as his, but it's way easier to install and should work for any platform that is able to run Node.js.*
 
 # Example
 
@@ -26,9 +26,9 @@ GreaseMonkey user scripts are great, but you need to publish them somewhere and 
 
 # How to install
 
-This extension is composed of two parts: the Chrome extension itself and a local HTTP server running on Node.js.
+This extension is composed of two parts: the Chrome extension itself and a local HTTP server running on Node.js. Follow these two steps below to install it.
 
-## Starting the server
+## Step 1: start the server
 
 First make sure you have [Node.js](https://nodejs.org) installed.
 
@@ -38,11 +38,11 @@ Go to the root of this repository and simply run:
 
 *Note: you may want to add it to your shell's login script, otherwise you'll need to restart it every time you reboot your system.*
 
-## Install Chrome extension
+## Step 2: install Chrome extension
 
 The extension is in the folder `chrome-extension/`. Please refer to Google on how to install development Chrome extensions on the most recent Chrome release. I am not writing the steps here since this is likely to change for newer Chrome versions.
 
-After both the server is running and the extension is installed, you're good to go. Write your kick-ass scripts and just put it under `~/.js`.
+After both the server is running and the extension is installed, you're good to go. Write your kick-ass scripts and just put them under `~/.js`.
 
 # How it works
 
