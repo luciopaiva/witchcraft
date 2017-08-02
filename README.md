@@ -13,6 +13,14 @@ On subdomains such as http://gist.github.com, dot.js will try to load `~/.js/gis
 
 GreaseMonkey user scripts are great, but you need to publish them somewhere and re-publish after making modifications. With dot.js, just add or edit files in `~/.js`. Script changes will immediately be seen by the extension; no need to reload anything.
 
+## What if I want to inject jQuery (or any other library?)
+
+Use `@include` directives. Inside your main script (say, `google.com.js`), write:
+
+    // @include jquery.js
+
+And then just add `jquery.js` to your `~/.js` folder. You can any number of scripts you want. Included scripts will also have their `@include` directives parsed in a recursive fashion. Dependency cycles (e.g., `foo` includes `bar`, which includes `foo` won't break the parser and the resulting script will be `<contents of bar>\n<contents of foo>`.
+
 *Note: this is my rendition of [defunkt](https://github.com/defunkt)'s original tool, [dotjs](https://github.com/defunkt/dotjs). Although I never got to actually use his implementation, I really wanted something like that. My approach works just the same as his, but it's way easier to install and should work for any platform that is able to run Node.js.*
 
 # Example
@@ -56,7 +64,7 @@ Our tiny server, upon receiving a request to `www.google.com`, looks for these s
 * `~/.js/google.com.js`
 * `~/.js/www.google.com.js`
 
-And it returns a bundled version of all scripts it could find, ready to be executed by the extension. If there were a `com.js` and a `www.google.com.js`, the resulting script would be a concatenation of them.
+And it returns a bundled version of all scripts it can find, ready to be executed by the extension. If there were a `com.js` and a `www.google.com.js`, the resulting script would be a concatenation of them.
 
 Defunkt's original dot.js server ran over HTTPS, since Chrome complains if you request something over HTTP on a HTTPS page. This is called "mixed content" (see [this explanation](https://developers.google.com/web/fundamentals/security/prevent-mixed-content/what-is-mixed-content)).
 
@@ -64,9 +72,8 @@ This new approach allow us to request HTTP just fine, though. Chrome extensions 
 
 # To do
 
-- allow for a custom script list to be loaded: if user accesses `google.com` and there is a `~/.js/google.com.list` file, override default behavior and load scripts in that list instead. The file can be a list of newline separated file names;
-- allow for loading of custom images and CSS through our tiny server;
-- allow for optional organization of scripts into subfolders (e.g.: `~/.js/com/google/`).
+- allow for loading of custom CSS (e.g.: `com.css`, `google.com.css`);
+- allow for loading of custom images;
 
 # Credits
 
