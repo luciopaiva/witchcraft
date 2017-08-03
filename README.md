@@ -74,6 +74,10 @@ This new approach allow us to request HTTP just fine, though. Chrome extensions 
 
 - allow for loading of custom CSS (e.g.: `com.css`, `google.com.css`);
 - allow for loading of custom images;
+- cache scripts in memory to avoid going to the disk all the time
+  (but will have to find out when scripts change on disk, otherwise cache will serve outdated stuff)
+- think of some way to avoid hitting the disk every time some page is loaded, given that most won't have a matching script
+  (keep an up-to-date set of all existing script names in memory to quickly answer requests)
 
 # Credits
 
