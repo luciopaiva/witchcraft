@@ -29,15 +29,15 @@ class RequestOptions {
     }
 }
 
-class DotJsServer {
+class WitchcraftServer {
 
     constructor () {
-        this.scriptsPath = path.join(os.homedir(), '.js/');
+        this.scriptsPath = path.join(os.homedir(), WitchcraftServer.SCRIPTS_DIRECTORY);
         /** @type {Set<string>} List of script paths that are already part of the bundle being prepared. Used to avoid
          *                      dependency cycles. */
         this.visitedScripts = new Set();
         this.server = http.createServer(this.onRequest.bind(this));
-        this.server.listen(DotJsServer.PORT, DotJsServer.onServerStarted.bind(null));
+        this.server.listen(WitchcraftServer.PORT, WitchcraftServer.onServerStarted.bind(null));
 
         /** @type {Map<string, FileTypeOptions>} */
         this.optionsByFileType = new Map();
@@ -52,20 +52,20 @@ class DotJsServer {
             this.visitedScripts.clear();
             const resultingScript = this.fetchRelevantScripts(requestOptions);
 
-            DotJsServer.log(`Received request for "${request.url}"`);
+            WitchcraftServer.log(`Received request for "${request.url}"`);
             if (this.visitedScripts.size === 0) {
-                DotJsServer.log('\tNo scripts found');
+                WitchcraftServer.log('\tNo scripts found');
             } else {
-                DotJsServer.log('\tScripts found:');
+                WitchcraftServer.log('\tScripts found:');
                 for (const script of this.visitedScripts.keys()) {
-                    DotJsServer.log('\t* ' + script);
+                    WitchcraftServer.log('\t* ' + script);
                 }
             }
 
             response.writeHead(200, { 'Content-Type': requestOptions.fileTypeOptions.mimeType });
             response.end(resultingScript);
         } else {
-            DotJsServer.log(`Invalid request "${request.url}"`);
+            WitchcraftServer.log(`Invalid request "${request.url}"`);
 
             // we always return success, no matter what; we don't want to pollute Chrome's console with errors
             response.writeHead(200, { 'Content-Type': 'text/plain' });
@@ -81,7 +81,7 @@ class DotJsServer {
      */
     fetchRelevantScripts(requestOptions) {
         // transform `foo.bar.com` into `[com, bar.com, foo.bar.com]`
-        const domainLevels = DotJsServer.obtainDomainLevels(requestOptions.hostname);
+        const domainLevels = WitchcraftServer.obtainDomainLevels(requestOptions.hostname);
         // map domain levels into script paths
         const fullScriptPaths = domainLevels.map(scriptName =>
             path.join(this.scriptsPath, scriptName + requestOptions.fileTypeOptions.extension));
@@ -119,13 +119,13 @@ class DotJsServer {
             // check for dependency cycles
             if (!this.visitedScripts.has(scriptPath)) {
                 const scriptContent = this.tryToLoadScriptFile(scriptPath);
-                scriptBundle = DotJsServer.spliceString(scriptBundle, startIndex, endIndex, scriptContent);
+                scriptBundle = WitchcraftServer.spliceString(scriptBundle, startIndex, endIndex, scriptContent);
 
                 // put regex caret right where the appended file begins to recursively look for include directives
                 includeDirective.lastIndex = startIndex;
             } else {
                 // this script was already included before
-                scriptBundle = DotJsServer.spliceString(scriptBundle, endIndex, endIndex,
+                scriptBundle = WitchcraftServer.spliceString(scriptBundle, endIndex, endIndex,
                     " ERROR! Dependency cycle detected!");
             }
         }
@@ -202,9 +202,9 @@ class DotJsServer {
 
     static onServerStarted(err) {
         if (err) {
-            return DotJsServer.log('Something bad happened', err);
+            return WitchcraftServer.log('Something bad happened', err);
         }
-        DotJsServer.log(`dot.js server listening on ${DotJsServer.PORT}`);
+        WitchcraftServer.log(`Witchcraft server listening on ${WitchcraftServer.PORT}`);
     }
 
     static log(...args) {
@@ -212,6 +212,7 @@ class DotJsServer {
     }
 }
 
-DotJsServer.PORT = 3131;
+WitchcraftServer.SCRIPTS_DIRECTORY = '.witchcraft/';
+WitchcraftServer.PORT = 3131;
 
-const dot = new DotJsServer();
+new WitchcraftServer();

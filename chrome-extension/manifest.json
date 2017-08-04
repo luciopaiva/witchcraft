@@ -1,8 +1,8 @@
 {
-  "name": "dot.js",
+  "name": "Witchcraft",
   "manifest_version": 2,
-  "version": "2.0",
-  "description": "~/.js",
+  "version": "1.0",
+  "description": "GreaseMonkey for developers",
   "icons": {
     "32": "witch-64.png",
     "128": "witch-128.png"
