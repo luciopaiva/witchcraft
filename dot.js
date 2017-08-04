@@ -85,10 +85,8 @@ class DotJsServer {
         // map domain levels into script paths
         const fullScriptPaths = domainLevels.map(scriptName =>
             path.join(this.scriptsPath, scriptName + requestOptions.fileTypeOptions.extension));
-        // mark scripts as visited
-        fullScriptPaths.forEach(fullScriptPath => this.visitedScripts.add(fullScriptPath));
         // load scripts' contents
-        const scriptsContents = fullScriptPaths.map(scriptPath => DotJsServer.tryToLoadScriptFile(scriptPath));
+        const scriptsContents = fullScriptPaths.map(scriptPath => this.tryToLoadScriptFile(scriptPath));
         // start by concatenating initial scripts' contents...
         let scriptBundle = scriptsContents.join('\n');
         // ...and then process include directives, returning the resulting bundle
@@ -120,13 +118,11 @@ class DotJsServer {
 
             // check for dependency cycles
             if (!this.visitedScripts.has(scriptPath)) {
-                const scriptContent = DotJsServer.tryToLoadScriptFile(scriptPath);
+                const scriptContent = this.tryToLoadScriptFile(scriptPath);
                 scriptBundle = DotJsServer.spliceString(scriptBundle, startIndex, endIndex, scriptContent);
 
                 // put regex caret right where the appended file begins to recursively look for include directives
                 includeDirective.lastIndex = startIndex;
-
-                this.visitedScripts.add(scriptPath);  // mark file as already visited
             } else {
                 // this script was already included before
                 scriptBundle = DotJsServer.spliceString(scriptBundle, endIndex, endIndex,
@@ -169,9 +165,16 @@ class DotJsServer {
         return str.substring(0, startIndex) + whatToReplaceWith + str.substring(endIndex);
     }
 
-    static tryToLoadScriptFile(scriptPath) {
+    /**
+     * @param {string} scriptPath - the script to try loading
+     * @return {string} the contents of the script or an empty string if the script wasn't found
+     */
+    tryToLoadScriptFile(scriptPath) {
         try {
-            return fs.readFileSync(scriptPath, 'utf-8');
+            const content = fs.readFileSync(scriptPath, 'utf-8');
+            // mark script as visited to avoid circular dependencies
+            this.visitedScripts.add(scriptPath);
+            return content;
         } catch (error) {
             return '';
         }

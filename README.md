@@ -82,6 +82,8 @@ This new approach allow us to request HTTP just fine, though. Chrome extensions 
 # To do
 
 - rename the extension to something that makes more sense, since the extension now also handles CSS;
+- implement include directives for CSS
+- improve UI by coloring the icon when at least one script was loaded
 - allow for loading of custom images;
 - cache scripts in memory to avoid going to the disk all the time
   (but will have to find out when scripts change on disk, otherwise cache will serve outdated stuff)
