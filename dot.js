@@ -4,9 +4,30 @@ const
     fs = require('fs'),
     os = require('os'),
     path = require('path'),
-    http = require('http'),
-    { URL } = require('url');
+    http = require('http');
 
+
+class FileTypeOptions {
+    /**
+     * @param {string} extension
+     * @param {string} mimeType
+     */
+    constructor (extension, mimeType) {
+        this.extension = extension;
+        this.mimeType = mimeType;
+    }
+}
+
+class RequestOptions {
+    /**
+     * @param {string} hostname
+     * @param {FileTypeOptions} fileTypeOptions
+     */
+    constructor (hostname, fileTypeOptions) {
+        this.hostname = hostname;
+        this.fileTypeOptions = fileTypeOptions;
+    }
+}
 
 class DotJsServer {
 
@@ -17,15 +38,20 @@ class DotJsServer {
         this.visitedScripts = new Set();
         this.server = http.createServer(this.onRequest.bind(this));
         this.server.listen(DotJsServer.PORT, DotJsServer.onServerStarted.bind(null));
+
+        /** @type {Map<string, FileTypeOptions>} */
+        this.optionsByFileType = new Map();
+        this.optionsByFileType.set('css', new FileTypeOptions('.css', 'text/css'));
+        this.optionsByFileType.set('js', new FileTypeOptions('.js', 'text/javascript'));
     }
 
     onRequest(request, response) {
-        let resultingScript = '';
 
-        const urlObject = DotJsServer.parseUrl(request.url);
-        if (urlObject) {
+        const requestOptions = this.parseRequest(request.url);
+        if (requestOptions) {
             this.visitedScripts.clear();
-            resultingScript = this.fetchRelevantScripts(urlObject);
+            const resultingScript = this.fetchRelevantScripts(requestOptions);
+
             DotJsServer.log(`Received request for "${request.url}"`);
             if (this.visitedScripts.size === 0) {
                 DotJsServer.log('\tNo scripts found');
@@ -35,28 +61,30 @@ class DotJsServer {
                     DotJsServer.log('\t* ' + script);
                 }
             }
+
+            response.writeHead(200, { 'Content-Type': requestOptions.fileTypeOptions.mimeType });
+            response.end(resultingScript);
         } else {
             DotJsServer.log(`Invalid request "${request.url}"`);
+
+            // we always return success, no matter what; we don't want to pollute Chrome's console with errors
+            response.writeHead(200, { 'Content-Type': 'text/plain' });
+            response.end('');
         }
-
-        // we always return success, no matter what; we don't want to pollute Chrome's console with errors
-        response.writeHead(200, { 'Content-Type': 'text/javascript' });
-        response.end(resultingScript);
-
-
     }
 
     /**
      * Fetches all relevant scripts and return them as a single, aggregated script.
      *
-     * @param {Url} url - the url that is requesting the scripts
+     * @param {RequestOptions} requestOptions - information about the
      * @return {string} all relevant scripts, concatenated into a single string
      */
-    fetchRelevantScripts(url) {
+    fetchRelevantScripts(requestOptions) {
         // transform `foo.bar.com` into `[com, bar.com, foo.bar.com]`
-        const domainLevels = DotJsServer.obtainDomainLevels(url);
+        const domainLevels = DotJsServer.obtainDomainLevels(requestOptions.hostname);
         // map domain levels into script paths
-        const fullScriptPaths = domainLevels.map(scriptName => path.join(this.scriptsPath, scriptName + '.js'));
+        const fullScriptPaths = domainLevels.map(scriptName =>
+            path.join(this.scriptsPath, scriptName + requestOptions.fileTypeOptions.extension));
         // mark scripts as visited
         fullScriptPaths.forEach(fullScriptPath => this.visitedScripts.add(fullScriptPath));
         // load scripts' contents
@@ -64,6 +92,7 @@ class DotJsServer {
         // start by concatenating initial scripts' contents...
         let scriptBundle = scriptsContents.join('\n');
         // ...and then process include directives, returning the resulting bundle
+        // ToDo make this work with CSS as well
         return this.processIncludeDirectives(scriptBundle);
     }
 
@@ -109,14 +138,14 @@ class DotJsServer {
     }
 
     /**
-     * Returns a list of progressive domain level increments, given an input url. For instance, if the input is a URL
-     * like `"foo.bar.com"`, the resulting array will be `['com', 'bar.com', 'foo.bar.com']`.
+     * Returns a list of progressive domain level increments, given an input hostname. For instance, if the hostname is
+     * `"foo.bar.com"`, the resulting array will be `['com', 'bar.com', 'foo.bar.com']`.
      *
-     * @param {Url} url - URL object
+     * @param {string} hostname - the page hostname
      * @return {Array<string>}
      */
-    static obtainDomainLevels(url) {
-        const parts = url.hostname.split('.');
+    static obtainDomainLevels(hostname) {
+        const parts = hostname.split('.');
         const domainLevels = [];
         for (let i = parts.length - 1; i >= 0; i--) {
             const scriptName = parts.slice(i, parts.length).join('.');
@@ -148,14 +177,24 @@ class DotJsServer {
         }
     }
 
-    static parseUrl(url) {
-        const cleanUrl = url.length > 0 ? url.substr(1) : '';  // skip leading `/`
-        try {
-            return new URL(cleanUrl);
-        } catch (error) {
-            // probably a ERR_INVALID_URL; just ignore it and return a blank script
-            return null;
+    /**
+     * @param {string} url - url in the format `(css|js)/<hostname>`
+     * @return {?RequestOptions}
+     */
+    parseRequest(url) {
+        const match = /^\/([^/]+)\/(.*)$/.exec(url);  // "/css/gist.github.com" -> "css", "gist.github.com"
+
+        if (match === null) {
+            return null;  // invalid request; just ignore it
         }
+
+        const fileTypeOptions = this.optionsByFileType.get(match[1]);
+
+        if (!fileTypeOptions) {
+            return null;  // invalid file type; just ignore it
+        }
+
+        return new RequestOptions(match[2], fileTypeOptions);
     }
 
     static onServerStarted(err) {

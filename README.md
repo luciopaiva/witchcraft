@@ -3,13 +3,13 @@
 
 > "I almost wish you could just stick JavaScript in ~/.js. Do you know what I'm saying?"
 
-dot.js is a Google Chrome extension that executes JavaScript files in `~/.js` based on the page domain being accessed.
+dot.js is a Google Chrome extension that executes JavaScript and CSS files in `~/.js` based on the page domain being accessed.
 
-If you navigate to `https://www.google.com`, dot.js will execute `~/.js/google.com.js`.
+If you navigate to `https://www.google.com`, dot.js will execute `~/.js/google.com.js` and `~/.js/google.com.css`.
 
-This makes it super easy to spruce up your favorite pages using JavaScript.
+This makes it super easy to spruce up your favorite pages using JavaScript and your own stylesheets.
 
-On subdomains such as http://gist.github.com, dot.js will try to load `~/.js/gist.github.com.js` as well as `~/.js/github.com.js` and `~/.js/com.js`.
+On subdomains such as http://gist.github.com, dot.js will try to load `~/.js/gist.github.com.js` as well as `~/.js/github.com.js` and `~/.js/com.js`. The same goes with CSS: `~/.js/gist.github.com.css`, `~/.js/github.com.css` and `~/.js/com.css` will be tried.
 
 GreaseMonkey user scripts are great, but you need to publish them somewhere and re-publish after making modifications. With dot.js, just add or edit files in `~/.js`. Script changes will immediately be seen by the extension; no need to reload anything.
 
@@ -29,6 +29,12 @@ And then just add `jquery.js` to your `~/.js` folder. You can any number of scri
 
     document.querySelectorAll('img')
         .forEach(img => img.style.transform = 'scaleX(-1)');
+
+Or you could also just:
+
+    > cat ~/.js/google.com.css
+
+    img { transform: scaleX(-1); }
 
 ![defaced avatars](elgoog.png)
 
@@ -56,15 +62,18 @@ After both the server is running and the extension is installed, you're good to 
 
 Chrome extensions can't access the local file system, so dot.js runs a tiny web server on port 3131 that serves files out of `~/.js`.
 
-The dot.js Chrome extension then makes ajax requests to http://localhost:3131/www.google.com any time you hit a page on `www.google.com`, for example, and executes the returned JavaScript.
+The dot.js Chrome extension then makes ajax requests to http://localhost:3131/www.google.com any time you hit a page on `www.google.com`, for example, and executes the returned JavaScript. It will also append any relevant CSS files to the page's head tag.
 
 Our tiny server, upon receiving a request to `www.google.com`, looks for these scripts, in this exact order:
 
+* `~/.js/com.css`
+* `~/.js/google.com.css`
+* `~/.js/www.google.com.css`
 * `~/.js/com.js`
 * `~/.js/google.com.js`
 * `~/.js/www.google.com.js`
 
-And it returns a bundled version of all scripts it can find, ready to be executed by the extension. If there were a `com.js` and a `www.google.com.js`, the resulting script would be a concatenation of them.
+And it returns a bundled version of all scripts it can find for each type (Javascript and CSS), ready to be executed by the extension. If there were a `com.js` and a `www.google.com.js`, the resulting script would be a concatenation of them. The same with CSS.
 
 Defunkt's original dot.js server ran over HTTPS, since Chrome complains if you request something over HTTP on a HTTPS page. This is called "mixed content" (see [this explanation](https://developers.google.com/web/fundamentals/security/prevent-mixed-content/what-is-mixed-content)).
 
@@ -72,7 +81,7 @@ This new approach allow us to request HTTP just fine, though. Chrome extensions 
 
 # To do
 
-- allow for loading of custom CSS (e.g.: `com.css`, `google.com.css`);
+- rename the extension to something that makes more sense, since the extension now also handles CSS;
 - allow for loading of custom images;
 - cache scripts in memory to avoid going to the disk all the time
   (but will have to find out when scripts change on disk, otherwise cache will serve outdated stuff)
@@ -83,3 +92,9 @@ This new approach allow us to request HTTP just fine, though. Chrome extensions 
 
 * [defunkt](https://github.com/defunkt) and his [original implementation](https://github.com/defunkt/dotjs);
 * witch icon downloaded from https://www.flaticon.com/free-icon/witch_477108.
+
+# Other approaches
+
+[Matthew Hadley](https://github.com/diffsky) made [an experiment](https://github.com/diffsky/chromedotfiles) using the [chrome.tabs API](https://developer.chrome.com/extensions/tabs) to load js and css without the need of a web server. The drawback is that you have to reload the extension every time a new script is added or updated. That's why I decided to have a web server running; I want script loading to be as seamless as possible.
+
+There's also [Jonathan Cremin](https://github.com/kudos)'s [Punkjs](https://github.com/kudos/punkjs), but I tried and it is currently not working (the app breaks when you select the .js folder) and I think that between extension+server and extension+app, I prefer the former. You can just schedule the server to run every time your system boots and then forget about it. The Chrome app approach expects you to open the app every time you open your browser. Besides, it seems to be no longer maintained as well.
