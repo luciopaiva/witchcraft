@@ -4,8 +4,21 @@
   "version": "1.0",
   "description": "GreaseMonkey for developers",
   "icons": {
-    "32": "witch-64.png",
+    "16": "witch-16.png",
+    "24": "witch-24.png",
+    "32": "witch-32.png",
+    "64": "witch-64.png",
     "128": "witch-128.png"
+  },
+  "browser_action": {
+    "default_icon": {
+      "16": "witch-16.png",
+      "24": "witch-24.png",
+      "32": "witch-32.png",
+      "64": "witch-64.png",
+      "128": "witch-128.png"
+    },
+    "default_title": "Witchcraft"
   },
   "content_scripts": [{
     "all_frames": true,
@@ -15,7 +28,7 @@
   }],
   "background": {
     "scripts": ["background.js"],
-    "persistent": false
+    "persistent": true
   },
   "permissions": [
     "tabs"

@@ -7,6 +7,7 @@ chrome.runtime.sendMessage({ type: 'css', hostname: location.hostname }, (cssCon
         const style = document.createElement('style');
         style.type = 'text/css';
         style.appendChild(document.createTextNode(cssContent));
+        style.setAttribute('witchcraft', '');  // to make it easy finding the element if we want to
         document.head.appendChild(style);
     }
 });

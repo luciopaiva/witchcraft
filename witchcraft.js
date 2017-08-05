@@ -62,14 +62,16 @@ class WitchcraftServer {
                 }
             }
 
+            const scriptCount = this.visitedScripts.size;
+
             response.writeHead(200, { 'Content-Type': requestOptions.fileTypeOptions.mimeType });
-            response.end(resultingScript);
+            response.end(`${scriptCount}\n${resultingScript}`);
         } else {
             WitchcraftServer.log(`Invalid request "${request.url}"`);
 
             // we always return success, no matter what; we don't want to pollute Chrome's console with errors
             response.writeHead(200, { 'Content-Type': 'text/plain' });
-            response.end('');
+            response.end('0');  // signal that no scripts (hence the "0") were found
         }
     }
 

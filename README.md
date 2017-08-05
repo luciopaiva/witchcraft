@@ -94,7 +94,6 @@ Witchcraft, on the other hand, allows us to request HTTP just fine, though. Chro
 # To do
 
 - implement include directives for CSS
-- improve UI by coloring the icon when at least one script was loaded
 - allow for loading of custom images;
 - cache scripts in memory to avoid going to the disk all the time
   (but use Node.js API to watch for files changes, otherwise cache will get outdated)
