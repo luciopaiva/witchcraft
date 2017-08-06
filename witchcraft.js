@@ -55,24 +55,29 @@ class WitchcraftServer {
             WitchcraftServer.log(`Received request for "${request.url}"`);
             if (this.visitedScripts.size === 0) {
                 WitchcraftServer.log('\tNo scripts found');
+                WitchcraftServer.sendEmptyResponse(response);
             } else {
                 WitchcraftServer.log('\tScripts found:');
+
                 for (const script of this.visitedScripts.keys()) {
                     WitchcraftServer.log('\t* ' + script);
                 }
+
+                const scriptNames = [...this.visitedScripts.keys()].join('\n');
+                response.writeHead(200, { 'Content-Type': requestOptions.fileTypeOptions.mimeType });
+                response.end(`${scriptNames}\n\n${resultingScript}`);
             }
-
-            const scriptCount = this.visitedScripts.size;
-
-            response.writeHead(200, { 'Content-Type': requestOptions.fileTypeOptions.mimeType });
-            response.end(`${scriptCount}\n${resultingScript}`);
         } else {
             WitchcraftServer.log(`Invalid request "${request.url}"`);
 
             // we always return success, no matter what; we don't want to pollute Chrome's console with errors
-            response.writeHead(200, { 'Content-Type': 'text/plain' });
-            response.end('0');  // signal that no scripts (hence the "0") were found
+            WitchcraftServer.sendEmptyResponse(response);
         }
+    }
+
+    static sendEmptyResponse(response) {
+        response.writeHead(200, { 'Content-Type': 'text/plain' });
+        response.end('');  // signal that no scripts (hence the "0") were found
     }
 
     /**
