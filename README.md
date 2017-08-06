@@ -89,15 +89,6 @@ Defunkt's original dot.js server also had another drawback: it ran over HTTPS, s
 
 Witchcraft, on the other hand, allows us to request HTTP just fine, though. Chrome extensions have a foreground environment, where you have access to a page's content, and a background one, where your scripts run in a exclusive process created just for your extension. This same background process is shared among all your foreground instances. It also happens that the background process can request whatever it wants, including HTTP (non-secure) requests; and this is just what we need. Witchcraft's foreground script fires requests to the background one, which then proceeds to requesting to Witchcraft's local server via HTTP. When the response gets back, the background script calls the foreground with the scripts' contents.
 
-# To do
-
-- implement include directives for CSS
-- allow for loading of custom images;
-- cache scripts in memory to avoid going to the disk all the time
-  (but use Node.js API to watch for files changes, otherwise cache will get outdated)
-- user Node.js file watch API to avoid hitting the disk every time some page is loaded, given that most won't have a matching script
-  (keep an up-to-date set of all existing script names in memory to quickly answer requests that won't match anything)
-
 # Credits
 
 * [defunkt](https://github.com/defunkt) and his [dotjs](https://github.com/defunkt/dotjs);
