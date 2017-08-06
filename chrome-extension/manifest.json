@@ -1,8 +1,9 @@
 {
-  "name": "Witchcraft",
+  "name": "Witchcraft: Inject JS and CSS",
+  "short_name": "Witchcraft",
   "manifest_version": 2,
-  "version": "1.0",
-  "description": "GreaseMonkey for developers",
+  "version": "1.0.2",
+  "description": "Inject Javascript and CSS right from your home folder. It's GreaseMonkey for developers!",
   "icons": {
     "16": "witch-16.png",
     "24": "witch-24.png",

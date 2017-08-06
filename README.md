@@ -1,9 +1,7 @@
 
-# Witchcraft
+![Witchcraft](art/witchcraft-banner.png)
 
 It's GreaseMonkey for developers!
-
-> "I almost wish you could just stick JavaScript in ~/.js. Do you know what I'm saying?"
 
 Witchcraft is a Google Chrome extension that executes JavaScript and CSS scripts located under your local `~/.witchcraft` folder by matching their names with the domain of the page being loaded.
 
@@ -102,8 +100,8 @@ Witchcraft, on the other hand, allows us to request HTTP just fine, though. Chro
 
 # Credits
 
-* [defunkt](https://github.com/defunkt) and his [original implementation](https://github.com/defunkt/dotjs);
-* witch icon downloaded from https://www.flaticon.com/free-icon/witch_477108.
+* [defunkt](https://github.com/defunkt) and his [dotjs](https://github.com/defunkt/dotjs);
+* witch and witch hat icons by [Freepik](https://www.flaticon.com/authors/freepik), downloaded from [Flaticon](https://www.flaticon.com).
 
 # Other approaches
 
