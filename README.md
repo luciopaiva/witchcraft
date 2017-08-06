@@ -57,7 +57,7 @@ Go to the root of this repository and simply run:
 
 ## Step 2: install Chrome extension
 
-The extension is in the folder `chrome-extension/`. Please refer to Google on how to install development Chrome extensions on the most recent Chrome release. I am not writing the steps here since this is likely to change for newer Chrome versions.
+Either [download the official release from the Chrome Web Store](https://chrome.google.com/webstore/detail/witchcraft-inject-js-and/hokcepcfcicnhalinladgknhaljndhpc) or install it as a development extension (look for it under the folder `chrome-extension/`).
 
 After both the server is running and the extension is installed, you're good to go. Write your kick-ass scripts and just put them under `~/.witchcraft`.
 
