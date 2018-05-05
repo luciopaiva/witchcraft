@@ -19,7 +19,7 @@ Use `@include` directives. Inside your main script (say, `google.com.js`), write
 
     // @include jquery.js
 
-And then just add `jquery.js` to your `~/.witchcraft` folder. You can any number of scripts you want. Included scripts will also have their `@include` directives parsed in a recursive fashion. Dependency cycles (e.g., `foo` includes `bar`, which includes `foo` won't break the parser and the resulting script will be `<contents of bar>\n<contents of foo>`.
+And then just add `jquery.js` to your `~/.witchcraft` folder. You can any number of scripts you want. Included scripts will also have their `@include` directives parsed in a recursive fashion. Dependency cycles (e.g., `foo` includes `bar`, which includes `foo`) won't break the parser and the resulting script will be `<contents of bar>\n<contents of foo>`.
 
 # Example
 
