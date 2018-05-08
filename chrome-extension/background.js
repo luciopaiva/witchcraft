@@ -116,8 +116,6 @@ class WitchcraftBackgroundManager {
         // send the script to the foreground
         callback(script);
 
-        console.info(`[${tabId}] scripts loaded so far: ${[...scriptsSet.keys()]}`);
-
         this.updateIconBadge(tabId);
     }
 
