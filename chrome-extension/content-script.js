@@ -1,16 +1,14 @@
 
-// ask for CSS content and attach it to the page
-chrome.runtime.sendMessage({ type: 'css', hostname: location.hostname }, (cssContent) => {
-    "use strict";
-
-    if (cssContent && cssContent.length > 0) {
+chrome.runtime.onMessage.addListener(({scriptType, scriptContents}) => {
+    if (scriptType === "js") {
+        eval(scriptContents);
+    } else if (scriptType === "css") {
         const style = document.createElement('style');
         style.type = 'text/css';
-        style.appendChild(document.createTextNode(cssContent));
-        style.setAttribute('witchcraft', '');  // to make it easy finding the element if we want to
+        style.appendChild(document.createTextNode(scriptContents));
+        style.setAttribute("data-witchcraft", "");  // to make it easy finding the element if we want to
         document.head.appendChild(style);
     }
 });
 
-// ask for Javascript content: script will be automatically evaluated when the callback is fired
-chrome.runtime.sendMessage({ type: 'js', hostname: location.hostname }, eval);
+chrome.runtime.sendMessage(location.hostname);
