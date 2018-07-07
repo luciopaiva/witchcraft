@@ -54,9 +54,9 @@ Get it from the Chrome Web Store [here](https://chrome.google.com/webstore/detai
 
 Scripts must reside inside the extension's folder, under `scripts/`. To locate the extension folder:
 
-- Windows: `\Users\<USER-NAME>\AppData\Local\Google\Chrome\User Data\Default\Extensions\hokcepcfcicnhalinladgknhaljndhpc\2.0.0_0\scripts`
-- Mac: `~/Library/Application\ Support/Google/Chrome/Default/Extensions/hokcepcfcicnhalinladgknhaljndhpc/2.0.0_0/scripts`
-- Linux: `~/.config/google-chrome/Default/Extensions/hokcepcfcicnhalinladgknhaljndhpc/2.0.0_0/scripts`
+- Windows: `\Users\<USER-NAME>\AppData\Local\Google\Chrome\User Data\Default\Extensions\hokcepcfcicnhalinladgknhaljndhpc\2.0.1_0\scripts`
+- Mac: `~/Library/Application\ Support/Google/Chrome/Default/Extensions/hokcepcfcicnhalinladgknhaljndhpc/2.0.1_0/scripts`
+- Linux: `~/.config/google-chrome/Default/Extensions/hokcepcfcicnhalinladgknhaljndhpc/2.0.1_0/scripts`
 
 You may want to create a shortcut to it (e.g.: at `~/.witchcraft`) to make it easier to find the scripts folder.
 
