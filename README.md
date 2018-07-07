@@ -7,7 +7,7 @@ Witchcraft is a Google Chrome extension that allows loading custom JavaScript an
 
 It works by matching the current page domain against script file names available in the scripts folder. For instance, if one navigates to `https://www.google.com`, Witchcraft will try to load and run `google.com.js` and `google.com.css`.
 
-It also tries all domain levels. For instance, if one accesses `https://gist.github.com`, Witchcraft will try to load, in this order: `com.js`, `github.com.js` and `gist.github.com.js`... and the same goes for CSS. All domain levels for which a script is found will be loaded, and not just the first one.
+It also tries all domain levels. For instance, if one accesses `https://gist.github.com`, Witchcraft will try to load, in this order: `com.js`, `github.com.js` and `gist.github.com.js`... and the same goes for CSS. All domain levels for which a script is found will be loaded, not just the first one.
 
 Whenever you edit or create new scripts, there's no need to reload anything other than the page where the scripts are supposed to run. It makes it way easier than other popular scripting tools, like Greasemonkey or Tampermonkey.
 
@@ -54,9 +54,9 @@ Get it from the Chrome Web Store [here](https://chrome.google.com/webstore/detai
 
 Scripts must reside inside the extension's folder, under `scripts/`. To locate the extension folder:
 
-- Windows: `\Users\<USER-NAME>\AppData\Local\Google\Chrome\User Data\Default\Extensions\hokcepcfcicnhalinladgknhaljndhpc\scripts`
-- Mac: `~/Library/Application\ Support/Google/Chrome/Default/Extensions/hokcepcfcicnhalinladgknhaljndhpc/scripts`
-- Linux: `~/.config/google-chrome/Default/Extensions/hokcepcfcicnhalinladgknhaljndhpc/scripts`
+- Windows: `\Users\<USER-NAME>\AppData\Local\Google\Chrome\User Data\Default\Extensions\hokcepcfcicnhalinladgknhaljndhpc\2.0.0_0\scripts`
+- Mac: `~/Library/Application\ Support/Google/Chrome/Default/Extensions/hokcepcfcicnhalinladgknhaljndhpc/2.0.0_0/scripts`
+- Linux: `~/.config/google-chrome/Default/Extensions/hokcepcfcicnhalinladgknhaljndhpc/2.0.0_0/scripts`
 
 You may want to create a shortcut to it (e.g.: at `~/.witchcraft`) to make it easier to find the scripts folder.
 
