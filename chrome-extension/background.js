@@ -122,8 +122,9 @@ class Witchcraft {
      */
     static async handleScriptLoading(domain, scriptType, scriptsSet, sender) {
         const scriptFileName = `${domain}.${scriptType}`;
-        const scriptContents = await Witchcraft.getFileFromExtensionFolder(scriptFileName);
+        let scriptContents = await Witchcraft.getFileFromExtensionFolder(scriptFileName);
         if (scriptContents) {
+            scriptContents = await Witchcraft.processIncludeDirectives(scriptContents, scriptFileName);
             chrome.tabs.sendMessage(sender.tab.id, {
                 scriptType,
                 scriptContents,
@@ -132,6 +133,68 @@ class Witchcraft {
             });
             scriptsSet.add(scriptFileName);
         }
+    }
+
+    /**
+     * Process `@include` directives, replacing them with the actual scripts they refer to. The processing is recursive,
+     * i.e., included files also have their `@include` directives processed. The algorithm detects dependency cycles and
+     * avoids them by not including any file more than once.
+     *
+     * @param {String} originalScript - raw script to be processed
+     * @param {String} originalScriptFileName - name of the raw script
+     * @return {Promise<String>} - processed script
+     */
+    static async processIncludeDirectives(originalScript, originalScriptFileName) {
+        const visitedScripts = new Set();
+        visitedScripts.add(originalScriptFileName);
+
+        let result;
+        const includeDirective = /^[ \t]*\/\/[ \t]*@include[ \t]*(".*?"|\S+).*$/mg;
+        while ((result = includeDirective.exec(originalScript)) !== null) {
+            const fullMatchStr = result[0];
+
+            // determine full path to include file
+            const scriptFileName = result[1].replace(/^"|"$/g, '');  // remove quotes, if any
+
+            // the matched directive to be cut from the original file
+            const endIndex = includeDirective.lastIndex;
+            const startIndex = endIndex - fullMatchStr.length;
+
+            // check for dependency cycles
+            if (!visitedScripts.has(scriptFileName)) {
+                const scriptContent = await Witchcraft.getFileFromExtensionFolder(scriptFileName);
+                if (scriptContent) {
+                    originalScript = Witchcraft.spliceString(originalScript, startIndex, endIndex, scriptContent);
+                    // put regex caret right where the appended file begins to recursively look for include directives
+                    includeDirective.lastIndex = startIndex;
+                    visitedScripts.add(scriptFileName);
+                } else {
+                    // script not found
+                    originalScript = Witchcraft.spliceString(originalScript, endIndex, endIndex,
+                        ` -- WITCHCRAFT: could not include "${scriptFileName}"; script was not found`);
+                }
+            } else {
+                // this script was already included before
+                originalScript = Witchcraft.spliceString(originalScript, endIndex, endIndex,
+                    ` -- WITCHCRAFT: skipping inclusion of "${scriptFileName}" to avoid dependency cycle`);
+            }
+        }
+
+        return originalScript;
+    }
+
+    /**
+     * Splices a string. See https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Array/splice
+     * for more info.
+     *
+     * @param {String} str - string that is going to be spliced
+     * @param {Number} startIndex - where to start the cut
+     * @param {Number} endIndex - where to end the cut
+     * @param {String} whatToReplaceWith - the substring that will replace the removed one
+     * @return {String} the resulting string
+     */
+    static spliceString(str, startIndex, endIndex, whatToReplaceWith) {
+        return str.substring(0, startIndex) + whatToReplaceWith + str.substring(endIndex);
     }
 
     /**
