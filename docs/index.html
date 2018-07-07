@@ -111,8 +111,17 @@
         }
 
         .footnote {
+            margin-top: 0;
             font-size: 12pt;
             text-align: right;
+        }
+
+        .right {
+            float: right;
+        }
+
+        .left {
+            float: left;
         }
 
         a, a:visited, a:hover, a:active {
@@ -130,8 +139,8 @@
 
 <div class="container">
     <h1>Witchcraft</h1>
-    <img class="witch" src="../art/witch.svg" alt="">
-    <img class="hat" src="../art/witch-hat.svg" alt="">
+    <img class="witch" src="witch.svg" alt="">
+    <img class="hat" src="witch-hat.svg" alt="">
 
     <a id="header-store-badge" href="https://chrome.google.com/webstore/detail/witchcraft-inject-js-and/hokcepcfcicnhalinladgknhaljndhpc?hl=en" target="_blank">
         <img class="store-badge" src="ChromeWebStore_Badge_v2_340x96.png" alt="">
@@ -164,7 +173,7 @@
 
     <p>And the result is this:</p>
 
-    <img class="screenshot" src="../elgoog.png" alt="Google inverted and in grayscale">
+    <img class="screenshot" src="elgoog.png" alt="Google inverted and in grayscale">
 
     <p>It also tries all domain levels. For instance, if one accesses <span class="code">https://gist.github.com</span>, <span class="title">Witchcraft</span> will try to load, in this order: <span class="code">com.js</span>, <span class="code">github.com.js</span> and <span class="code">gist.github.com.js</span>... and the same goes for CSS. All domain levels for which a script is found will be loaded, not just the first one.</p>
 
@@ -178,7 +187,8 @@
 
     <hr>
 
-    <p class="footnote">Made by <a href="http://luciopaiva.com">Lucio Paiva</a> - July 2018</p>
+    <p class="footnote right">Made by <a href="http://luciopaiva.com">Lucio Paiva</a> - July 2018</p>
+    <p class="footnote left">View <a href="//github.com/luciopaiva/witchcraft">source</a> on GitHub</p>
 </div>
 
 </body>
