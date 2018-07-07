@@ -26,8 +26,6 @@
 
 class Witchcraft {
 
-    static get PATH_TO_SCRIPTS() { return "scripts/"; }
-
     constructor () {
         /** @type {Map<number, Set<string>>} map with number of scripts loaded per tab, with the sole purpose of keeping
          *                                   the badge in the UI up-to-date */
@@ -76,22 +74,25 @@ class Witchcraft {
     }
 
     /**
-     * @param {String} scriptFileName - the file inside the extension folder to load
+     * @param {String} scriptFileName - the script file name to query for
      * @returns {Promise<String>} file contents or null if file does not exist
      */
-    static getFileFromExtensionFolder(scriptFileName) {
+    static queryLocalServerForFile(scriptFileName) {
         return new Promise(resolve => {
             const request = new XMLHttpRequest();
             request.addEventListener("load", function () {
-                // script was found - return its contents
-                resolve(this.responseText);
+                if (this.status === 200) {
+                    // script was found - return its contents
+                    resolve(this.responseText);
+                } else {
+                    resolve(null);
+                }
             });
             request.addEventListener("error", function () {
                 // scripts does not exit
                 resolve(null);
             });
-            const extensionUrl = chrome.runtime.getURL(Witchcraft.PATH_TO_SCRIPTS + scriptFileName);
-            request.open("GET", extensionUrl, true);
+            request.open("GET", "http://127.0.0.1:5743/" + scriptFileName, true);
             request.send();
         });
     }
@@ -122,7 +123,7 @@ class Witchcraft {
      */
     static async handleScriptLoading(domain, scriptType, scriptsSet, sender) {
         const scriptFileName = `${domain}.${scriptType}`;
-        let scriptContents = await Witchcraft.getFileFromExtensionFolder(scriptFileName);
+        let scriptContents = await Witchcraft.queryLocalServerForFile(scriptFileName);
         if (scriptContents) {
             scriptContents = await Witchcraft.processIncludeDirectives(scriptContents, scriptFileName);
             chrome.tabs.sendMessage(sender.tab.id, {
@@ -162,7 +163,7 @@ class Witchcraft {
 
             // check for dependency cycles
             if (!visitedScripts.has(scriptFileName)) {
-                const scriptContent = await Witchcraft.getFileFromExtensionFolder(scriptFileName);
+                const scriptContent = await Witchcraft.queryLocalServerForFile(scriptFileName);
                 if (scriptContent) {
                     originalScript = Witchcraft.spliceString(originalScript, startIndex, endIndex, scriptContent);
                     // put regex caret right where the appended file begins to recursively look for include directives
