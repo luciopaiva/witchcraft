@@ -3,137 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Witchcraft: inject Javascript and CSS</title>
-    <style>
-        :root {
-            --title-color: #c9b320;
-        }
 
-        body {
-            font-family: serif;
-            background-color: #141f1c;
-            color: #949494;
-            font-size: 17pt;
-        }
-
-        .container {
-            margin: auto;
-            width: 1024px;
-
-            position: relative;
-        }
-
-        h1 {
-            color: var(--title-color);
-            font-weight: lighter;
-            font-size: 80pt;
-            text-shadow: 3px 3px #000000;
-            transform: scale(1.1, 1);
-            position: relative;
-            left: 50px;
-            user-select: none;
-        }
-
-        img.witch {
-            position: absolute;
-            width: 100px;
-            left: 520px;
-            animation: flying 1.5s infinite ease-in-out;
-        }
-
-        @keyframes flying {
-            0%   { top: 0;    }
-            50%  { top: 20px; }
-            100% { top: 0;    }
-        }
-
-        img.hat {
-            width: 100px;
-            position: absolute;
-            top: -23px;
-            left: 347px;
-            transform: rotate(-4deg);
-        }
-
-        #header-store-badge {
-            position: absolute;
-            right: 0;
-            top: 20px;
-        }
-
-        img.center {
-            display: block;
-            margin: auto;
-        }
-
-        img.screenshot {
-            display: block;
-            margin: 30px auto;
-        }
-
-        .code {
-            background-color: rgba(255, 255, 255, 0.08);
-            color: #b66ac3;
-            font-family: courier, sans-serif;
-            font-size: 11pt;
-            font-weight: bold;
-            padding: 3px 8px;
-            border-radius: 3px;
-            position: relative;
-            top: -2px;
-        }
-
-        .title {
-            color: var(--title-color);
-        }
-
-        .script-name {
-            color: #a0934b;
-            font-size: 15pt;
-        }
-
-        .code-container {
-            margin: 20px 200px;
-        }
-
-        pre {
-            padding: 10px;
-            background-color: rgba(255, 255, 255, 0.1);
-            font-size: 12pt;
-            color: #bb78f7;
-            border-radius: 10px;
-        }
-
-        hr {
-            border: 0;
-            height: 0;
-            border-top: 1px solid rgba(0, 0, 0, 0.1);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-        }
-
-        .footnote {
-            margin-top: 0;
-            font-size: 12pt;
-            text-align: right;
-        }
-
-        .right {
-            float: right;
-        }
-
-        .left {
-            float: left;
-        }
-
-        a, a:visited, a:hover, a:active {
-            color: white;
-            text-decoration: none;
-        }
-
-        p {
-            font-family: sans-serif;
-            font-size: 15pt;
-        }
-    </style>
+    <link rel="stylesheet" href="index.css">
 </head>
 <body>
 
@@ -142,13 +13,20 @@
     <img class="witch" src="witch.svg" alt="">
     <img class="hat" src="witch-hat.svg" alt="">
 
-    <a id="header-store-badge" href="https://chrome.google.com/webstore/detail/witchcraft-inject-js-and/hokcepcfcicnhalinladgknhaljndhpc?hl=en" target="_blank">
+    <a id="header-store-badge" class="image" href="https://chrome.google.com/webstore/detail/witchcraft-inject-js-and/hokcepcfcicnhalinladgknhaljndhpc?hl=en" target="_blank">
         <img class="store-badge" src="ChromeWebStore_Badge_v2_340x96.png" alt="">
     </a>
 
+    <p class="menu">
+        <a href="how-to-install.html">How to install</a>
+        <a href="https://github.com/luciopaiva/witchcraft" target="_blank">Source code</a>
+    </p>
+
+    <h2>What is it?</h2>
+
     <p>Think Greasemonkey for developers.</p>
 
-    <p><span class="title">Witchcraft</span> is a Google Chrome extension that allows loading custom JavaScript and CSS scripts right from the file system, automatically injecting them into selected pages.</p>
+    <p><span class="title">Witchcraft</span> is a Google Chrome extension that allows loading custom JavaScript and CSS scripts right from your file system, automatically injecting them into target pages.</p>
 
     <p>It works by matching the current page domain against script file names available in the scripts folder. For instance, if one navigates to <span class="code">https://www.google.com</span>, <span class="title">Witchcraft</span> will try to load and run <span class="code">google.com.js</span> and <span class="code">google.com.css</span>.</p>
 
@@ -156,8 +34,8 @@
         <span class="script-name">google.com.js</span>
     <pre>
     window.addEventListener("load" => {
-    document.querySelectorAll("img")
-        .forEach(img => img.style.transform = "scaleX(-1)");
+        document.querySelectorAll("img")
+            .forEach(img => img.style.transform = "scaleX(-1)");
     });
     </pre>
     </div>
@@ -175,13 +53,26 @@
 
     <img class="screenshot" src="elgoog.png" alt="Google inverted and in grayscale">
 
-    <p>It also tries all domain levels. For instance, if one accesses <span class="code">https://gist.github.com</span>, <span class="title">Witchcraft</span> will try to load, in this order: <span class="code">com.js</span>, <span class="code">github.com.js</span> and <span class="code">gist.github.com.js</span>... and the same goes for CSS. All domain levels for which a script is found will be loaded, not just the first one.</p>
+    <p>Actual practical uses include getting rid of nasty ads, automating clicks and improving page layouts with your own CSS rules. You're only limited to what Javascript and CSS can do.</p>
 
-    <p>Whenever you edit or create new scripts, there's no need to reload anything other than the page where the scripts are supposed to run. It makes it way easier than other popular scripting tools, like Greasemonkey or Tampermonkey.</p>
+    <p><span class="title">Witchcraft</span> also looks for scripts on all domain levels. For instance, if one accesses <span class="code">https://gist.github.com</span>, it will try to load, in this order:
 
-    <p><span class="title">Witchcraft</span> works on Windows, Mac and Linux.</p>
+    <ul>
+        <li><span class="code">com.js</span></li>
+        <li><span class="code">com.css</span></li>
+        <li><span class="code">github.com.js</span></li>
+        <li><span class="code">github.com.css</span></li>
+        <li><span class="code">gist.github.com.js</span></li>
+        <li><span class="code">gist.github.com.css</span></li>
+    </ul>
 
-    <a href="https://chrome.google.com/webstore/detail/witchcraft-inject-js-and/hokcepcfcicnhalinladgknhaljndhpc?hl=en" target="_blank">
+    <p>All domain levels for which a script is found will be loaded, not just the first one.</p>
+
+    <p>Whenever you edit or create new scripts, there's no need to reload anything other than the page where the scripts are supposed to run. This is what makes <span class="title">Witchcraft</span> special and different than other popular scripting tools, like Greasemonkey or Tampermonkey.</p>
+
+    <p>Since <span class="title">Witchcraft</span> runs as a Chrome extension, it is also cross-platform. It has been tested on Windows, MacOS and Linux.</p>
+
+    <a class="image" href="https://chrome.google.com/webstore/detail/witchcraft-inject-js-and/hokcepcfcicnhalinladgknhaljndhpc?hl=en" target="_blank">
         <img class="center store-badge" src="ChromeWebStore_Badge_v2_340x96.png" alt="">
     </a>
 
