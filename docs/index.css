@@ -12,10 +12,11 @@ body {
     background-color: #141f1c;
     color: var(--text-color);
     font-size: 17pt;
+    margin: 0;
 }
 
 .container {
-    margin: auto;
+    margin: 50px auto 0 auto;
     width: 1024px;
 
     position: relative;
@@ -30,7 +31,7 @@ h1 {
     position: relative;
     left: 50px;
     user-select: none;
-    margin-bottom: 0;
+    margin: 0;
 }
 
 h3 {
@@ -54,7 +55,7 @@ img.witch {
 img.hat {
     width: 100px;
     position: absolute;
-    top: -23px;
+    top: -39px;
     left: 347px;
     transform: rotate(-4deg);
 }
