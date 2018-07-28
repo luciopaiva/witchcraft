@@ -1,10 +1,4 @@
 
-@font-face {
-    /* "IM Fell English" from https://fonts.google.com */
-    font-family: IMFellEnglish;
-    src: url(IMFeENrm28P.ttf);
-}
-
 :root {
     --text-color: #949494;
     --anchor-color: #a1a1a1;
@@ -26,19 +20,6 @@ body {
     width: 1024px;
 
     position: relative;
-}
-
-h1 {
-    font-family: IMFellEnglish;
-    color: var(--title-color);
-    font-weight: lighter;
-    font-size: 106px;
-    text-shadow: 3px 3px #000000;
-    transform: scale(1.1, 1);
-    position: relative;
-    left: 50px;
-    user-select: none;
-    margin: 0;
 }
 
 h2 {
@@ -64,18 +45,10 @@ img.witch {
     100% { top: 0;    }
 }
 
-img.hat {
-    width: 78px;
-    position: absolute;
-    top: -4px;
-    left: 374px;
-    transform: rotate(6deg);
-}
-
 #header-store-badge {
     position: absolute;
     right: 0;
-    top: 20px;
+    top: 12px;
 }
 
 img.center {
@@ -86,7 +59,7 @@ img.center {
 img.screenshot {
     display: block;
     margin: 30px auto;
-    border-radius: 10px;
+    border-radius: 4px;
 }
 
 .code {
@@ -119,7 +92,7 @@ pre {
     background-color: rgba(255, 255, 255, 0.1);
     font-size: 12pt;
     color: var(--secondary-color);
-    border-radius: 10px;
+    border-radius: 4px;
 }
 
 hr {
