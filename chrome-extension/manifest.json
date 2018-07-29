@@ -19,7 +19,8 @@
       "64": "witch-64.png",
       "128": "witch-128.png"
     },
-    "default_title": "Witchcraft"
+    "default_title": "Witchcraft",
+    "default_popup": "popup.html"
   },
   "content_scripts": [{
     "all_frames": true,

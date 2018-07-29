@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Witchcraft</title>
+
+    <style>
+        :root {
+            --background-color: #141f1c;
+            --background-color-lighter: #3b4243;
+            --primary-color: #c9b320;
+            --secondary-color: #b66ac3;
+            --text-color: #bebebe;
+            --js-color: #eddd51;
+            --js-text-color: black;
+            --css-color: #3d91f2;
+            --css-text-color: white;
+            --server-online-fill: #00ff00;
+            --server-online-stroke: #00ff00;
+            --server-offline-fill: #ff0000;
+            --server-offline-stroke: #d20000;
+        }
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+        }
+        .hidden {
+            display: none;
+        }
+        .container > div {
+            margin: 4px 8px;
+        }
+        #no-scripts {
+            text-align: center;
+        }
+        table.scripts {
+            --margin: 4px;
+            margin: var(--margin);
+            width: calc(100% - 2 * var(--margin));
+        }
+        td.js, td.css {
+            text-align: center;
+            font-size: 10px;
+            font-weight: bold;
+        }
+        td.js {
+            background-color: var(--js-color);
+            color: var(--js-text-color);
+        }
+        td.css {
+            background-color: var(--css-color);
+            color: var(--css-text-color);
+        }
+        .container {
+            min-width: 200px;
+            font-family: monospace;
+        }
+        .header {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            height: 10px;
+            font-size: 10px;
+            padding: 6px;
+
+            background-color: var(--background-color-lighter);
+        }
+        .header > .title {
+            flex: 1 0 0;
+        }
+        #server-status {
+            height: 4px;
+            width: 4px;
+            border-radius: 3px;
+            border: 1px solid var(--server-online-stroke);
+            background-color: var(--server-online-fill);
+            display: inline-block;
+        }
+        #server-status.offline {
+            border: 1px solid var(--server-offline-stroke);
+            background-color: var(--server-offline-fill);
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div class="title">Witchcraft</div>
+    <div>server: <div id="server-status"></div></div>
+</div>
+
+<div class="container">
+    <div id="no-scripts">No scripts found</div>
+    <table id="scripts-table" class="scripts"></table>
+</div>
+
+<script src="popup.js"></script>
+</body>
+</html>
