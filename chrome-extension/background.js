@@ -7,10 +7,12 @@
 /**
  * @class chrome
  * @property runtime.onMessage.addListener
- * @property runtime.getURL
+ * @property chrome.extension.getURL
  * @property tabs.onActivated
  * @property tabs.sendMessage
  * @property browserAction.setBadgeText
+ * @property chrome.browserAction.setIcon
+ * @property chrome.browserAction.setTitle
  */
 /**
  * // https://developer.chrome.com/extensions/tabs#type-Tab
@@ -27,16 +29,30 @@
 class Witchcraft {
 
     constructor () {
+        this.serverPort = 5743;
+        this.serverAddress = `http://127.0.0.1:${this.serverPort}/`;
+        /** @type {Boolean} */
+        this.isServerReachable = true;
+
         /** @type {Map<number, Set<string>>} map with number of scripts loaded per tab, with the sole purpose of keeping
          *                                   the badge in the UI up-to-date */
         this.scriptsLoadedByTabId = new Map();
+        this.currentTabId = -1;
+
+        this.iconSize = 16;
+        this.iconCanvas = document.createElement("canvas");
+        this.iconCanvas.width = this.iconSize;
+        this.iconCanvas.height = this.iconSize;
+        this.iconContext = this.iconCanvas.getContext("2d");
+        this.iconImage = new Image();
+        this.iconImage.src = chrome.extension.getURL("/witch-16.png");
 
         // listen for script/stylesheet requests
         chrome.runtime.onMessage.addListener(this.retrieveRelevantScripts.bind(this));
 
         // listen for tab switches
         chrome.tabs.onActivated.addListener(
-            /** @type {{tabId: number}} */ activeInfo => this.updateIconBadge(activeInfo.tabId));
+            /** @type {{tabId: number}} */ activeInfo => this.updateInterface(activeInfo.tabId));
     }
 
     /**
@@ -77,22 +93,31 @@ class Witchcraft {
      * @param {String} scriptFileName - the script file name to query for
      * @returns {Promise<String>} file contents or null if file does not exist
      */
-    static queryLocalServerForFile(scriptFileName) {
+    queryLocalServerForFile(scriptFileName) {
+        const self = this;
+
         return new Promise(resolve => {
             const request = new XMLHttpRequest();
             request.addEventListener("load", function () {
+                self.isServerReachable = true;
+
                 if (this.status === 200) {
                     // script was found - return its contents
                     resolve(this.responseText);
+                } else if (this.status === 404) {
+                    resolve(null);
                 } else {
+                    // bad response - assume server is down
+                    self.isServerReachable = false;
                     resolve(null);
                 }
             });
             request.addEventListener("error", function () {
-                // scripts does not exit
+                // bad response - assume server is down
+                self.isServerReachable = false;
                 resolve(null);
             });
-            request.open("GET", "http://127.0.0.1:5743/" + scriptFileName, true);
+            request.open("GET", this.serverAddress + scriptFileName, true);
             request.send();
         });
     }
@@ -107,11 +132,11 @@ class Witchcraft {
         const scriptsSet = this.obtainScriptsSetForSender(sender);
 
         for (const domain of Witchcraft.iterateDomainLevels(hostName)) {
-            await Witchcraft.handleScriptLoading(domain, "js", scriptsSet, sender);
-            await Witchcraft.handleScriptLoading(domain, "css", scriptsSet, sender);
+            await this.handleScriptLoading(domain, "js", scriptsSet, sender);
+            await this.handleScriptLoading(domain, "css", scriptsSet, sender);
         }
 
-        this.updateIconBadge(sender.tab.id);
+        this.updateInterface(sender.tab.id);
     }
 
     /**
@@ -121,11 +146,11 @@ class Witchcraft {
      * @param {MessageSender} sender - the sender context of the content script that called us
      * @returns {Promise<void>}
      */
-    static async handleScriptLoading(domain, scriptType, scriptsSet, sender) {
+    async handleScriptLoading(domain, scriptType, scriptsSet, sender) {
         const scriptFileName = `${domain}.${scriptType}`;
-        let scriptContents = await Witchcraft.queryLocalServerForFile(scriptFileName);
+        let scriptContents = await this.queryLocalServerForFile(scriptFileName);
         if (scriptContents) {
-            scriptContents = await Witchcraft.processIncludeDirectives(scriptContents, scriptFileName);
+            scriptContents = await this.processIncludeDirectives(scriptContents, scriptFileName);
             chrome.tabs.sendMessage(sender.tab.id, {
                 scriptType,
                 scriptContents,
@@ -145,12 +170,13 @@ class Witchcraft {
      * @param {String} originalScriptFileName - name of the raw script
      * @return {Promise<String>} - processed script
      */
-    static async processIncludeDirectives(originalScript, originalScriptFileName) {
+    async processIncludeDirectives(originalScript, originalScriptFileName) {
         const visitedScripts = new Set();
         visitedScripts.add(originalScriptFileName);
 
         let result;
         const includeDirective = /^[ \t]*\/\/[ \t]*@include[ \t]*(".*?"|\S+).*$/mg;
+        // noinspection JSValidateTypes
         while ((result = includeDirective.exec(originalScript)) !== null) {
             const fullMatchStr = result[0];
 
@@ -163,7 +189,7 @@ class Witchcraft {
 
             // check for dependency cycles
             if (!visitedScripts.has(scriptFileName)) {
-                const scriptContent = await Witchcraft.queryLocalServerForFile(scriptFileName);
+                const scriptContent = await this.queryLocalServerForFile(scriptFileName);
                 if (scriptContent) {
                     originalScript = Witchcraft.spliceString(originalScript, startIndex, endIndex, scriptContent);
                     // put regex caret right where the appended file begins to recursively look for include directives
@@ -199,15 +225,56 @@ class Witchcraft {
     }
 
     /**
-     * Update the icon badge with the number of scripts loaded by the currently active Chrome tab.
+     * Redraws extension icon with loaded script count for current tab. Also shows a red exclamation mark if file server
+     * is not reachable.
+     *
+     * Better than using chrome.browserAction.setBadgeText(). Not only text color is not configurable, it also restricts
+     * font size, positioning, etc.
+     *
+     * @param {Number} count
+     */
+    updateIconWithScriptCount(count) {
+        this.iconContext.clearRect(0, 0, this.iconSize, this.iconSize);
+        this.iconContext.drawImage(this.iconImage, 0, 0);
+
+        this.iconContext.font = "9px arial";
+        this.iconContext.textAlign = "right";
+        this.iconContext.fillStyle = "#00FF00";
+        this.iconContext.fillText(count.toString(), this.iconSize, this.iconSize);
+
+        if (!this.isServerReachable) {
+            this.iconContext.font = "bold 20px serif";
+            this.iconContext.textAlign = "left";
+            this.iconContext.fillStyle = "#FF0000";
+            this.iconContext.fillText("!", 0, this.iconSize);
+        }
+
+        chrome.browserAction.setIcon({ imageData: this.iconContext.getImageData(0, 0, this.iconSize, this.iconSize) });
+    }
+
+    /**
+     * Updates the icon badge and popup with information about scripts loaded by the currently active Chrome tab.
      *
      * @param {number} tabId - the id of the tab for which the badge should reflect the number of scripts loaded
      */
-    updateIconBadge(tabId) {
+    updateInterface(tabId) {
+        // this will be used by the popup when it's opened
+        this.currentTabId = tabId;
+
         const scripts = this.scriptsLoadedByTabId.get(tabId);
-        const countStr = scripts ? scripts.size.toString() : '';
-        chrome.browserAction.setBadgeText({ text: countStr });
+        const count = scripts ? scripts.size : 0;
+
+        this.updateIconWithScriptCount(count);
+
+        const countStr = count.toString();
+        const title = `Witchcraft (${count === 0 ? "no" : countStr} script${count === 1 ? "" : "s"} loaded)`;
+        chrome.browserAction.setTitle({ title: title});
+    }
+
+    getLoadedScriptNames() {
+        return this.scriptsLoadedByTabId.get(this.currentTabId);
     }
 }
 
-new Witchcraft();
+// bind it to window so it can be accessed from the popup screen
+window.witchcraft = new Witchcraft();
