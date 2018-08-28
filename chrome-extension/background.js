@@ -34,9 +34,9 @@ class Witchcraft {
         /** @type {Boolean} */
         this.isServerReachable = true;
 
-        /** @type {Map<number, Set<string>>} map with number of scripts loaded per tab, with the sole purpose of keeping
+        /** @type {Map<number, Set<string>>} map with set of scripts loaded per tab, with the sole purpose of keeping
          *                                   the badge in the UI up-to-date */
-        this.scriptsLoadedByTabId = new Map();
+        this.scriptNamesByTabId = new Map();
         this.currentTabId = -1;
 
         this.iconSize = 16;
@@ -48,7 +48,7 @@ class Witchcraft {
         this.iconImage.src = chrome.extension.getURL("/witch-16.png");
 
         // listen for script/stylesheet requests
-        chrome.runtime.onMessage.addListener(this.retrieveRelevantScripts.bind(this));
+        chrome.runtime.onMessage.addListener(this.onScriptRequest.bind(this));
 
         // listen for tab switches
         chrome.tabs.onActivated.addListener(
@@ -57,21 +57,28 @@ class Witchcraft {
 
     /**
      * @param {MessageSender} sender - the sender context of the content script that called us
-     * @returns {Set<String>}
      */
-    obtainScriptsSetForSender(sender) {
-        let scripts = this.scriptsLoadedByTabId.get(sender.tab.id);
-        if (!scripts) {
-            scripts = new Set();
-            this.scriptsLoadedByTabId.set(sender.tab.id, scripts);
-        }
-
+    clearScriptsIfTopFrame(sender) {
         if (sender.frameId === 0) {
             // this is the top frame; assume the tab is being reloaded and take the chance to reset its counter
-            scripts.clear();
+            const scripts = this.scriptNamesByTabId.get(sender.tab.id);
+            if (scripts) {
+                scripts.clear();
+            }
         }
+    }
 
-        return scripts;
+    /**
+     * @param {String} scriptFileName
+     * @param {Number} tabId
+     */
+    registerScriptForTabId(scriptFileName, tabId) {
+        let scripts = this.scriptNamesByTabId.get(tabId);
+        if (!scripts) {
+            scripts = new Set();
+            this.scriptNamesByTabId.set(tabId, scripts);
+        }
+        scripts.add(scriptFileName);
     }
 
     /**
@@ -128,12 +135,12 @@ class Witchcraft {
      * @param {String} hostName - the host name of the tab being loaded
      * @param {MessageSender} sender - the sender context of the content script that called us
      */
-    async retrieveRelevantScripts(hostName, sender) {
-        const scriptsSet = this.obtainScriptsSetForSender(sender);
+    async onScriptRequest(hostName, sender) {
+        this.clearScriptsIfTopFrame(sender);
 
         for (const domain of Witchcraft.iterateDomainLevels(hostName)) {
-            await this.handleScriptLoading(domain, "js", scriptsSet, sender);
-            await this.handleScriptLoading(domain, "css", scriptsSet, sender);
+            await this.loadScript(domain, "js", sender);
+            await this.loadScript(domain, "css", sender);
         }
 
         this.updateInterface(sender.tab.id);
@@ -142,11 +149,10 @@ class Witchcraft {
     /**
      * @param {String} domain
      * @param {String} scriptType - either "js" or "css"
-     * @param {Set<String>} scriptsSet - set of scripts to update if this script is successfully loaded
      * @param {MessageSender} sender - the sender context of the content script that called us
      * @returns {Promise<void>}
      */
-    async handleScriptLoading(domain, scriptType, scriptsSet, sender) {
+    async loadScript(domain, scriptType, sender) {
         const scriptFileName = `${domain}.${scriptType}`;
         let scriptContents = await this.queryLocalServerForFile(scriptFileName);
         if (scriptContents) {
@@ -157,7 +163,7 @@ class Witchcraft {
             }, {
                 frameId: sender.frameId
             });
-            scriptsSet.add(scriptFileName);
+            this.registerScriptForTabId(scriptFileName, sender.tab.id);
         }
     }
 
@@ -261,7 +267,7 @@ class Witchcraft {
         // this will be used by the popup when it's opened
         this.currentTabId = tabId;
 
-        const scripts = this.scriptsLoadedByTabId.get(tabId);
+        const scripts = this.scriptNamesByTabId.get(tabId);
         const count = scripts ? scripts.size : 0;
 
         this.updateIconWithScriptCount(count);
@@ -271,8 +277,13 @@ class Witchcraft {
         chrome.browserAction.setTitle({ title: title});
     }
 
+    /**
+     * Used by the popup window to show badge with count.
+     *
+     * @returns {Set<string>}
+     */
     getLoadedScriptNames() {
-        return this.scriptsLoadedByTabId.get(this.currentTabId);
+        return this.scriptNamesByTabId.get(this.currentTabId);
     }
 }
 
