@@ -24,7 +24,6 @@
     const noScriptsElement = document.getElementById("no-scripts");
 
     const scriptNames = witchcraft.getLoadedScriptNames();
-    console.info(scriptNames);
 
     if (scriptNames && scriptNames.size > 0) {
         noScriptsElement.classList.add("hidden");
