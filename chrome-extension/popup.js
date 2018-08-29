@@ -23,7 +23,7 @@
     const scriptsTable = document.getElementById("scripts-table");
     const noScriptsElement = document.getElementById("no-scripts");
 
-    const scriptNames = witchcraft.getLoadedScriptNames();
+    const scriptNames = witchcraft.getCurrentTabScriptNames();
 
     if (scriptNames && scriptNames.size > 0) {
         noScriptsElement.classList.add("hidden");

@@ -29,7 +29,7 @@
     "js":         ["content-script.js"]
   }],
   "background": {
-    "scripts": ["background.js"],
+    "scripts": ["witchcraft.js", "background.js"],
     "persistent": true
   },
   "permissions": [
