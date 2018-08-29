@@ -1,7 +1,7 @@
 
 const
     assert = require("assert"),
-    {describe, it, setup} = require("mocha"),
+    {describe, it, setup, teardown} = require("mocha"),
     sinon = require("sinon"),
     chrome = require("sinon-chrome"),
     Witchcraft = require("../chrome-extension/witchcraft");
@@ -23,6 +23,11 @@ describe("Witchcraft", function () {
             tab: { id: tabId },
             frameId: 0
         };
+    });
+
+    teardown(function () {
+        chrome.browserAction.setTitle.resetHistory();
+        chrome.tabs.sendMessage.resetHistory();
     });
 
     it ("should correctly iterate domain levels", function () {
