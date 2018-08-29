@@ -153,6 +153,9 @@ class Witchcraft {
     async onScriptRequest(hostName, sender) {
         this.clearScriptsIfTopFrame(sender);
 
+        await this.loadScript(Witchcraft.globalScriptName, "js", sender);
+        await this.loadScript(Witchcraft.globalScriptName, "css", sender);
+
         for (const domain of Witchcraft.iterateDomainLevels(hostName)) {
             await this.loadScript(domain, "js", sender);
             await this.loadScript(domain, "css", sender);
@@ -311,6 +314,10 @@ class Witchcraft {
      */
     getScriptNamesForTabId(tabId) {
         return this.scriptNamesByTabId.get(tabId) || this.emptySet;
+    }
+
+    static get globalScriptName() {
+        return "_global";
     }
 }
 

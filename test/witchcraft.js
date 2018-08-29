@@ -103,4 +103,35 @@ describe("Witchcraft", function () {
             }
         ]);
     });
+
+    it("should fetch all relevant scripts for hostname", async function () {
+        const tabId = 42;
+        const sampleCode = "// some javascript code";
+        const globalJs = Witchcraft.globalScriptName + ".js";
+        const globalCss = Witchcraft.globalScriptName + ".css";
+        const witchcraft = new Witchcraft(chrome, undefined);
+
+        sinon.stub(witchcraft, "queryLocalServerForFile").resolves(sampleCode);
+
+        const sender = {
+            tab: { id: tabId },
+            frameId: 0
+        };
+
+        await witchcraft.onScriptRequest("google.com", sender);
+
+        const calls = witchcraft.queryLocalServerForFile.getCalls();
+
+        // must have made a total of 6 of calls: [global, google.com, com] x [js, css]
+        assert.strictEqual(calls.length, 6);
+        for (const call of calls) {
+            assert.strictEqual(call.args.length, 1);
+        }
+
+        const actualScriptNames = calls.map(call => call.args[0]);
+        assert.deepStrictEqual(actualScriptNames, [
+            globalJs, globalCss,
+            "com.js", "com.css",
+            "google.com.js", "google.com.css"]);
+    });
 });
