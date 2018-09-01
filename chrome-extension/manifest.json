@@ -1,9 +1,9 @@
 {
-  "name": "Witchcraft: Inject JS and CSS",
+  "name": "Witchcraft: JS/CSS injector",
   "short_name": "Witchcraft",
   "manifest_version": 2,
   "version": "2.3.0",
-  "description": "Inject Javascript and CSS right from your home folder. It's GreaseMonkey for developers!",
+  "description": "Witchcraft loads custom Javascript and CSS directly from a folder in your file system. Think GreaseMonkey for more advanced users.",
   "icons": {
     "16": "witch-16.png",
     "24": "witch-24.png",
