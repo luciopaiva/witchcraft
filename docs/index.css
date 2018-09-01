@@ -2,7 +2,7 @@
 :root {
     --background-color: #141f1c;
     --text-color: #b4b4b4;
-    --anchor-color: #a1a1a1;
+    --anchor-color: #c9b320;
     --title-color: #c9b320;
     --primary-color: var(--title-color);
     --secondary-color: #b66ac3;
@@ -103,7 +103,6 @@ hr {
 
 a, a:visited, a:hover, a:active {
     text-decoration: none;
-    border-bottom: 1px solid;
     color: var(--anchor-color);
 }
 
@@ -128,26 +127,13 @@ p.note {
 p.menu {
     text-align: center;
     margin: 40px 0;
+    padding: 5px 0;
+    border-top: 1px solid var(--secondary-color-darker);
+    border-bottom: 1px solid var(--secondary-color-darker);
 }
 
-p.menu a {
-    margin: 0 10px;
-    font-size: 12pt;
-    border: 1px solid var(--text-color);
-    border-radius: 3px;
-    padding: 6px 12px;
-    text-decoration: none;
-    background-color: var(--text-color);
-    color: var(--background-color);
-    box-shadow: black 0 1px 3px;
-}
-
-p.menu a:hover {
-    color: black;
-    background-color: #c7c7c7;
-    text-decoration: none;
-    position: relative;
-    top: -1px;
+p.menu-bottom {
+    border: none;
 }
 
 section {
@@ -156,4 +142,14 @@ section {
 
 li {
     line-height: 1.5em;
+    margin-top: 10px;
+}
+
+p.question {
+    margin: 30px 0 0 0;
+    font-size: 20px;
+}
+
+p.answer {
+    margin-top: 10px;
 }

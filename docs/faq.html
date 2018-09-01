@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Witchcraft: How to install and use</title>
+    <title>Witchcraft: Frequently asked questions</title>
 
     <link rel="stylesheet" href="index.css">
 </head>
@@ -17,37 +17,28 @@
     <p class="menu">
         <a href="index.html">Home</a>
         &#x26B9;
-        <a href="faq.html">FAQ</a>
+        <a href="how-to-install.html">How to install</a>
     </p>
 
     <article>
-        <h2>How to install and use</h2>
+        <h2>Frequently Asked Questions</h2>
 
-        <p>Follow these steps:</p>
+        <p class="question">Q: Where should I put my Witchcraft scripts?</p>
 
-        <ol>
-            <li>Install Witchcraft Chrome extension: get it <a href="//chrome.google.com/webstore/detail/witchcraft-inject-js-and/hokcepcfcicnhalinladgknhaljndhpc" target="_blank">here</a></li>
-            <li>Install Web Server Chrome app: get it <a href="//chrome.google.com/webstore/detail/web-server-for-chrome/ofhbbkphhbklhfoeikjpcbhemlocgigb" target="_blank">here</a></li>
-            <li>Choose a folder where your scripts will live. For instance, <span class="code">~/witchcraft-scripts</span> (create it now if it doesn't exist yet)</li>
-            <li>Open Web Server Chrome app configuration window. Go to the chrome://apps/ window and open it. It looks like this: <br>
-                <img class="screenshot" src="web-server-icon.png" alt="Web Server icon">
-            </li>
-            <li>Configure Web Server Chrome app
-                <img class="screenshot" src="web-server-configuration.png" alt="Web Server Chrome app configuration window">
-                <ol>
-                    <li>Click the <span class="code">CHOOSE FOLDER</span> button and select the folder you chose in step 3</li>
-                    <li>Toggle on the server if it isn't yet (should say <i>Web Server: STARTED</i>)</li>
-                    <li>Mark <i>Run in background</i></li>
-                    <li>Mark <i>Start on login</i></li>
-                    <li>On <i>Enter Port</i>, write <span class="code">5743</span></li>
-                </ol>
-            </li>
-            <li>Restart Chrome for the changes to apply and Witchcraft should be working now. Head to <a href="http://localhost:5743/" target="_blank">http://localhost:5743/</a> and you should see your list of scripts (or an empty folder if you haven't added any scripts yet!)</li>
-        </ol>
+        <p class="answer">A: You must put them in the same folder being served by Web Server Chrome app. Read full instructions <a
+                href="how-to-install.html" target="_blank">here</a>.</p>
 
-        <p>To test it, create some script, put it in the selected folder and try it!</p>
-        
-        <p>Note: if the instructions didn't work for any reason, you can get help by posting you problem <a href="https://github.com/luciopaiva/witchcraft/issues" target="_blank">here</a>.</p>
+        <p class="question">Q: Why do I need to install Web Server Chrome app?</p>
+
+        <p class="answer">A: Witchcraft will look for scripts in <span class="code">http://127.0.0.1:5743</span> (e.g., <span class="code">http://127.0.0.1:5743/github.com.js</span>). It doesn't have its own web server, that's why it depends on Web Server Chrome app. You don't need to use Web Server Chrome app if you don't want to, as long as you replace it with another local web server listening on port 5743 and serving static files from your Witchcraft scripts folder. For a comprehensive list of local server options, check this <a href="//gist.github.com/willurd/5720255" target="_blank">gist</a>.</p>
+
+        <p class="question">Q: But couldn't Witchcraft spawn its own local web server?</p>
+
+        <p class="answer">A: No. It is a Chrome <i>extension</i>. Chrome extensions don't have permission to access your file system. You need a Chrome <i>app</i> for that, but it turns out Chrome apps are no longer being supported by Google. This means you can't publish any new Chrome apps. However, existing Chrome apps (like the <i>Web Server Chrome app</i>) are still being supported, so it's ok to rely on them.</p>
+
+        <p class="question">Q: Can I install Witchcraft from sources instead?</p>
+
+        <p class="answer">Yes, you can install Witchcraft directly from sources instead of downloading it from the Chrome store. Look for the extension source under the folder `/chrome-extension` and manually load it as an unpacked extension. If you don't know how to load unpacked extensions in Chrome, just google it; it's very easy.</p>
 
     </article>
 
