@@ -1,7 +1,7 @@
 
 chrome.runtime.onMessage.addListener(({scriptType, scriptContents}) => {
     if (scriptType === "js") {
-        eval(scriptContents);
+        Function(scriptContents)();
     } else if (scriptType === "css") {
         const style = document.createElement('style');
         style.type = 'text/css';
