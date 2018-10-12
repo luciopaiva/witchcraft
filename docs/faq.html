@@ -36,9 +36,20 @@
 
         <p class="answer">A: No. It is a Chrome <i>extension</i>. Chrome extensions don't have permission to access your file system. You need a Chrome <i>app</i> for that, but it turns out Chrome apps are no longer being supported by Google. This means you can't publish any new Chrome apps. However, existing Chrome apps (like the <i>Web Server Chrome app</i>) are still being supported, so it's ok to rely on them.</p>
 
+        <p class="question">Q: When exactly my script gets loaded?</p>
+
+        <p class="answer">A: It's loaded at <a href="https://developer.chrome.com/extensions/content_scripts" target="_blank">document_start</a>. This is after any css files, but before any other DOM is constructed or any other script is run. If you need, you can wait for
+            <a href="https://developer.mozilla.org/en-US/docs/Web/Events/DOMContentLoaded" target="_blank">DOMContentLoaded</a> or
+            the <a href="https://developer.mozilla.org/en-US/docs/Web/Events/load" target="_blank">window load event</a>.</p>
+
+        <p class="question">Q: I'm unable to read custom properties from or change the window object. What is wrong?</p>
+
+        <p class="answer">A: Scripts can't directly access the window object. This is a restriction imposed by the Chrome extension API. You can, however,
+            <a href="https://stackoverflow.com/q/12395722/778272" target="_blank">work around it</a> easily.</p>
+
         <p class="question">Q: Can I install Witchcraft from sources instead?</p>
 
-        <p class="answer">Yes, you can install Witchcraft directly from sources instead of downloading it from the Chrome store. Look for the extension source under the folder `/chrome-extension` and manually load it as an unpacked extension. If you don't know how to load unpacked extensions in Chrome, just google it; it's very easy.</p>
+        <p class="answer">A: Yes, you can install Witchcraft directly from sources instead of downloading it from the Chrome store. Look for the extension source under the folder `/chrome-extension` and manually load it as an unpacked extension. If you don't know how to load unpacked extensions in Chrome, just google it; it's very easy.</p>
 
     </article>
 
