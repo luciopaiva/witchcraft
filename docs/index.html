@@ -108,7 +108,9 @@
 
         <p>You may add multiple directives to the same script. If your script name contains spaces, you can use double quotes to refer to it (see example above).</p>
 
-        <p>This directive may also be useful to include third-party libraries, like jQuery.</p>
+        <p>Included scripts can also contain <span class="code">@include</span> directives as well, since the parser will recursively iterate through all files. Dependency cycles (e.g., <span class="code">foo.js</span> includes <span class="code">bar.js</span>, which includes <span class="code">foo.js</span>) will be automatically resolved and each script won't be loaded more than once.</p>
+
+        <p>This directive may be useful for including third-party libraries, like jQuery.</p>
 
     </article>
 
