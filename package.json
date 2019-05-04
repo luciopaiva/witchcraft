@@ -11,7 +11,9 @@
   },
   "nyc": {
     "all": true,
-    "include": ["chrome-extension/*.js"]
+    "include": [
+      "chrome-extension/*.js"
+    ]
   },
   "repository": {
     "type": "git",
@@ -27,7 +29,7 @@
   "dependencies": {},
   "devDependencies": {
     "mocha": "^5.2.0",
-    "nyc": "^13.0.1",
+    "nyc": "^14.1.0",
     "sinon": "^6.1.5",
     "sinon-chrome": "^2.3.2"
   }
