@@ -45,13 +45,13 @@ body {
 }
 
 h2 {
+    margin-top: 40px;
     font-size: 26px;
 }
 
 h3 {
-    font-size: 22px;
+    font-size: 20px;
     margin: 40px 0 0 0;
-    color: var(--anchor-color);
 }
 
 .gist {
@@ -126,7 +126,7 @@ p.note {
 
 p.menu {
     text-align: center;
-    margin: 40px 0;
+    margin: 40px 0 0 0;
     padding: 5px 0;
     border-top: 1px solid var(--secondary-color-darker);
     border-bottom: 1px solid var(--secondary-color-darker);

@@ -46,11 +46,46 @@
 
         <p>Actual practical uses include getting rid of nasty ads, automating clicks and improving page layouts with your own CSS rules. You're only limited to what Javascript and CSS can do.</p>
 
-        <p>Witchcraft also looks for scripts on all domain levels. For instance, if one accesses <span class="code">https://gist.github.com</span>, it will try to load any combination of the following files, in this order:
+        <h2>Main features</h2>
 
         <ul>
-            <li><span class="code">_global.js</span></li>
-            <li><span class="code">_global.css</span></li>
+            <li>
+                <b>Javascript and CSS</b>
+
+                <p>Witchcraft is not only able to run Javascript, but also CSS;</p>
+            </li>
+
+            <li>
+                <b>Script changes are seamless</b>
+
+                <p>Whenever you edit or create new scripts, there's no need to reload anything other than the page where the scripts are supposed to run. This is what makes Witchcraft special and different from other popular scripting tools, like Greasemonkey or Tampermonkey;</p>
+            </li>
+
+            <li>
+                <b>Cross-platform</b>
+
+                <p>Since Witchcraft runs as a Chrome extension, it is also cross-platform. It has been tested on Windows, MacOS and Linux;</p>
+            </li>
+
+            <li>
+                <b>Runs on all frames</b>
+
+                <p>Witchcraft is listening for pages loading everywhere, not just on the top frame. This means it will run even on pages loaded inside other pages.</p>
+            </li>
+
+        </ul>
+
+        <h2>How to use</h2>
+
+        <p>Once your environment is ready (see <a href="how-to-install.html">installation instructions</a>), simply start creating your scripts and adding them to the scripts folder. If you'd like to run some script every time you enter github.com, just go ahead and create <span class="code">github.com.js</span>. Then head to <span class="code">github.com</span> (or refresh the page if it's already open) and the script will run immediately.</p>
+
+        <h3>Domain level scripts</h3>
+
+        <p>Witchcraft also looks for scripts on all domain levels. For instance, if one accesses <span class="code">https://gist.github.com</span>, it will try to load any combination of the following files, in this very order:
+
+        <ul>
+            <li><span class="code">_global.js</span> <i>(see next section for more details)</i></li>
+            <li><span class="code">_global.css</span> <i>(see next section for more details)</i></li>
             <li><span class="code">com.js</span></li>
             <li><span class="code">com.css</span></li>
             <li><span class="code">github.com.js</span></li>
@@ -59,13 +94,22 @@
             <li><span class="code">gist.github.com.css</span></li>
         </ul>
 
-        <p><i><span class="code">_global</span> scripts were added in version 2.3.0. If present, they will load for every web site independently of the host name.</i></p>
+        <p>Every script found is directly executed in the current page context.</p>
 
-        <p>Whenever you edit or create new scripts, there's no need to reload anything other than the page where the scripts are supposed to run. This is what makes Witchcraft special and different from other popular scripting tools, like Greasemonkey or Tampermonkey.</p>
+        <h3>Global scripts</h3>
 
-        <p>Witchcraft is listening for pages loading everywhere, not just on the top frame. This means it will run even on pages loaded inside other pages.</p>
+        <p>If present, <span class="code">_global.js</span> and <span class="code">_global.css</span> scripts (added in version 2.3.0) will load for every web site, independently of the host name. Useful if you have some setup routine common to all your scripts.</p>
 
-        <p>Since Witchcraft runs as a Chrome extension, it is also cross-platform. It has been tested on Windows, MacOS and Linux.</p>
+        <h3>Including other scripts</h3>
+
+        <p>It's also possible to include scripts in your main script using the <span class="code">@include</span> directive. To use it, simply add a line comment to your main script naming the other script and it will be inserted right where the <span class="code">@include</span> directive was found. Example:</p>
+
+        <script src="https://gist.github.com/luciopaiva/7c60f377f997aa6b2f3db565058e116b.js"></script>
+
+        <p>You may add multiple directives to the same script. If your script name contains spaces, you can use double quotes to refer to it (see example above).</p>
+
+        <p>This directive may also be useful to include third-party libraries, like jQuery.</p>
+
     </article>
 
     <p class="menu menu-bottom">
@@ -74,7 +118,7 @@
 
     <hr>
 
-    <p class="footnote right">Made by <a href="//luciopaiva.com" target="_blank">Lucio Paiva</a> - July 2018</p>
+    <p class="footnote right">Made by <a href="//luciopaiva.com" target="_blank">Lucio Paiva</a></p>
     <p class="footnote left">View <a href="//github.com/luciopaiva/witchcraft" target="_blank">source</a> on GitHub</p>
 </div>
 
