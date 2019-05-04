@@ -37,6 +37,10 @@
         <p class="answer">A: You must put them in the same folder being served by Web Server Chrome app. Read full instructions <a
                 href="how-to-install.html" target="_blank">here</a>.</p>
 
+        <p class="question">Q: How to add jQuery to my scripts?</p>
+
+        <p class="answer">A: Use the <span class="code">@include</span> directive as described in "Including other scripts" <a href="index.html#include-directive">here</a>. jQuery must be downloaded and added to your scripts folder so the directive can find it.</p>
+
         <p class="question">Q: Why do I need to install Web Server Chrome app?</p>
 
         <p class="answer">A: Witchcraft will look for scripts in <span class="code">http://127.0.0.1:5743</span> (e.g., <span class="code">http://127.0.0.1:5743/github.com.js</span>). It doesn't have its own web server, that's why it depends on Web Server Chrome app. You don't need to use Web Server Chrome app if you don't want to, as long as you replace it with another local web server listening on port 5743 and serving static files from your Witchcraft scripts folder. For a comprehensive list of local server options, check this <a href="//gist.github.com/willurd/5720255" target="_blank">gist</a>.</p>
