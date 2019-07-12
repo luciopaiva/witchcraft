@@ -29,8 +29,8 @@
   "dependencies": {},
   "devDependencies": {
     "mocha": "^5.2.0",
-    "nyc": "^14.1.0",
-    "sinon": "^6.1.5",
+    "nyc": "^14.1.1",
+    "sinon": "^6.3.5",
     "sinon-chrome": "^2.3.2"
   }
 }
