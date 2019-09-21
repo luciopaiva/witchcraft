@@ -28,9 +28,9 @@
   "homepage": "https://github.com/luciopaiva/witchcraft#readme",
   "dependencies": {},
   "devDependencies": {
-    "mocha": "^5.2.0",
+    "mocha": "^6.2.0",
     "nyc": "^14.1.1",
-    "sinon": "^6.3.5",
-    "sinon-chrome": "^2.3.2"
+    "sinon": "^7.4.2",
+    "sinon-chrome": "^3.0.1"
   }
 }
