@@ -33,35 +33,33 @@
         <h2>Frequently Asked Questions</h2>
 
         <p class="question">Q: Where should I put my Witchcraft scripts?</p>
-
         <p class="answer">A: You must put them in the same folder being served by Web Server Chrome app. Read full instructions <a
                 href="how-to-install.html" target="_blank">here</a>.</p>
 
         <p class="question">Q: How to add jQuery to my scripts?</p>
-
-        <p class="answer">A: Use the <span class="code">@include</span> directive as described in "Including other scripts" <a href="index.html#include-directive">here</a>. jQuery must be downloaded and added to your scripts folder so the directive can find it.</p>
+        <p class="answer">A: Use the <span class="code">@include</span> directive as described in "Including other scripts" <a href="index.html#include-directive">here</a>. jQuery must be downloaded and added to your scripts folder so the directive can find it. However, if you allow me to give you a suggestion, stop using jQuery unless you really need to. Most things nowadays can be easily done in pure Javascript. jQuery did its part years ago to help and save Javascript, but now it's time for its well-deserved retirement.</p>
 
         <p class="question">Q: Why do I need to install Web Server Chrome app?</p>
-
         <p class="answer">A: Witchcraft will look for scripts in <span class="code">http://127.0.0.1:5743</span> (e.g., <span class="code">http://127.0.0.1:5743/github.com.js</span>). It doesn't have its own web server, that's why it depends on Web Server Chrome app. You don't need to use Web Server Chrome app if you don't want to, as long as you replace it with another local web server listening on port 5743 and serving static files from your Witchcraft scripts folder. For a comprehensive list of local server options, check this <a href="//gist.github.com/willurd/5720255" target="_blank">gist</a>.</p>
 
-        <p class="question">Q: But couldn't Witchcraft spawn its own local web server?</p>
-
-        <p class="answer">A: No. It is a Chrome <i>extension</i>. Chrome extensions don't have permission to access your file system. You need a Chrome <i>app</i> for that, but it turns out Chrome apps are no longer being supported by Google. This means you can't publish any new Chrome apps. However, existing Chrome apps (like the <i>Web Server Chrome app</i>) are still being supported, so it's ok to rely on them.</p>
-
         <p class="question">Q: When exactly my script gets loaded?</p>
-
         <p class="answer">A: It's loaded at <a href="https://developer.chrome.com/extensions/content_scripts" target="_blank">document_start</a>. This is after any css files, but before any other DOM is constructed or any other script is run. If you need, you can wait for
             <a href="https://developer.mozilla.org/en-US/docs/Web/Events/DOMContentLoaded" target="_blank">DOMContentLoaded</a> or
             the <a href="https://developer.mozilla.org/en-US/docs/Web/Events/load" target="_blank">window load event</a>.</p>
 
-        <p class="question">Q: I'm unable to read custom properties from or change the window object. What is wrong?</p>
-
-        <p class="answer">A: Scripts can't directly access the window object. This is a restriction imposed by the Chrome extension API. You can, however,
+        <p class="question">Q: I'm unable to read custom properties from or change the window object in any way. What is wrong?</p>
+        <p class="answer">A: Scripts can't directly access the window object. They share the DOM tree, but they live in
+            <a href="https://www.youtube.com/watch?v=laLudeUmXHM">isolated worlds</a> This is a restriction imposed by the Chrome extension API. You can, however,
             <a href="https://stackoverflow.com/q/12395722/778272" target="_blank">work around it</a> easily.</p>
 
-        <p class="question">Q: Can I install Witchcraft from sources instead?</p>
+        <p class="question">Q: How do I inject scripts into my localhost web server page?</p>
+        <div class="answer">A: Just name your script <span class="code">localhost.js</span>/<span class="code">localhost.css</span>. If you're running multiple web servers and need to tell them apart, do it by checking the port inside your script (check the <span class="code">location.port</span> property). See an example
+            <a href="https://github.com/luciopaiva/witchcraft/issues/18">here</a>.</div>
 
+        <p class="question">Q: But couldn't Witchcraft spawn its own local web server?</p>
+        <p class="answer">A: No. It is a Chrome <i>extension</i>. Chrome extensions don't have permission to access your file system. You need a Chrome <i>app</i> for that, but it turns out Chrome apps are no longer being supported by Google. This means you can't publish any new Chrome apps. However, existing Chrome apps (like the <i>Web Server Chrome app</i>) are still being supported, so it's ok to rely on them.</p>
+
+        <p class="question">Q: Can I install Witchcraft from sources instead?</p>
         <p class="answer">A: Yes, you can install Witchcraft directly from sources instead of downloading it from the Chrome store. Look for the extension source under the folder `/chrome-extension` and manually load it as an unpacked extension. If you don't know how to load unpacked extensions in Chrome, just google it; it's very easy.</p>
 
     </article>
