@@ -52,7 +52,7 @@ class Witchcraft {
 
         this.iconSize = 16;
 
-        if (this.document) {  // can be false during tests
+        if (this.document) {  // will be false during tests
             const iconCanvas = this.document.createElement("canvas");
             iconCanvas.width = this.iconSize;
             iconCanvas.height = this.iconSize;

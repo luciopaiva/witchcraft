@@ -14,7 +14,7 @@ For more information on how to install and use it, head to Witchcraft's [home pa
 Node.js is required, but just to run tests. I also use `nvm` to manage Node.js versions, but that's not required (just make sure your Node.js version is similar to the one `.nvmrc` currently points to). To install test dependencies:
 
     cd <project-folder>
-    nvm use
+    nvm install
     npm install
 
 Then you're ready to run tests:
