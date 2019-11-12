@@ -25,6 +25,8 @@
 
     const scriptNames = witchcraft.getCurrentTabScriptNames();
 
+    const serverAddress = witchcraft.getServerAddress();
+
     if (scriptNames && scriptNames.size > 0) {
         noScriptsElement.classList.add("hidden");
         scriptsTable.classList.remove("hidden");
@@ -32,7 +34,11 @@
         for (const scriptName of scriptNames) {
 
             const tdName = document.createElement("td");
-            tdName.innerText = scriptName;
+            const aName = document.createElement("a");
+            tdName.appendChild(aName)
+            aName.target = "_blank";
+            aName.innerText = scriptName;
+            aName.href = serverAddress + scriptName;
 
             const tdType = document.createElement("td");
             const extensionMatch = scriptName.match(/\.([^.]+)$/);

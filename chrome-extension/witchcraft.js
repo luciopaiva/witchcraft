@@ -309,6 +309,15 @@ class Witchcraft {
     }
 
     /**
+     * Used by the popup window to construct URL's of loaded files.
+     *
+     * @returns {string}
+     */
+    getServerAddress() {
+        return this.serverAddress;
+    }
+
+    /**
      * @param {Number} tabId
      * @returns {Set<String>}
      */
