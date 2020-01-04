@@ -1,7 +1,7 @@
 
 ![Witchcraft](docs/title.png)
 
-Think Greasemonkey for more advanced users.
+Think Greasemonkey for developers.
 
 Witchcraft is a Google Chrome extension for loading custom Javascript and CSS directly from a folder in your file system, injecting them into pages that match their files names.
 
