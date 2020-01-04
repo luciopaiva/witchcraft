@@ -51,6 +51,9 @@
         <p class="answer">A: Your page probably has frames/iframes in it. By design, Witchcraft loads itself into every window it can find. If you want to run your script in only one of the windows, you need to add that condition to your script. For instance, you most likely only want to run your code in the topmost window. If that's your case, just check if <span class="code">window.self === window.top</span>. More details
             <a href="https://github.com/luciopaiva/witchcraft/issues/23">here</a>.</p>
 
+        <p class="question">Q: How to load Witchcraft only in the topmost window?</p>
+        <p class="answer">A: Check the question above.</p>
+
         <p class="question">Q: I'm unable to read custom properties from or change the window object in any way. What is wrong?</p>
         <p class="answer">A: Scripts can't directly access the window object. They share the DOM tree, but they live in
             <a href="https://www.youtube.com/watch?v=laLudeUmXHM">isolated worlds</a>. This is a restriction imposed by the Chrome extension API. You can, however,
