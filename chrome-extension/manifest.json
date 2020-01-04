@@ -3,7 +3,7 @@
   "short_name": "Witchcraft",
   "manifest_version": 2,
   "version": "2.4.0",
-  "description": "Witchcraft loads custom Javascript and CSS directly from a folder in your file system. Think GreaseMonkey for more advanced users.",
+  "description": "Witchcraft loads custom Javascript and CSS directly from a folder in your file system. Think GreaseMonkey for developers.",
   "icons": {
     "16": "witch-16.png",
     "24": "witch-24.png",
