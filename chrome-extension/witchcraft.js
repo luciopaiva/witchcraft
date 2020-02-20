@@ -62,7 +62,8 @@ class Witchcraft {
             this.iconImage.src = this.chrome.extension.getURL("/witch-16.png");
         }
 
-        this.fetch = typeof fetch === "undefined" ? (async () => {}) : fetch;  // fetch is only undefined during tests
+        // fetch is only undefined during tests
+        this.fetch = typeof fetch === "undefined" ? (async () => {}) : fetch.bind(window);
 
         // listen for script/stylesheet requests
         this.chrome.runtime.onMessage.addListener(this.onScriptRequest.bind(this));
