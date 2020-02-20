@@ -90,6 +90,14 @@ describe("Witchcraft", function () {
         assert.strictEqual(witchcraft.getScriptNamesForTabId(1).size, 1);
     });
 
+    it("should clear scripts", function () {
+        assert.strictEqual(witchcraft.getScriptNamesForTabId(sender.tab.id).size, 0);
+        witchcraft.registerScriptForTabId("foo", sender.tab.id);
+        assert.strictEqual(witchcraft.getScriptNamesForTabId(sender.tab.id).size, 1);
+        witchcraft.clearScriptsIfTopFrame(sender);
+        assert.strictEqual(witchcraft.getScriptNamesForTabId(sender.tab.id).size, 0);
+    });
+
     it("should update interface for given tab", function () {
         sinon.spy(witchcraft, "updateIconWithScriptCount");
 
@@ -110,6 +118,12 @@ describe("Witchcraft", function () {
         assert(witchcraft.updateIconWithScriptCount.calledOnce);
         assert(witchcraft.updateIconWithScriptCount.calledWith(2));
         assert(chrome.browserAction.setTitle.calledOnce);
+
+        // take the chance to check if updateInterface() updated the current tab id
+        const scriptNames = witchcraft.getCurrentTabScriptNames();
+        assert.strictEqual(scriptNames.size, 2);
+        assert(scriptNames.has("foo"));
+        assert(scriptNames.has("bar"));
 
         // erase call history
         witchcraft.updateIconWithScriptCount.resetHistory();
