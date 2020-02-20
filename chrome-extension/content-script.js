@@ -15,4 +15,4 @@ chrome.runtime.onMessage.addListener(({scriptType, scriptContents}) => {
     }
 });
 
-chrome.runtime.sendMessage(location.hostname);
+chrome.runtime.sendMessage(location);

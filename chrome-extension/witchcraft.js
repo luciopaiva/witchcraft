@@ -97,21 +97,6 @@ class Witchcraft {
     }
 
     /**
-     * Receives a domain and yields it back in parts, progressively adding sub-levels starting from the TLD. For
-     * instance, if the hostname is `"foo.bar.com"`, the resulting sequence will be `"com"`, `"bar.com"`,
-     * `"foo.bar.com"`.
-     *
-     * @param {String} hostname
-     * @returns {IterableIterator<String>}
-     */
-    static *iterateDomainLevels(hostname) {
-        const parts = hostname.split(".");
-        for (let i = parts.length - 1; i >= 0; i--) {
-            yield parts.slice(i, parts.length).join(".");
-        }
-    }
-
-    /**
      * @param {String} scriptFileName - the script file name to query for
      * @returns {Promise<String>} file contents or null if file does not exist
      */
@@ -147,21 +132,62 @@ class Witchcraft {
     /**
      * Ask the local server to retrieve all relevant scripts for this url.
      *
-     * @param {String} hostName - the host name of the tab being loaded
+     * @param {Location} location - the Location object of the tab being loaded
      * @param {MessageSender} sender - the sender context of the content script that called us
      */
-    async onScriptRequest(hostName, sender) {
+    async onScriptRequest(location, sender) {
         this.clearScriptsIfTopFrame(sender);
 
         await this.loadScript(Witchcraft.globalScriptName, "js", sender);
         await this.loadScript(Witchcraft.globalScriptName, "css", sender);
 
-        for (const domain of Witchcraft.iterateDomainLevels(hostName)) {
+        for (const domain of Witchcraft.iterateDomainLevels(location.hostname)) {
             await this.loadScript(domain, "js", sender);
             await this.loadScript(domain, "css", sender);
         }
 
+        for (const segment of Witchcraft.iteratePathSegments(location.pathname)) {
+            await this.loadScript(location.hostname + segment, "js", sender);
+            await this.loadScript(location.hostname + segment, "css", sender);
+        }
+
         this.updateInterface(sender.tab.id);
+    }
+
+    /**
+     * Receives a domain and yields it back in parts, progressively adding sub-levels starting from the TLD. For
+     * instance, if the hostname is `"foo.bar.com"`, the resulting sequence will be `"com"`, `"bar.com"`,
+     * `"foo.bar.com"`.
+     *
+     * @param {String} hostname
+     * @returns {IterableIterator<String>}
+     */
+    static *iterateDomainLevels(hostname) {
+        const parts = hostname.split(".");
+        for (let i = parts.length - 1; i >= 0; i--) {
+            yield parts.slice(i, parts.length).join(".");
+        }
+    }
+
+    /**
+     * Receives a path and yields it back in parts, progressively adding directories starting from the base one. For
+     * instance, if the path is `"/foo/bar/index.html"`, the resulting sequence will be `"/foo"`, `"/foo/bar"`,
+     * `"/foo/bar/index.html"`.
+     *
+     * @param {String} pathName
+     * @return {IterableIterator<String>}
+     */
+    static *iteratePathSegments(pathName = "/") {
+        if (!pathName || pathName.length < 2) {
+            return undefined;
+        }
+        let beginAt = 1;  // we don't want to match the leading slash alone
+        let result = pathName.indexOf("/", beginAt);
+        while ((result = pathName.indexOf("/", beginAt)) !== -1) {
+            yield pathName.substring(0, result);
+            beginAt = result + 1;
+        }
+        yield pathName.substring(0, pathName.length);
     }
 
     /**

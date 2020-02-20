@@ -48,6 +48,23 @@ describe("Witchcraft", function () {
         assert.deepStrictEqual(levels, [""]);
     });
 
+    it ("should correctly iterate path segments", function () {
+        let levels = [...Witchcraft.iteratePathSegments("/")];
+        assert.strictEqual(levels.length, 0);
+
+        levels = [...Witchcraft.iteratePathSegments("")];
+        assert.strictEqual(levels.length, 0);
+
+        levels = [...Witchcraft.iteratePathSegments(undefined)];
+        assert.strictEqual(levels.length, 0);
+
+        levels = [...Witchcraft.iteratePathSegments("/foo")];
+        assert.deepStrictEqual(levels, ["/foo"]);
+
+        levels = [...Witchcraft.iteratePathSegments("/foo/bar/index.html")];
+        assert.deepStrictEqual(levels, ["/foo", "/foo/bar", "/foo/bar/index.html"]);
+    });
+
     it ("should be able to splice strings", function () {
         // insert by shifting
         assert.strictEqual(Witchcraft.spliceString("foofoo", 3, 3, "bar"), "foobarfoo");
@@ -119,7 +136,10 @@ describe("Witchcraft", function () {
         const globalJs = Witchcraft.globalScriptName + ".js";
         const globalCss = Witchcraft.globalScriptName + ".css";
 
-        await witchcraft.onScriptRequest("google.com", sender);
+        const location = /** @type {Location} */ {
+            hostname: "google.com",
+        };
+        await witchcraft.onScriptRequest(location, sender);
 
         const calls = witchcraft.queryLocalServerForFile.getCalls();
 
@@ -134,6 +154,37 @@ describe("Witchcraft", function () {
             globalJs, globalCss,
             "com.js", "com.css",
             "google.com.js", "google.com.css"]);
+    });
+
+    it("should fetch all relevant scripts for hostname with a pathname", async function () {
+        const globalJs = Witchcraft.globalScriptName + ".js";
+        const globalCss = Witchcraft.globalScriptName + ".css";
+
+        const location = /** @type {Location} */ {
+            hostname: "luciopaiva.com",
+            pathname: "/foo/bar/index.html",
+        };
+        await witchcraft.onScriptRequest(location, sender);
+
+        const calls = witchcraft.queryLocalServerForFile.getCalls();
+
+        // must have made a total of 6 of calls:
+        // [global, com, luciopaiva.com, luciopaiva.com/foo, luciopaiva.com/foo/bar, luciopaiva.com/foo/bar/index.html]
+        // x [js, css]
+        assert.strictEqual(calls.length, 12);
+        for (const call of calls) {
+            assert.strictEqual(call.args.length, 1);
+        }
+
+        const actualScriptNames = calls.map(call => call.args[0]);
+        assert.deepStrictEqual(actualScriptNames, [
+            globalJs, globalCss,
+            "com.js", "com.css",
+            "luciopaiva.com.js", "luciopaiva.com.css",
+            "luciopaiva.com/foo.js", "luciopaiva.com/foo.css",
+            "luciopaiva.com/foo/bar.js", "luciopaiva.com/foo/bar.css",
+            "luciopaiva.com/foo/bar/index.html.js", "luciopaiva.com/foo/bar/index.html.css",
+        ]);
     });
 
     it("should process include directives", async function () {
@@ -151,7 +202,10 @@ describe("Witchcraft", function () {
         witchcraft.queryLocalServerForFile.onCall(++callIndex).resolves(sampleCodeWithIncludeDirective);  // com.js
         witchcraft.queryLocalServerForFile.onCall(++callIndex).resolves(fooCode);  // foo.js (included from com.js)
         witchcraft.queryLocalServerForFile.onCall(++callIndex).resolves(null);  // com.css
-        await witchcraft.onScriptRequest("com", sender);
+        const location = /** @type {Location} */ {
+            hostname: "com",
+        };
+        await witchcraft.onScriptRequest(location, sender);
 
         const calls = witchcraft.queryLocalServerForFile.getCalls();
         assert.strictEqual(calls.length, 5);

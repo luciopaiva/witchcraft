@@ -81,7 +81,7 @@
 
         <h3>Domain level scripts</h3>
 
-        <p>Witchcraft also looks for scripts on all domain levels. For instance, if one accesses <span class="code">https://gist.github.com</span>, it will try to load any combination of the following files, in this very order:
+        <p>Witchcraft also looks for scripts on all domain levels. For instance, if one accesses <span class="code">https://gist.github.com</span>, it will try to load all domain levels for which there are existing scripts, in this very order:
 
         <ul>
             <li><span class="code">_global.js</span> <i>(see next section for more details)</i></li>
@@ -99,6 +99,25 @@
         <h3>Global scripts</h3>
 
         <p>If present, <span class="code">_global.js</span> and <span class="code">_global.css</span> scripts (added in version 2.3.0) will load for every web site, independently of the host name. Useful if you have some setup routine common to all your scripts.</p>
+
+        <h3>Path segments</h3>
+
+        <p>Starting with version 2.5.0, Witchcraft also tries to match path segments. For example, going to <span class="code">https://github.com/luciopaiva/witchcraft</span> will yield the following sequence of script loading attempts:</p>
+
+        <ul>
+            <li><span class="code">_global.js</span></li>
+            <li><span class="code">_global.css</span></li>
+            <li><span class="code">com.js</span></li>
+            <li><span class="code">com.css</span></li>
+            <li><span class="code">github.com.js</span></li>
+            <li><span class="code">github.com.css</span></li>
+            <li><span class="code">github.com/luciopaiva.js</span></li>
+            <li><span class="code">github.com/luciopaiva.css</span></li>
+            <li><span class="code">github.com/luciopaiva/witchcraft.js</span></li>
+            <li><span class="code">github.com/luciopaiva/witchcraft.css</span></li>
+        </ul>
+
+        <p>Notice that path segments are mapped to local folders in your scripts directory.</p>
 
         <h3>Including other scripts</h3><a id="include-directive"></a>
 
