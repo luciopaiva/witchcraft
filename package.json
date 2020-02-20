@@ -1,6 +1,6 @@
 {
   "name": "witchcraft",
-  "version": "2.4.0",
+  "version": "2.5.0",
   "description": "![Witchcraft](docs/title.png)",
   "main": "index.js",
   "directories": {
