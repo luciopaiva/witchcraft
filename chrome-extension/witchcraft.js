@@ -62,6 +62,8 @@ class Witchcraft {
             this.iconImage.src = this.chrome.extension.getURL("/witch-16.png");
         }
 
+        this.fetch = typeof fetch === "undefined" ? (async () => {}) : fetch;  // fetch is only undefined during tests
+
         // listen for script/stylesheet requests
         this.chrome.runtime.onMessage.addListener(this.onScriptRequest.bind(this));
 
@@ -102,7 +104,7 @@ class Witchcraft {
      */
     async queryLocalServerForFile(scriptFileName) {
         try {
-            const response = await fetch(this.serverAddress + scriptFileName);
+            const response = await this.fetch(this.serverAddress + scriptFileName);
             this.isServerReachable = true;
 
             if (response.status === 200) {

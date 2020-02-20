@@ -187,6 +187,30 @@ describe("Witchcraft", function () {
         ]);
     });
 
+    it("should handle bad fetch responses", async function () {
+        witchcraft.queryLocalServerForFile.restore();  // remove stub placed during setup()
+
+        witchcraft.fetch = async () => { throw new Error() };
+        const response1 = await witchcraft.queryLocalServerForFile("google.com.js");
+        assert.strictEqual(response1, null);
+
+        witchcraft.fetch = async () => { return { status: 500 } };
+        const response2 = await witchcraft.queryLocalServerForFile("google.com.js");
+        assert.strictEqual(response2, null);
+
+        witchcraft.fetch = async () => { return { status: 404 } };
+        const response3 = await witchcraft.queryLocalServerForFile("google.com.js");
+        assert.strictEqual(response3, null);
+    });
+
+    it("should handle good fetch responses", async function () {
+        witchcraft.queryLocalServerForFile.restore();  // remove stub placed during setup()
+
+        witchcraft.fetch = async () => { return { status: 200, text: async () => { return "hello"; } } };
+        const response = await witchcraft.queryLocalServerForFile("google.com.js");
+        assert.strictEqual(response, "hello");
+    });
+
     it("should process include directives", async function () {
         const includeFoo = "// @include foo.js";
         const sampleCodeWithIncludeDirective = `console.info('Hello');\n${includeFoo}\nconsole.info('world');`;
