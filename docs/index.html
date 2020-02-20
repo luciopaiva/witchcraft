@@ -119,6 +119,8 @@
 
         <p>Notice that path segments are mapped to local folders in your scripts directory.</p>
 
+        <p>Also important to notice is that, if the host name begins with <span class="code">www</span>, it must be part of the directory structure as well. This is important because modern browsers tend to hide the <span class="code">www</span> part, giving the false impression that it is not there.</p>
+
         <h3>Including other scripts</h3><a id="include-directive"></a>
 
         <p>It's also possible to include scripts in your main script using the <span class="code">@include</span> directive. To use it, simply add a line comment to your main script naming the other script and it will be inserted right where the <span class="code">@include</span> directive was found. Example:</p>
