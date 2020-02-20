@@ -100,33 +100,23 @@ class Witchcraft {
      * @param {String} scriptFileName - the script file name to query for
      * @returns {Promise<String>} file contents or null if file does not exist
      */
-    queryLocalServerForFile(scriptFileName) {
-        const self = this;
+    async queryLocalServerForFile(scriptFileName) {
+        try {
+            const response = await fetch(this.serverAddress + scriptFileName);
+            this.isServerReachable = true;
 
-        return new Promise(resolve => {
-            const request = new XMLHttpRequest();
-            request.addEventListener("load", function () {
-                self.isServerReachable = true;
-
-                if (this.status === 200) {
-                    // script was found - return its contents
-                    resolve(this.responseText);
-                } else if (this.status === 404) {
-                    resolve(null);
-                } else {
-                    // bad response - assume server is down
-                    self.isServerReachable = false;
-                    resolve(null);
-                }
-            });
-            request.addEventListener("error", function () {
-                // bad response - assume server is down
-                self.isServerReachable = false;
-                resolve(null);
-            });
-            request.open("GET", this.serverAddress + scriptFileName, true);
-            request.send();
-        });
+            if (response.status === 200) {
+                return await response.text();
+            } else if (response.status === 404) {
+                return null;
+            } else {
+                this.isServerReachable = false;
+                return null;
+            }
+        } catch (e) {
+            this.isServerReachable = false;
+            return null;
+        }
     }
 
     /**
