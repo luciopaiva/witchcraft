@@ -65,6 +65,11 @@ class Witchcraft {
         // fetch is only undefined during tests
         this.fetch = typeof fetch === "undefined" ? (async () => {}) : fetch.bind(window);
 
+        // either `// @include foo.js` or `/* @include foo.js */`
+        this.includeDirectiveRegexJs = /^[ \t]*(?:\/\/|\/\*)[ \t]*@include[ \t]*(".*?"|[^*\s]+).*$/mg;
+        // only `/* @include foo.js */` is acceptable
+        this.includeDirectiveRegexCss = /^[ \t]*\/\*[ \t]*@include[ \t]*(".*?"|\S+)[ \t]*\*\/.*$/mg;
+
         // listen for script/stylesheet requests
         this.chrome.runtime.onMessage.addListener(this.onScriptRequest.bind(this));
 
@@ -131,17 +136,17 @@ class Witchcraft {
     async onScriptRequest(location, sender) {
         this.clearScriptsIfTopFrame(sender);
 
-        await this.loadScript(Witchcraft.globalScriptName, "js", sender);
-        await this.loadScript(Witchcraft.globalScriptName, "css", sender);
+        await this.loadScript(Witchcraft.globalScriptName, Witchcraft.EXT_JS, sender);
+        await this.loadScript(Witchcraft.globalScriptName, Witchcraft.EXT_CSS, sender);
 
         for (const domain of Witchcraft.iterateDomainLevels(location.hostname)) {
-            await this.loadScript(domain, "js", sender);
-            await this.loadScript(domain, "css", sender);
+            await this.loadScript(domain, Witchcraft.EXT_JS, sender);
+            await this.loadScript(domain, Witchcraft.EXT_CSS, sender);
         }
 
         for (const segment of Witchcraft.iteratePathSegments(location.pathname)) {
-            await this.loadScript(location.hostname + segment, "js", sender);
-            await this.loadScript(location.hostname + segment, "css", sender);
+            await this.loadScript(location.hostname + segment, Witchcraft.EXT_JS, sender);
+            await this.loadScript(location.hostname + segment, Witchcraft.EXT_CSS, sender);
         }
 
         this.updateInterface(sender.tab.id);
@@ -185,7 +190,7 @@ class Witchcraft {
 
     /**
      * @param {String} domain
-     * @param {String} scriptType - either "js" or "css"
+     * @param {String} scriptType - either Witchcraft.EXT_JS or Witchcraft.EXT_CSS
      * @param {MessageSender} sender - the sender context of the content script that called us
      * @returns {Promise<void>}
      */
@@ -193,7 +198,7 @@ class Witchcraft {
         const scriptFileName = `${domain}.${scriptType}`;
         let scriptContents = await this.queryLocalServerForFile(scriptFileName);
         if (scriptContents) {
-            scriptContents = await this.processIncludeDirectives(scriptContents, scriptFileName);
+            scriptContents = await this.processIncludeDirectives(scriptContents, scriptFileName, scriptType);
             this.chrome.tabs.sendMessage(sender.tab.id, {
                 scriptType,
                 scriptContents,
@@ -211,14 +216,17 @@ class Witchcraft {
      *
      * @param {String} originalScript - raw script to be processed
      * @param {String} originalScriptFileName - name of the raw script
+     * @param {String} scriptType - either JavaScript or CSS
      * @return {Promise<String>} - processed script
      */
-    async processIncludeDirectives(originalScript, originalScriptFileName) {
+    async processIncludeDirectives(originalScript, originalScriptFileName, scriptType) {
         const visitedScripts = new Set();
         visitedScripts.add(originalScriptFileName);
 
         let result;
-        const includeDirective = /^[ \t]*\/\/[ \t]*@include[ \t]*(".*?"|\S+).*$/mg;
+        const includeDirective = scriptType === Witchcraft.EXT_CSS ?
+            this.includeDirectiveRegexCss : this.includeDirectiveRegexJs;
+
         // noinspection JSValidateTypes
         while ((result = includeDirective.exec(originalScript)) !== null) {
             const fullMatchStr = result[0];
@@ -347,6 +355,9 @@ class Witchcraft {
     static get globalScriptName() {
         return "_global";
     }
+
+    static get EXT_JS() { return "js" }
+    static get EXT_CSS() { return "css" }
 }
 
 if (typeof module !== "undefined" && typeof module.exports !== "undefined") {

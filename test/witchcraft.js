@@ -225,6 +225,24 @@ describe("Witchcraft", function () {
         assert.strictEqual(response, "hello");
     });
 
+    it("should correctly match JavaScript include directives", function () {
+        function testString(line) {
+            const result = witchcraft.includeDirectiveRegexJs.exec(line);
+            return result ? result[1] : null;
+        }
+
+        // valid includes
+        assert.strictEqual(testString("// @include foo.js"), "foo.js");
+        assert.strictEqual(testString("/* @include foo.js */"), "foo.js");
+        assert.strictEqual(testString('// @include "foo.js"'), '"foo.js"');
+        assert.strictEqual(testString('/* @include "foo.js" */'), '"foo.js"');
+        assert.strictEqual(testString('/* @include "foo.js"*/'), '"foo.js"');
+
+        // malformed includes
+        assert.strictEqual(testString("// include foo.js"), null);
+        assert.strictEqual(testString("/* include foo.js"), null);
+    });
+
     it("should process include directives", async function () {
         const includeFoo = "// @include foo.js";
         const sampleCodeWithIncludeDirective = `console.info('Hello');\n${includeFoo}\nconsole.info('world');`;
