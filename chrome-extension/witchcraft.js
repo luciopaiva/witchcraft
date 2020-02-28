@@ -84,6 +84,10 @@ class Witchcraft {
         this.cssHitCount = 0;
         this.errorCount = 0;
         this.failCount = 0;
+        this.jsIncludesHitCount = 0;
+        this.cssIncludesHitCount = 0;
+        this.jsIncludesErrorCount = 0;
+        this.cssIncludesErrorCount = 0;
     }
 
     /**
@@ -179,6 +183,18 @@ class Witchcraft {
             if (this.failCount > 0) {
                 this.analytics.send("Scripts", "Server failures", undefined, this.failCount);
             }
+            if (this.jsIncludesHitCount > 0) {
+                this.analytics.send("Scripts", "JS include hits", undefined, this.jsIncludesHitCount);
+            }
+            if (this.cssIncludesHitCount > 0) {
+                this.analytics.send("Scripts", "CSS include hits", undefined, this.cssIncludesHitCount);
+            }
+            if (this.jsIncludesErrorCount > 0) {
+                this.analytics.send("Scripts", "JS include errors", undefined, this.jsIncludesErrorCount);
+            }
+            if (this.cssIncludesErrorCount > 0) {
+                this.analytics.send("Scripts", "CSS include errors", undefined, this.cssIncludesErrorCount);
+            }
         }
     }
 
@@ -273,10 +289,20 @@ class Witchcraft {
                     // put regex caret right where the appended file begins to recursively look for include directives
                     includeDirective.lastIndex = startIndex;
                     visitedScripts.add(scriptFileName);
+                    if (scriptFileName.endsWith("js")) {
+                        this.jsIncludesHitCount++;
+                    } else if (scriptFileName.endsWith("css")) {
+                        this.cssIncludesHitCount++;
+                    }
                 } else {
                     // script not found
                     originalScript = Witchcraft.spliceString(originalScript, endIndex, endIndex,
                         ` -- WITCHCRAFT: could not include "${scriptFileName}"; script was not found`);
+                    if (scriptFileName.endsWith("js")) {
+                        this.jsIncludesErrorCount++;
+                    } else if (scriptFileName.endsWith("css")) {
+                        this.cssIncludesErrorCount++;
+                    }
                 }
             } else {
                 // this script was already included before
