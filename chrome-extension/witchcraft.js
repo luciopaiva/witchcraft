@@ -33,10 +33,12 @@ class Witchcraft {
      *
      * @param {chrome} chrome
      * @param {Document} document
+     * @param {Analytics} analytics
      */
-    constructor (chrome, document) {
+    constructor (chrome, document, analytics) {
         this.chrome = chrome;
         this.document = document;
+        this.analytics = analytics;
 
         this.emptySet = new Set();
 
@@ -76,6 +78,21 @@ class Witchcraft {
         // listen for tab switches
         this.chrome.tabs.onActivated.addListener(
             /** @type {{tabId: number}} */ activeInfo => this.updateInterface(activeInfo.tabId));
+
+        this.analytics && this.analytics.send("App", "Load");
+
+        this.resetMetrics();
+    }
+
+    resetMetrics() {
+        this.jsHitCount = 0;
+        this.cssHitCount = 0;
+        this.errorCount = 0;
+        this.failCount = 0;
+        this.jsIncludesHitCount = 0;
+        this.cssIncludesHitCount = 0;
+        this.jsIncludesErrorCount = 0;
+        this.cssIncludesErrorCount = 0;
     }
 
     /**
@@ -114,14 +131,17 @@ class Witchcraft {
             this.isServerReachable = true;
 
             if (response.status === 200) {
+                scriptFileName.endsWith("js") ? this.jsHitCount++ : this.cssHitCount++;
                 return await response.text();
             } else if (response.status === 404) {
                 return null;
             } else {
+                this.errorCount++;
                 this.isServerReachable = false;
                 return null;
             }
         } catch (e) {
+            this.failCount++;
             this.isServerReachable = false;
             return null;
         }
@@ -135,6 +155,7 @@ class Witchcraft {
      */
     async onScriptRequest(location, sender) {
         this.clearScriptsIfTopFrame(sender);
+        this.resetMetrics();
 
         await this.loadScript(Witchcraft.globalScriptName, Witchcraft.EXT_JS, sender);
         await this.loadScript(Witchcraft.globalScriptName, Witchcraft.EXT_CSS, sender);
@@ -150,6 +171,36 @@ class Witchcraft {
         }
 
         this.updateInterface(sender.tab.id);
+        this.sendMetrics();
+    }
+
+    sendMetrics() {
+        if (this.analytics) {
+            if (this.jsHitCount > 0) {
+                this.analytics.send("Scripts", "JS hits", undefined, this.jsHitCount);
+            }
+            if (this.cssHitCount > 0) {
+                this.analytics.send("Scripts", "CSS hits", undefined, this.cssHitCount);
+            }
+            if (this.errorCount > 0) {
+                this.analytics.send("Scripts", "Errors", undefined, this.errorCount);
+            }
+            if (this.failCount > 0) {
+                this.analytics.send("Scripts", "Server failures", undefined, this.failCount);
+            }
+            if (this.jsIncludesHitCount > 0) {
+                this.analytics.send("Scripts", "JS include hits", undefined, this.jsIncludesHitCount);
+            }
+            if (this.cssIncludesHitCount > 0) {
+                this.analytics.send("Scripts", "CSS include hits", undefined, this.cssIncludesHitCount);
+            }
+            if (this.jsIncludesErrorCount > 0) {
+                this.analytics.send("Scripts", "JS include errors", undefined, this.jsIncludesErrorCount);
+            }
+            if (this.cssIncludesErrorCount > 0) {
+                this.analytics.send("Scripts", "CSS include errors", undefined, this.cssIncludesErrorCount);
+            }
+        }
     }
 
     /**
@@ -246,10 +297,20 @@ class Witchcraft {
                     // put regex caret right where the appended file begins to recursively look for include directives
                     includeDirective.lastIndex = startIndex;
                     visitedScripts.add(scriptFileName);
+                    if (scriptFileName.endsWith("js")) {
+                        this.jsIncludesHitCount++;
+                    } else if (scriptFileName.endsWith("css")) {
+                        this.cssIncludesHitCount++;
+                    }
                 } else {
                     // script not found
                     originalScript = Witchcraft.spliceString(originalScript, endIndex, endIndex,
                         ` -- WITCHCRAFT: could not include "${scriptFileName}"; script was not found`);
+                    if (scriptFileName.endsWith("js")) {
+                        this.jsIncludesErrorCount++;
+                    } else if (scriptFileName.endsWith("css")) {
+                        this.cssIncludesErrorCount++;
+                    }
                 }
             } else {
                 // this script was already included before
