@@ -35,7 +35,7 @@ class Witchcraft {
      * @param {Document} document
      * @param {Analytics} analytics
      */
-    constructor (chrome, document, analytics) {
+    constructor (chrome, document, analytics = undefined) {
         this.chrome = chrome;
         this.document = document;
         this.analytics = analytics;
@@ -187,28 +187,28 @@ class Witchcraft {
     sendMetrics() {
         if (this.analytics) {
             if (this.jsHitCount > 0) {
-                this.analytics.send("Scripts", "JS hits", undefined, this.jsHitCount);
+                this.analytics.send(...Witchcraft.JS_HITS, this.jsHitCount);
             }
             if (this.cssHitCount > 0) {
-                this.analytics.send("Scripts", "CSS hits", undefined, this.cssHitCount);
+                this.analytics.send(...Witchcraft.CSS_HITS, this.cssHitCount);
             }
             if (this.errorCount > 0) {
-                this.analytics.send("Scripts", "Errors", undefined, this.errorCount);
+                this.analytics.send(...Witchcraft.ERROR_COUNTS, this.errorCount);
             }
             if (this.failCount > 0) {
-                this.analytics.send("Scripts", "Server failures", undefined, this.failCount);
+                this.analytics.send(...Witchcraft.FAIL_COUNTS, this.failCount);
             }
             if (this.jsIncludesHitCount > 0) {
-                this.analytics.send("Scripts", "JS include hits", undefined, this.jsIncludesHitCount);
+                this.analytics.send(...Witchcraft.JS_INCLUDE_HITS, this.jsIncludesHitCount);
             }
             if (this.cssIncludesHitCount > 0) {
-                this.analytics.send("Scripts", "CSS include hits", undefined, this.cssIncludesHitCount);
+                this.analytics.send(...Witchcraft.CSS_INCLUDE_HITS, this.cssIncludesHitCount);
             }
             if (this.jsIncludesNotFoundCount > 0) {
-                this.analytics.send("Scripts", "JS include not found", undefined, this.jsIncludesNotFoundCount);
+                this.analytics.send(...Witchcraft.JS_INCLUDES_NOT_FOUND, this.jsIncludesNotFoundCount);
             }
             if (this.cssIncludesNotFoundCount > 0) {
-                this.analytics.send("Scripts", "CSS include not found", undefined, this.cssIncludesNotFoundCount);
+                this.analytics.send(...Witchcraft.CSS_INCLUDES_NOT_FOUND, this.cssIncludesNotFoundCount);
             }
         }
     }
@@ -461,6 +461,15 @@ class Witchcraft {
     static get EXT_JS() { return "js" }
     static get EXT_CSS() { return "css" }
 }
+
+Witchcraft.JS_HITS = ["Scripts", "JS hits", undefined];
+Witchcraft.CSS_HITS = ["Scripts", "CSS hits", undefined];
+Witchcraft.ERROR_COUNTS = ["Scripts", "Errors", undefined];
+Witchcraft.FAIL_COUNTS = ["Scripts", "Server failures", undefined];
+Witchcraft.JS_INCLUDE_HITS = ["Scripts", "JS include hits", undefined];
+Witchcraft.CSS_INCLUDE_HITS = ["Scripts", "CSS include hits", undefined];
+Witchcraft.JS_INCLUDES_NOT_FOUND = ["Scripts", "JS includes not found", undefined];
+Witchcraft.CSS_INCLUDES_NOT_FOUND = ["Scripts", "CSS includes not found", undefined];
 
 if (typeof module !== "undefined" && typeof module.exports !== "undefined") {
     module.exports = Witchcraft;  // used by Node.js when testing

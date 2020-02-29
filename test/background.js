@@ -3,10 +3,18 @@ const
     vm = require("vm"),
     fs = require("fs"),
     assert = require("assert"),
-    {describe, it} = require("mocha"),
+    {describe, it, setup, teardown} = require("mocha"),
     chrome = require("sinon-chrome");
 
 describe("Background script", function () {
+
+    setup(function () {
+        chrome.reset();  // just to be on the safe side in case we missed any teardown
+    });
+
+    teardown(function () {
+        chrome.reset();
+    });
 
     it ("should bind Witchcraft instance to window", function () {
         // Thanks this SO answer for showing how to do this: https://stackoverflow.com/a/26779746/778272
@@ -20,6 +28,7 @@ describe("Background script", function () {
         vm.runInNewContext([witchcraftCode, backgroundCode].join("\n\n"), context);
 
         // should be listening for messages from the tab context
+        console.info(chrome.runtime.onMessage.addListener.getCalls().length);
         assert(chrome.runtime.onMessage.addListener.calledOnce);
         // should be listening for tab switches
         assert(chrome.tabs.onActivated.addListener.calledOnce);

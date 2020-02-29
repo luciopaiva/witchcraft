@@ -16,6 +16,8 @@ describe("Witchcraft", function () {
     let sender;
 
     setup(function () {
+        chrome.reset();  // just to be on the safe side in case we missed any teardown
+
         witchcraft = new Witchcraft(chrome, undefined);
         sinon.stub(witchcraft, "queryLocalServerForFile").resolves(sampleCode);
 
@@ -26,8 +28,7 @@ describe("Witchcraft", function () {
     });
 
     teardown(function () {
-        chrome.browserAction.setTitle.resetHistory();
-        chrome.tabs.sendMessage.resetHistory();
+        chrome.reset();
     });
 
     it ("should correctly iterate domain levels", function () {
@@ -383,7 +384,7 @@ describe("Witchcraft", function () {
         assert(result.endsWith("*/\n.bar {}"));
     });
 
-    it("should process include directives", async function () {
+    it("should fetch all included scripts", async function () {
         const includeFoo = "// @include foo.js";
         const sampleCodeWithIncludeDirective = `console.info('Hello');\n${includeFoo}\nconsole.info('world');`;
         const fooCode = "// foo";
@@ -401,6 +402,9 @@ describe("Witchcraft", function () {
         const location = /** @type {Location} */ {
             hostname: "com",
         };
+
+        const sendMetricsSpy = sinon.spy(witchcraft, "sendMetrics");
+
         await witchcraft.onScriptRequest(location, sender);
 
         const calls = witchcraft.queryLocalServerForFile.getCalls();
@@ -423,5 +427,7 @@ describe("Witchcraft", function () {
         assert.strictEqual(loadedScripts.size, 2);
         assert(loadedScripts.has("com.js"));
         assert(loadedScripts.has("foo.js"));
+
+        assert(sendMetricsSpy.calledOnce);
     });
 });
