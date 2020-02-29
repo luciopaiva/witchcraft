@@ -13,7 +13,7 @@
     --server-online-stroke: #00ff00;
     --server-offline-fill: #ff0000;
     --server-offline-stroke: #d20000;
-    --panel-margin: 4px;
+    --container-margin: 4px;
     --panel-label-padding: 3px;
     --panel-label-width: 45px;
 }
@@ -21,6 +21,7 @@
 body {
     background-color: var(--background-color);
     font-size: 10px;
+    min-width: 200px;
 }
 
 body, a {
@@ -33,17 +34,12 @@ body, a {
     display: none;
 }
 
-.container > div {
-    margin: 4px 8px;
-}
-
 #no-scripts {
     text-align: center;
 }
 
 table.scripts {
-    margin: var(--panel-margin);
-    width: calc(100% - 2 * var(--panel-margin));
+    width: calc(100% - 2 * var(--container-margin));
 }
 
 td.script-name {
@@ -51,6 +47,7 @@ td.script-name {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    font-family: monospace;
 }
 
 td.js, td.css {
@@ -68,55 +65,42 @@ td.css {
     color: var(--css-text-color);
 }
 
-.container {
-    min-width: 200px;
-    font-family: monospace;
-}
-
-.header, .footer {
+.header {
     display: flex;
     flex-direction: row;
     align-items: center;
+    justify-content: space-between;
     height: 10px;
     padding: 6px;
 
     background-color: var(--background-color-lighter);
 }
 
-.header > .title {
-    flex: 1 0 0;
-}
-
-.footer {
-    justify-content: space-between;
-}
-
-.advanced-panel {
-    display: flex;
-    flex-direction: column;
-    padding: 6px;
-
-    background-color: var(--background-color-lighter);
-}
-
-#advanced-panel {
-    margin: var(--panel-margin);
+.container {
+    margin: var(--container-margin);
     background-color: var(--background-color);
 }
 
-#advanced-panel label {
-    display: block;
+.row {
     padding: var(--panel-label-padding);
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
 }
 
-#advanced-panel label span {
+.row label {
     width: var(--panel-label-width);
     display: inline-block;
 }
 
-#advanced-panel label input {
-    width: calc(100% - var(--panel-label-width) - 2 * var(--panel-label-padding) - 2 * var(--panel-margin));
+.row input {
+    width: calc(100% - var(--panel-label-width) - 2 * var(--panel-label-padding) - 2 * var(--container-margin));
     display: inline-block;
+}
+
+.row.right {
+    flex-direction: row-reverse;
 }
 
 #server-status {

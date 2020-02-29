@@ -8,8 +8,7 @@
 <body>
 
 <div class="header">
-    <div class="title">Witchcraft <span id="version"></span></div>
-    <div>server: <div id="server-status"></div></div>
+    Loaded scripts
 </div>
 
 <div class="container">
@@ -17,23 +16,29 @@
     <table id="scripts-table" class="scripts"></table>
 </div>
 
-<div class="advanced-panel">
-    <a id="advanced" href="">Server</a>
+<div class="header">
+    <div>Server</div><div id="server-status"></div>
 </div>
 
-<div id="advanced-panel" class="hidden">
-    <label>
-        <span>Address:</span>
+<div id="advanced-panel" class="container">
+    <div class="row">
+        <label for="server-address">Address:</label>
         <input type="text" value="host" id="server-address">
-    </label>
-    <label class="right">
+    </div>
+    <div class="row right">
         <a id="server-address-reset" href="">Reset to default</a>
-    </label>
+    </div>
 </div>
 
-<div class="footer">
-    <a id="docs" href="https://luciopaiva.com/witchcraft">Docs</a>
-    <a id="report-issue" href="https://github.com/luciopaiva/witchcraft/issues">Report issue</a>
+<div class="header">
+    <div class="title">Witchcraft <span id="version"></span></div>
+</div>
+
+<div class="container">
+    <div class="row">
+        <a id="docs" href="https://luciopaiva.com/witchcraft">Docs</a>
+        <a id="report-issue" href="https://github.com/luciopaiva/witchcraft/issues">Report issue</a>
+    </div>
 </div>
 
 <script src="popup.js" type="module"></script>
