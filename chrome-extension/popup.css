@@ -13,10 +13,14 @@
     --server-online-stroke: #00ff00;
     --server-offline-fill: #ff0000;
     --server-offline-stroke: #d20000;
+    --panel-margin: 4px;
+    --panel-label-padding: 3px;
+    --panel-label-width: 45px;
 }
 
 body {
     background-color: var(--background-color);
+    font-size: 10px;
 }
 
 body, a {
@@ -38,9 +42,8 @@ body, a {
 }
 
 table.scripts {
-    --margin: 4px;
-    margin: var(--margin);
-    width: calc(100% - 2 * var(--margin));
+    margin: var(--panel-margin);
+    width: calc(100% - 2 * var(--panel-margin));
 }
 
 td.script-name {
@@ -52,7 +55,6 @@ td.script-name {
 
 td.js, td.css {
     text-align: center;
-    font-size: 10px;
     font-weight: bold;
 }
 
@@ -76,7 +78,6 @@ td.css {
     flex-direction: row;
     align-items: center;
     height: 10px;
-    font-size: 10px;
     padding: 6px;
 
     background-color: var(--background-color-lighter);
@@ -88,6 +89,34 @@ td.css {
 
 .footer {
     justify-content: space-between;
+}
+
+.advanced-panel {
+    display: flex;
+    flex-direction: column;
+    padding: 6px;
+
+    background-color: var(--background-color-lighter);
+}
+
+#advanced-panel {
+    margin: var(--panel-margin);
+    background-color: var(--background-color);
+}
+
+#advanced-panel label {
+    display: block;
+    padding: var(--panel-label-padding);
+}
+
+#advanced-panel label span {
+    width: var(--panel-label-width);
+    display: inline-block;
+}
+
+#advanced-panel label input {
+    width: calc(100% - var(--panel-label-width) - 2 * var(--panel-label-padding) - 2 * var(--panel-margin));
+    display: inline-block;
 }
 
 #server-status {

@@ -43,7 +43,9 @@ class Witchcraft {
         this.emptySet = new Set();
 
         this.serverPort = 5743;
-        this.serverAddress = `http://127.0.0.1:${this.serverPort}/`;
+        this.defaultServerAddress = `http://127.0.0.1:${this.serverPort}/`;
+        const savedServerAddress = localStorage.getItem("server-address");
+        this.serverAddress = savedServerAddress || this.defaultServerAddress;
         /** @type {Boolean} */
         this.isServerReachable = true;
 
@@ -441,12 +443,27 @@ class Witchcraft {
     }
 
     /**
-     * Used by the popup window to construct URL's of loaded files.
+     * Used by the popup window to construct the URL of each loaded file.
      *
-     * @returns {string}
+     * @returns {String}
      */
     getServerAddress() {
         return this.serverAddress;
+    }
+
+    /**
+     * Called by the popup window to update the server address.
+     *
+     * @param {String} serverAddress
+     * @returns {String}
+     */
+    setServerAddress(serverAddress) {
+        serverAddress = serverAddress.trim();
+        if (!serverAddress.endsWith("/")) {
+            serverAddress += "/";
+        }
+        this.serverAddress = serverAddress;
+        localStorage.setItem("server-address", this.serverAddress);
     }
 
     /**
