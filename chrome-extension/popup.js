@@ -18,6 +18,9 @@ class Popup {
 
         /** @type {Witchcraft} */
         this.witchcraft = background.window.witchcraft;
+        /** @type {Analytics} */
+        this.analytics = background.window.analytics;
+        this.analytics.pageView("/popup");
 
         this.makeButton("docs");
         this.makeButton("report-issue");
@@ -34,6 +37,7 @@ class Popup {
         const link = document.getElementById(id);
         link.addEventListener("click", () => {
             chrome.tabs.create({ url: link.getAttribute("href") });
+            this.analytics.pageView("/popup/" + id);
             return false;
         });
     }
