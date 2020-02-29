@@ -24,8 +24,8 @@ class Popup {
         this.analytics = background.window.analytics;
         this.analytics.pageView("/popup");
 
-        this.makeButton("docs");
-        this.makeButton("report-issue");
+        this.makeButtonFromAnchor("docs");
+        this.makeButtonFromAnchor("report-issue");
         this.showVersion();
         this.showServerStatus();
         this.renderScriptsTable();
@@ -35,11 +35,11 @@ class Popup {
         document.getElementById("version").innerText = chrome.runtime.getManifest().version;
     }
 
-    makeButton(id) {
-        const link = document.getElementById(id);
-        link.addEventListener("click", () => {
-            chrome.tabs.create({ url: link.getAttribute("href") });
-            this.analytics.pageView("/popup/" + id);
+    makeButtonFromAnchor(id, pageName = id) {
+        const anchor = typeof id === "string" ? document.getElementById(id) : id;
+        anchor.addEventListener("click", () => {
+            chrome.tabs.create({ url: anchor.getAttribute("href") });
+            this.analytics.pageView("/popup/" + pageName);
             return false;
         });
     }
@@ -74,6 +74,7 @@ class Popup {
                 aName.innerText = fileName;
                 aName.href = fullUrl;
                 aName.setAttribute("title", aName.href);
+                this.makeButtonFromAnchor(aName, "script");
 
                 const tdType = document.createElement("td");
                 const extensionMatch = scriptName.match(/\.([^.]+)$/);
