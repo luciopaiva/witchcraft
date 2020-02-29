@@ -123,13 +123,17 @@
 
         <h3>Including other scripts</h3><a id="include-directive"></a>
 
-        <p>It's also possible to include scripts in your main script using the <span class="code">@include</span> directive. To use it, simply add a line comment to your main script naming the other script and it will be inserted right where the <span class="code">@include</span> directive was found. Example:</p>
+        <p>It's possible to include scripts from your main JavaScript or CSS file via the <span class="code">@include</span> directive. To use it, simply add a special one-line comment like so:</p>
 
         <script src="https://gist.github.com/luciopaiva/7c60f377f997aa6b2f3db565058e116b.js"></script>
 
-        <p>You may add multiple directives to the same script. If your script name contains spaces, you can use double quotes to refer to it (see example above).</p>
+        And for CSS scripts:
 
-        <p>Included scripts can also contain <span class="code">@include</span> directives as well, since the parser will recursively iterate through all files. Dependency cycles (e.g., <span class="code">foo.js</span> includes <span class="code">bar.js</span>, which includes <span class="code">foo.js</span>) will be automatically resolved and each script won't be loaded more than once.</p>
+        <script src="https://gist.github.com/luciopaiva/7054a131596d3a6af46674a848e0e5c8.js"></script>
+
+        <p>You may add multiple directives to the same script. If your script name contains spaces, you can use double quotes to refer to it (see the JavaScript example above).</p>
+
+        <p>Included scripts can also <span class="code">@include</span> scripts of their own; the parser will recursively iterate through them. Dependency cycles (e.g., <span class="code">foo.js</span> includes <span class="code">bar.js</span>, which includes <span class="code">foo.js</span>) will be automatically resolved and each script won't be loaded more than once.</p>
 
         <p>This directive may be useful for including third-party libraries, like jQuery.</p>
 
