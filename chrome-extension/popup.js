@@ -96,22 +96,10 @@ class Popup {
     }
 
     makeAdvancedPanel() {
-        const openButton = document.getElementById("advanced");
-        const panel = document.getElementById("advanced-panel");
-
         const serverAddressInput = document.getElementById("server-address");
         serverAddressInput.value = this.witchcraft.getServerAddress();
         serverAddressInput.addEventListener("input", event => {
             this.witchcraft.setServerAddress(event.target.value);
-        });
-
-        this.isAdvancedPanelVisible = false;
-
-        openButton.addEventListener("click", event => {
-            this.isAdvancedPanelVisible = !this.isAdvancedPanelVisible;
-            panel.classList.toggle("hidden", !this.isAdvancedPanelVisible);
-            event.preventDefault();
-            return false;
         });
 
         const resetButton = document.getElementById("server-address-reset");
