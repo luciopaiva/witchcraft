@@ -227,20 +227,94 @@ describe("Witchcraft", function () {
 
     it("should correctly match JavaScript include directives", function () {
         function testString(line) {
-            const result = witchcraft.includeDirectiveRegexJs.exec(line);
-            return result ? result[1] : null;
+            const result = witchcraft.findIncludedScriptNames(line, Witchcraft.EXT_JS).next().value;
+            return result ? result[0] : null;
         }
 
         // valid includes
         assert.strictEqual(testString("// @include foo.js"), "foo.js");
         assert.strictEqual(testString("/* @include foo.js */"), "foo.js");
-        assert.strictEqual(testString('// @include "foo.js"'), '"foo.js"');
-        assert.strictEqual(testString('/* @include "foo.js" */'), '"foo.js"');
-        assert.strictEqual(testString('/* @include "foo.js"*/'), '"foo.js"');
+        assert.strictEqual(testString('// @include "foo.js"'), "foo.js");
+        assert.strictEqual(testString('/* @include "foo.js" */'), "foo.js");
+        assert.strictEqual(testString('/* @include "foo.js"*/'), "foo.js");
 
         // malformed includes
-        assert.strictEqual(testString("// include foo.js"), null);
-        assert.strictEqual(testString("/* include foo.js"), null);
+        assert.strictEqual(testString("// include foo.js"), null);  // missing the @
+        assert.strictEqual(testString("/* include foo.js"), null);  // must close in the same line
+        assert.strictEqual(testString(" include foo.js */"), null);  // must open in the same line
+    });
+
+    it("should correctly match CSS include directives", function () {
+        function testString(line) {
+            const result = witchcraft.findIncludedScriptNames(line, Witchcraft.EXT_CSS).next().value;
+            return result ? result[0] : null;
+        }
+
+        // valid includes
+        assert.strictEqual(testString("/* @include foo.css */"), "foo.css");
+        assert.strictEqual(testString('/* @include "foo.css" */'), "foo.css");
+        assert.strictEqual(testString('/*@include "foo.css" */'), "foo.css");
+        assert.strictEqual(testString('/* @include "foo.css"*/'), "foo.css");
+        assert.strictEqual(testString('/*@include "foo.css"*/'), "foo.css");
+
+        // malformed includes
+        assert.strictEqual(testString("/* include foo.css */"), null);  // missing the @
+        assert.strictEqual(testString("/* @include foo.css"), null);  // must close in the same line
+        assert.strictEqual(testString(" @include foo.css */"), null);  // must open in the same line
+    });
+
+    it("should process simple JavaScript include directives", async function () {
+        const fileName = "foo.js";
+        const script = `// 1\n// @include bar.js\n// 3`;
+
+        witchcraft.queryLocalServerForFile.reset();
+        witchcraft.queryLocalServerForFile.onCall(0).resolves("// 2");  // bar.js
+
+        const result = await witchcraft.processIncludeDirectives(script, fileName, Witchcraft.EXT_JS);
+
+        assert.strictEqual(witchcraft.queryLocalServerForFile.getCalls().length, 1);
+        assert.strictEqual(result, "// 1\n// 2\n// 3");
+    });
+
+    it("should process recursive JavaScript include directives", async function () {
+        const fileName = "foo.js";
+        const script = `// 1\n// @include bar.js\n// 3`;
+
+        witchcraft.queryLocalServerForFile.reset();
+        witchcraft.queryLocalServerForFile.onCall(0).resolves("// @include third.js");  // bar.js
+        witchcraft.queryLocalServerForFile.onCall(1).resolves("// 2");  // third.js
+
+        const result = await witchcraft.processIncludeDirectives(script, fileName, Witchcraft.EXT_JS);
+
+        assert.strictEqual(witchcraft.queryLocalServerForFile.getCalls().length, 2);
+        assert.strictEqual(result, "// 1\n// 2\n// 3");
+    });
+
+    it("should process simple CSS include directives", async function () {
+        const fileName = "foo.css";
+        const script = `div {}\n/* @include bar.css */\n.bar {}`;
+
+        witchcraft.queryLocalServerForFile.reset();
+        witchcraft.queryLocalServerForFile.onCall(0).resolves(".foo {}");  // bar.js
+
+        const result = await witchcraft.processIncludeDirectives(script, fileName, Witchcraft.EXT_CSS);
+
+        assert.strictEqual(witchcraft.queryLocalServerForFile.getCalls().length, 1);
+        assert.strictEqual(result, "div {}\n.foo {}\n.bar {}");
+    });
+
+    it("should process recursive CSS include directives", async function () {
+        const fileName = "foo.css";
+        const script = `div {}\n/* @include bar.css */\n.bar {}`;
+
+        witchcraft.queryLocalServerForFile.reset();
+        witchcraft.queryLocalServerForFile.onCall(0).resolves("/* @include third.css */");  // bar.css
+        witchcraft.queryLocalServerForFile.onCall(1).resolves(".foo {}");  // third.css
+
+        const result = await witchcraft.processIncludeDirectives(script, fileName, Witchcraft.EXT_CSS);
+
+        assert.strictEqual(witchcraft.queryLocalServerForFile.getCalls().length, 2);
+        assert.strictEqual(result, "div {}\n.foo {}\n.bar {}");
     });
 
     it("should process include directives", async function () {

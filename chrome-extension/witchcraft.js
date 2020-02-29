@@ -268,35 +268,26 @@ class Witchcraft {
      * @param {String} originalScript - raw script to be processed
      * @param {String} originalScriptFileName - name of the raw script
      * @param {String} scriptType - either JavaScript or CSS
+     * @param {Set<String>} visitedScripts
      * @return {Promise<String>} - processed script
      */
-    async processIncludeDirectives(originalScript, originalScriptFileName, scriptType) {
-        const visitedScripts = new Set();
+    async processIncludeDirectives(originalScript, originalScriptFileName, scriptType,
+                                   visitedScripts = new Set()) {
         visitedScripts.add(originalScriptFileName);
 
-        let result;
-        const includeDirective = scriptType === Witchcraft.EXT_CSS ?
-            this.includeDirectiveRegexCss : this.includeDirectiveRegexJs;
+        /** @type {Array<{ startIndex: Number, endIndex: Number, scriptContent: String}>} */
+        const directives = [];
 
-        // noinspection JSValidateTypes
-        while ((result = includeDirective.exec(originalScript)) !== null) {
-            const fullMatchStr = result[0];
-
-            // determine full path to include file
-            const scriptFileName = result[1].replace(/^"|"$/g, "");  // remove quotes, if any
-
-            // the matched directive to be cut from the original file
-            const endIndex = includeDirective.lastIndex;
-            const startIndex = endIndex - fullMatchStr.length;
-
+        for (const [scriptFileName, startIndex, endIndex] of this.findIncludedScriptNames(originalScript, scriptType)) {
             // check for dependency cycles
             if (!visitedScripts.has(scriptFileName)) {
-                const scriptContent = await this.queryLocalServerForFile(scriptFileName);
+                let scriptContent = await this.queryLocalServerForFile(scriptFileName);
                 if (scriptContent) {
-                    originalScript = Witchcraft.spliceString(originalScript, startIndex, endIndex, scriptContent);
-                    // put regex caret right where the appended file begins to recursively look for include directives
-                    includeDirective.lastIndex = startIndex;
-                    visitedScripts.add(scriptFileName);
+                    // expand it recursively
+                    const expandedScript =
+                        await this.processIncludeDirectives(scriptContent, scriptFileName, scriptType, visitedScripts);
+                    directives.push({ startIndex, endIndex, scriptContent: expandedScript });
+
                     if (scriptFileName.endsWith("js")) {
                         this.jsIncludesHitCount++;
                     } else if (scriptFileName.endsWith("css")) {
@@ -304,8 +295,9 @@ class Witchcraft {
                     }
                 } else {
                     // script not found
-                    originalScript = Witchcraft.spliceString(originalScript, endIndex, endIndex,
-                        ` -- WITCHCRAFT: could not include "${scriptFileName}"; script was not found`);
+                    directives.push({ startIndex, endIndex, scriptContent:
+                            `/* WITCHCRAFT: could not include "${scriptFileName}"; script was not found */`});
+
                     if (scriptFileName.endsWith("js")) {
                         this.jsIncludesErrorCount++;
                     } else if (scriptFileName.endsWith("css")) {
@@ -314,12 +306,49 @@ class Witchcraft {
                 }
             } else {
                 // this script was already included before
-                originalScript = Witchcraft.spliceString(originalScript, endIndex, endIndex,
-                    ` -- WITCHCRAFT: skipping inclusion of "${scriptFileName}" to avoid dependency cycle`);
+                directives.push({ startIndex, endIndex, scriptContent:
+                        `/* WITCHCRAFT: skipping inclusion of "${scriptFileName}" due to dependency cycle */`});
             }
         }
 
-        return originalScript;
+        let expandedScript = originalScript;
+        let delta = 0;
+        for (const directive of directives) {
+            expandedScript = Witchcraft.spliceString(expandedScript, directive.startIndex + delta,
+                directive.endIndex + delta, directive.scriptContent);
+            delta += directive.scriptContent.length;
+        }
+
+        return expandedScript;
+    }
+
+    /**
+     * @param {String} script
+     * @param {String} scriptType
+     * @return {Generator<[String, Number, Number]>}
+     */
+    *findIncludedScriptNames(script, scriptType) {
+        const includeDirective = scriptType === Witchcraft.EXT_CSS ?
+            this.includeDirectiveRegexCss : this.includeDirectiveRegexJs;
+
+        // important to reset the regex cursor before starting
+        includeDirective.lastIndex = 0;
+
+        let result;
+
+        while ((result = includeDirective.exec(script)) !== null) {
+            const fullMatchStr = result[0];
+
+            const endIndex = includeDirective.lastIndex;
+            const startIndex = endIndex - fullMatchStr.length;
+
+            // determine full path to include file
+            const scriptFileName = result[1].replace(/^"|"$/g, "");  // remove quotes, if any
+            yield [scriptFileName, startIndex, endIndex];
+
+            // needed because lastIndex may have been changed outside after the yield above
+            includeDirective.lastIndex = endIndex;
+        }
     }
 
     /**
