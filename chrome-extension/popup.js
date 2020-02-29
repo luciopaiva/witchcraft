@@ -29,6 +29,7 @@ class Popup {
         this.showVersion();
         this.showServerStatus();
         this.renderScriptsTable();
+        this.makeAdvancedPanel();
     }
 
     showVersion() {
@@ -92,6 +93,35 @@ class Popup {
                 scriptsTable.appendChild(tr);
             }
         }
+    }
+
+    makeAdvancedPanel() {
+        const openButton = document.getElementById("advanced");
+        const panel = document.getElementById("advanced-panel");
+
+        const serverAddressInput = document.getElementById("server-address");
+        serverAddressInput.value = this.witchcraft.getServerAddress();
+        serverAddressInput.addEventListener("input", event => {
+            this.witchcraft.setServerAddress(event.target.value);
+        });
+
+        this.isAdvancedPanelVisible = false;
+
+        openButton.addEventListener("click", event => {
+            this.isAdvancedPanelVisible = !this.isAdvancedPanelVisible;
+            panel.classList.toggle("hidden", !this.isAdvancedPanelVisible);
+            event.preventDefault();
+            return false;
+        });
+
+        const resetButton = document.getElementById("server-address-reset");
+        resetButton.addEventListener("click", event => {
+            console.info(this.witchcraft.defaultServerAddress);
+            this.witchcraft.setServerAddress(this.witchcraft.defaultServerAddress);
+            serverAddressInput.value = this.witchcraft.getServerAddress();
+            event.preventDefault();
+            return false;
+        });
     }
 }
 
