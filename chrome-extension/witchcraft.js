@@ -91,8 +91,8 @@ class Witchcraft {
         this.failCount = 0;
         this.jsIncludesHitCount = 0;
         this.cssIncludesHitCount = 0;
-        this.jsIncludesErrorCount = 0;
-        this.cssIncludesErrorCount = 0;
+        this.jsIncludesNotFoundCount = 0;
+        this.cssIncludesNotFoundCount = 0;
     }
 
     /**
@@ -194,11 +194,11 @@ class Witchcraft {
             if (this.cssIncludesHitCount > 0) {
                 this.analytics.send("Scripts", "CSS include hits", undefined, this.cssIncludesHitCount);
             }
-            if (this.jsIncludesErrorCount > 0) {
-                this.analytics.send("Scripts", "JS include errors", undefined, this.jsIncludesErrorCount);
+            if (this.jsIncludesNotFoundCount > 0) {
+                this.analytics.send("Scripts", "JS include not found", undefined, this.jsIncludesNotFoundCount);
             }
-            if (this.cssIncludesErrorCount > 0) {
-                this.analytics.send("Scripts", "CSS include errors", undefined, this.cssIncludesErrorCount);
+            if (this.cssIncludesNotFoundCount > 0) {
+                this.analytics.send("Scripts", "CSS include not found", undefined, this.cssIncludesNotFoundCount);
             }
         }
     }
@@ -299,9 +299,9 @@ class Witchcraft {
                             `/* WITCHCRAFT: could not include "${scriptFileName}"; script was not found */`});
 
                     if (scriptFileName.endsWith("js")) {
-                        this.jsIncludesErrorCount++;
+                        this.jsIncludesNotFoundCount++;
                     } else if (scriptFileName.endsWith("css")) {
-                        this.cssIncludesErrorCount++;
+                        this.cssIncludesNotFoundCount++;
                     }
                 }
             } else {

@@ -289,7 +289,7 @@ describe("Witchcraft", function () {
         // we expect the include directive to have been replaced by a multiline comment with a warning
         assert(result.startsWith("// 1\n/*"));
         assert(result.endsWith("*/\n// 3"));
-        assert.strictEqual(witchcraft.jsIncludesErrorCount, 1);
+        assert.strictEqual(witchcraft.jsIncludesNotFoundCount, 1);
     });
 
     it("should process recursive JavaScript include directives", async function () {
@@ -347,7 +347,7 @@ describe("Witchcraft", function () {
         // we expect the include directive to have been replaced by a multiline comment with a warning
         assert(result.startsWith("div {}\n/*"));
         assert(result.endsWith("*/\n.bar {}"));
-        assert.strictEqual(witchcraft.cssIncludesErrorCount, 1);
+        assert.strictEqual(witchcraft.cssIncludesNotFoundCount, 1);
     });
 
     it("should process recursive CSS include directives", async function () {
