@@ -276,6 +276,22 @@ describe("Witchcraft", function () {
         assert.strictEqual(result, "// 1\n// 2\n// 3");
     });
 
+    it("should not break if JavaScript include is not found", async function () {
+        const fileName = "foo.js";
+        const script = `// 1\n// @include bar.js\n// 3`;
+
+        witchcraft.queryLocalServerForFile.reset();
+        witchcraft.queryLocalServerForFile.onCall(0).resolves(null);  // bar.js not found
+
+        const result = await witchcraft.processIncludeDirectives(script, fileName, Witchcraft.EXT_JS);
+
+        assert.strictEqual(witchcraft.queryLocalServerForFile.getCalls().length, 1);
+        // we expect the include directive to have been replaced by a multiline comment with a warning
+        assert(result.startsWith("// 1\n/*"));
+        assert(result.endsWith("*/\n// 3"));
+        assert.strictEqual(witchcraft.jsIncludesErrorCount, 1);
+    });
+
     it("should process recursive JavaScript include directives", async function () {
         const fileName = "foo.js";
         const script = `// 1\n// @include bar.js\n// 3`;
@@ -288,6 +304,21 @@ describe("Witchcraft", function () {
 
         assert.strictEqual(witchcraft.queryLocalServerForFile.getCalls().length, 2);
         assert.strictEqual(result, "// 1\n// 2\n// 3");
+    });
+
+    it("should detect and avoid CSS include dependency cycles", async function () {
+        const fileName = "foo.js";
+        const script = `// 1\n// @include bar.js\n// 3`;
+
+        witchcraft.queryLocalServerForFile.reset();
+        witchcraft.queryLocalServerForFile.onCall(0).resolves("// @include bar.js");  // bar.js
+
+        const result = await witchcraft.processIncludeDirectives(script, fileName, Witchcraft.EXT_JS);
+
+        assert.strictEqual(witchcraft.queryLocalServerForFile.getCalls().length, 1);
+        // we expect the include directive to have been replaced by a multiline comment with a warning
+        assert(result.startsWith("// 1\n/*"));
+        assert(result.endsWith("*/\n// 3"));
     });
 
     it("should process simple CSS include directives", async function () {
@@ -303,6 +334,22 @@ describe("Witchcraft", function () {
         assert.strictEqual(result, "div {}\n.foo {}\n.bar {}");
     });
 
+    it("should not break if CSS include is not found", async function () {
+        const fileName = "foo.css";
+        const script = `div {}\n/* @include bar.css */\n.bar {}`;
+
+        witchcraft.queryLocalServerForFile.reset();
+        witchcraft.queryLocalServerForFile.onCall(0).resolves(null);  // bar.css not found
+
+        const result = await witchcraft.processIncludeDirectives(script, fileName, Witchcraft.EXT_CSS);
+
+        assert.strictEqual(witchcraft.queryLocalServerForFile.getCalls().length, 1);
+        // we expect the include directive to have been replaced by a multiline comment with a warning
+        assert(result.startsWith("div {}\n/*"));
+        assert(result.endsWith("*/\n.bar {}"));
+        assert.strictEqual(witchcraft.cssIncludesErrorCount, 1);
+    });
+
     it("should process recursive CSS include directives", async function () {
         const fileName = "foo.css";
         const script = `div {}\n/* @include bar.css */\n.bar {}`;
@@ -315,6 +362,21 @@ describe("Witchcraft", function () {
 
         assert.strictEqual(witchcraft.queryLocalServerForFile.getCalls().length, 2);
         assert.strictEqual(result, "div {}\n.foo {}\n.bar {}");
+    });
+
+    it("should detect and avoid CSS include dependency cycles", async function () {
+        const fileName = "foo.css";
+        const script = `div {}\n/* @include bar.css */\n.bar {}`;
+
+        witchcraft.queryLocalServerForFile.reset();
+        witchcraft.queryLocalServerForFile.onCall(0).resolves("/* @include bar.css */");  // bar.css
+
+        const result = await witchcraft.processIncludeDirectives(script, fileName, Witchcraft.EXT_CSS);
+
+        assert.strictEqual(witchcraft.queryLocalServerForFile.getCalls().length, 1);
+        // we expect the include directive to have been replaced by a multiline comment with a warning
+        assert(result.startsWith("div {}\n/*"));
+        assert(result.endsWith("*/\n.bar {}"));
     });
 
     it("should process include directives", async function () {
