@@ -28,7 +28,6 @@ describe("Background script", function () {
         vm.runInNewContext([witchcraftCode, backgroundCode].join("\n\n"), context);
 
         // should be listening for messages from the tab context
-        console.info(chrome.runtime.onMessage.addListener.getCalls().length);
         assert(chrome.runtime.onMessage.addListener.calledOnce);
         // should be listening for tab switches
         assert(chrome.tabs.onActivated.addListener.calledOnce);
