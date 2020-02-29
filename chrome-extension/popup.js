@@ -16,6 +16,8 @@ class Popup {
     constructor () {
         const background = chrome.extension.getBackgroundPage();
 
+        this.fullUrlRegex = /^https?:\/\//;
+
         /** @type {Witchcraft} */
         this.witchcraft = background.window.witchcraft;
         /** @type {Analytics} */
@@ -61,13 +63,17 @@ class Popup {
 
         if (hasScripts) {
             for (const scriptName of scriptNames) {
+                const fileName = scriptName.substr(scriptName.lastIndexOf("/") + 1);
+                const fullUrl = this.fullUrlRegex.test(scriptName) ? scriptName : serverAddress + scriptName;
 
                 const tdName = document.createElement("td");
+                tdName.classList.add("script-name");
                 const aName = document.createElement("a");
                 tdName.appendChild(aName);
                 aName.target = "_blank";
-                aName.innerText = scriptName;
-                aName.href = serverAddress + scriptName;
+                aName.innerText = fileName;
+                aName.href = fullUrl;
+                aName.setAttribute("title", aName.href);
 
                 const tdType = document.createElement("td");
                 const extensionMatch = scriptName.match(/\.([^.]+)$/);

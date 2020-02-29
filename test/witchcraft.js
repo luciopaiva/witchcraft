@@ -19,7 +19,7 @@ describe("Witchcraft", function () {
         chrome.reset();  // just to be on the safe side in case we missed any teardown
 
         witchcraft = new Witchcraft(chrome, undefined);
-        sinon.stub(witchcraft, "queryLocalServerForFile").resolves(sampleCode);
+        sinon.stub(witchcraft, "queryServerForFile").resolves(sampleCode);
 
         sender = {
             tab: { id: tabId },
@@ -160,12 +160,12 @@ describe("Witchcraft", function () {
         };
         await witchcraft.onScriptRequest(location, sender);
 
-        const calls = witchcraft.queryLocalServerForFile.getCalls();
+        const calls = witchcraft.queryServerForFile.getCalls();
 
         // must have made a total of 6 of calls: [global, google.com, com] x [js, css]
         assert.strictEqual(calls.length, 6);
         for (const call of calls) {
-            assert.strictEqual(call.args.length, 1);
+            assert.strictEqual(call.args.length, 2);
         }
 
         const actualScriptNames = calls.map(call => call.args[0]);
@@ -185,14 +185,14 @@ describe("Witchcraft", function () {
         };
         await witchcraft.onScriptRequest(location, sender);
 
-        const calls = witchcraft.queryLocalServerForFile.getCalls();
+        const calls = witchcraft.queryServerForFile.getCalls();
 
         // must have made a total of 6 of calls:
         // [global, com, luciopaiva.com, luciopaiva.com/foo, luciopaiva.com/foo/bar, luciopaiva.com/foo/bar/index.html]
         // x [js, css]
         assert.strictEqual(calls.length, 12);
         for (const call of calls) {
-            assert.strictEqual(call.args.length, 1);
+            assert.strictEqual(call.args.length, 2);
         }
 
         const actualScriptNames = calls.map(call => call.args[0]);
@@ -207,27 +207,49 @@ describe("Witchcraft", function () {
     });
 
     it("should handle bad fetch responses", async function () {
-        witchcraft.queryLocalServerForFile.restore();  // remove stub placed during setup()
+        witchcraft.queryServerForFile.restore();  // remove stub placed during setup()
 
         witchcraft.fetch = async () => { throw new Error() };
-        const response1 = await witchcraft.queryLocalServerForFile("google.com.js");
+        const response1 = await witchcraft.queryServerForFile("google.com.js", Witchcraft.EXT_JS);
         assert.strictEqual(response1, null);
 
         witchcraft.fetch = async () => { return { status: 500 } };
-        const response2 = await witchcraft.queryLocalServerForFile("google.com.js");
+        const response2 = await witchcraft.queryServerForFile("google.com.js", Witchcraft.EXT_JS);
         assert.strictEqual(response2, null);
 
         witchcraft.fetch = async () => { return { status: 404 } };
-        const response3 = await witchcraft.queryLocalServerForFile("google.com.js");
+        const response3 = await witchcraft.queryServerForFile("google.com.js", Witchcraft.EXT_JS);
         assert.strictEqual(response3, null);
     });
 
     it("should handle good fetch responses", async function () {
-        witchcraft.queryLocalServerForFile.restore();  // remove stub placed during setup()
+        witchcraft.queryServerForFile.restore();  // remove stub placed during setup()
 
         witchcraft.fetch = async () => { return { status: 200, text: async () => { return "hello"; } } };
-        const response = await witchcraft.queryLocalServerForFile("google.com.js");
+        const response = await witchcraft.queryServerForFile("google.com.js", Witchcraft.EXT_JS);
         assert.strictEqual(response, "hello");
+    });
+
+    it("should handle local URL", async function () {
+        witchcraft.queryServerForFile.restore();  // remove stub placed during setup()
+
+        witchcraft.fetch = sinon.stub();
+
+        const localFile = "google.com.js";
+        await witchcraft.queryServerForFile(localFile, Witchcraft.EXT_JS);
+        assert(witchcraft.fetch.calledOnce);
+        assert(witchcraft.fetch.getCall(0).calledWithExactly(witchcraft.serverAddress + localFile));
+    });
+
+    it("should handle remote URL", async function () {
+        witchcraft.queryServerForFile.restore();  // remove stub placed during setup()
+
+        witchcraft.fetch = sinon.stub();
+
+        const url = "https://google.com/foo.js";
+        await witchcraft.queryServerForFile(url, Witchcraft.EXT_JS);
+        assert(witchcraft.fetch.calledOnce);
+        assert(witchcraft.fetch.getCall(0).calledWithExactly(url));
     });
 
     it("should correctly match JavaScript include directives", function () {
@@ -242,6 +264,10 @@ describe("Witchcraft", function () {
         assert.strictEqual(testString('// @include "foo.js"'), "foo.js");
         assert.strictEqual(testString('/* @include "foo.js" */'), "foo.js");
         assert.strictEqual(testString('/* @include "foo.js"*/'), "foo.js");
+
+        // valid remote includes
+        assert.strictEqual(testString("// @include http://google.com/foo.js"), "http://google.com/foo.js");
+        assert.strictEqual(testString('// @include "http://google.com/foo.js"'), "http://google.com/foo.js");
 
         // malformed includes
         assert.strictEqual(testString("// include foo.js"), null);  // missing the @
@@ -272,12 +298,12 @@ describe("Witchcraft", function () {
         const fileName = "foo.js";
         const script = `// 1\n// @include bar.js\n// 3`;
 
-        witchcraft.queryLocalServerForFile.reset();
-        witchcraft.queryLocalServerForFile.onCall(0).resolves("// 2");  // bar.js
+        witchcraft.queryServerForFile.reset();
+        witchcraft.queryServerForFile.onCall(0).resolves("// 2");  // bar.js
 
         const result = await witchcraft.processIncludeDirectives(script, fileName, Witchcraft.EXT_JS, sender);
 
-        assert.strictEqual(witchcraft.queryLocalServerForFile.getCalls().length, 1);
+        assert.strictEqual(witchcraft.queryServerForFile.getCalls().length, 1);
         assert.strictEqual(result, "// 1\n// 2\n// 3");
     });
 
@@ -285,12 +311,12 @@ describe("Witchcraft", function () {
         const fileName = "foo.js";
         const script = `// 1\n// @include bar.js\n// 3`;
 
-        witchcraft.queryLocalServerForFile.reset();
-        witchcraft.queryLocalServerForFile.onCall(0).resolves(null);  // bar.js not found
+        witchcraft.queryServerForFile.reset();
+        witchcraft.queryServerForFile.onCall(0).resolves(null);  // bar.js not found
 
         const result = await witchcraft.processIncludeDirectives(script, fileName, Witchcraft.EXT_JS, sender);
 
-        assert.strictEqual(witchcraft.queryLocalServerForFile.getCalls().length, 1);
+        assert.strictEqual(witchcraft.queryServerForFile.getCalls().length, 1);
         // we expect the include directive to have been replaced by a multiline comment with a warning
         assert(result.startsWith("// 1\n/*"));
         assert(result.endsWith("*/\n// 3"));
@@ -301,13 +327,13 @@ describe("Witchcraft", function () {
         const fileName = "foo.js";
         const script = `// 1\n// @include bar.js\n// 3`;
 
-        witchcraft.queryLocalServerForFile.reset();
-        witchcraft.queryLocalServerForFile.onCall(0).resolves("// @include third.js");  // bar.js
-        witchcraft.queryLocalServerForFile.onCall(1).resolves("// 2");  // third.js
+        witchcraft.queryServerForFile.reset();
+        witchcraft.queryServerForFile.onCall(0).resolves("// @include third.js");  // bar.js
+        witchcraft.queryServerForFile.onCall(1).resolves("// 2");  // third.js
 
         const result = await witchcraft.processIncludeDirectives(script, fileName, Witchcraft.EXT_JS, sender);
 
-        assert.strictEqual(witchcraft.queryLocalServerForFile.getCalls().length, 2);
+        assert.strictEqual(witchcraft.queryServerForFile.getCalls().length, 2);
         assert.strictEqual(result, "// 1\n// 2\n// 3");
     });
 
@@ -315,12 +341,12 @@ describe("Witchcraft", function () {
         const fileName = "foo.js";
         const script = `// 1\n// @include bar.js\n// 3`;
 
-        witchcraft.queryLocalServerForFile.reset();
-        witchcraft.queryLocalServerForFile.onCall(0).resolves("// @include bar.js");  // bar.js
+        witchcraft.queryServerForFile.reset();
+        witchcraft.queryServerForFile.onCall(0).resolves("// @include bar.js");  // bar.js
 
         const result = await witchcraft.processIncludeDirectives(script, fileName, Witchcraft.EXT_JS, sender);
 
-        assert.strictEqual(witchcraft.queryLocalServerForFile.getCalls().length, 1);
+        assert.strictEqual(witchcraft.queryServerForFile.getCalls().length, 1);
         // we expect the include directive to have been replaced by a multiline comment with a warning
         assert(result.startsWith("// 1\n/*"));
         assert(result.endsWith("*/\n// 3"));
@@ -330,12 +356,12 @@ describe("Witchcraft", function () {
         const fileName = "foo.css";
         const script = `div {}\n/* @include bar.css */\n.bar {}`;
 
-        witchcraft.queryLocalServerForFile.reset();
-        witchcraft.queryLocalServerForFile.onCall(0).resolves(".foo {}");  // bar.js
+        witchcraft.queryServerForFile.reset();
+        witchcraft.queryServerForFile.onCall(0).resolves(".foo {}");  // bar.js
 
         const result = await witchcraft.processIncludeDirectives(script, fileName, Witchcraft.EXT_CSS, sender);
 
-        assert.strictEqual(witchcraft.queryLocalServerForFile.getCalls().length, 1);
+        assert.strictEqual(witchcraft.queryServerForFile.getCalls().length, 1);
         assert.strictEqual(result, "div {}\n.foo {}\n.bar {}");
     });
 
@@ -343,12 +369,12 @@ describe("Witchcraft", function () {
         const fileName = "foo.css";
         const script = `div {}\n/* @include bar.css */\n.bar {}`;
 
-        witchcraft.queryLocalServerForFile.reset();
-        witchcraft.queryLocalServerForFile.onCall(0).resolves(null);  // bar.css not found
+        witchcraft.queryServerForFile.reset();
+        witchcraft.queryServerForFile.onCall(0).resolves(null);  // bar.css not found
 
         const result = await witchcraft.processIncludeDirectives(script, fileName, Witchcraft.EXT_CSS, sender);
 
-        assert.strictEqual(witchcraft.queryLocalServerForFile.getCalls().length, 1);
+        assert.strictEqual(witchcraft.queryServerForFile.getCalls().length, 1);
         // we expect the include directive to have been replaced by a multiline comment with a warning
         assert(result.startsWith("div {}\n/*"));
         assert(result.endsWith("*/\n.bar {}"));
@@ -359,13 +385,13 @@ describe("Witchcraft", function () {
         const fileName = "foo.css";
         const script = `div {}\n/* @include bar.css */\n.bar {}`;
 
-        witchcraft.queryLocalServerForFile.reset();
-        witchcraft.queryLocalServerForFile.onCall(0).resolves("/* @include third.css */");  // bar.css
-        witchcraft.queryLocalServerForFile.onCall(1).resolves(".foo {}");  // third.css
+        witchcraft.queryServerForFile.reset();
+        witchcraft.queryServerForFile.onCall(0).resolves("/* @include third.css */");  // bar.css
+        witchcraft.queryServerForFile.onCall(1).resolves(".foo {}");  // third.css
 
         const result = await witchcraft.processIncludeDirectives(script, fileName, Witchcraft.EXT_CSS, sender);
 
-        assert.strictEqual(witchcraft.queryLocalServerForFile.getCalls().length, 2);
+        assert.strictEqual(witchcraft.queryServerForFile.getCalls().length, 2);
         assert.strictEqual(result, "div {}\n.foo {}\n.bar {}");
     });
 
@@ -373,12 +399,12 @@ describe("Witchcraft", function () {
         const fileName = "foo.css";
         const script = `div {}\n/* @include bar.css */\n.bar {}`;
 
-        witchcraft.queryLocalServerForFile.reset();
-        witchcraft.queryLocalServerForFile.onCall(0).resolves("/* @include bar.css */");  // bar.css
+        witchcraft.queryServerForFile.reset();
+        witchcraft.queryServerForFile.onCall(0).resolves("/* @include bar.css */");  // bar.css
 
         const result = await witchcraft.processIncludeDirectives(script, fileName, Witchcraft.EXT_CSS, sender);
 
-        assert.strictEqual(witchcraft.queryLocalServerForFile.getCalls().length, 1);
+        assert.strictEqual(witchcraft.queryServerForFile.getCalls().length, 1);
         // we expect the include directive to have been replaced by a multiline comment with a warning
         assert(result.startsWith("div {}\n/*"));
         assert(result.endsWith("*/\n.bar {}"));
@@ -392,13 +418,13 @@ describe("Witchcraft", function () {
         const endIndex = startIndex + includeFoo.length;
         const finalCode = Witchcraft.spliceString(sampleCodeWithIncludeDirective, startIndex, endIndex, fooCode);
 
-        witchcraft.queryLocalServerForFile.reset();
+        witchcraft.queryServerForFile.reset();
         let callIndex = -1;
-        witchcraft.queryLocalServerForFile.onCall(++callIndex).resolves(null);  // _global.js
-        witchcraft.queryLocalServerForFile.onCall(++callIndex).resolves(null);  // _global.css
-        witchcraft.queryLocalServerForFile.onCall(++callIndex).resolves(sampleCodeWithIncludeDirective);  // com.js
-        witchcraft.queryLocalServerForFile.onCall(++callIndex).resolves(fooCode);  // foo.js (included from com.js)
-        witchcraft.queryLocalServerForFile.onCall(++callIndex).resolves(null);  // com.css
+        witchcraft.queryServerForFile.onCall(++callIndex).resolves(null);  // _global.js
+        witchcraft.queryServerForFile.onCall(++callIndex).resolves(null);  // _global.css
+        witchcraft.queryServerForFile.onCall(++callIndex).resolves(sampleCodeWithIncludeDirective);  // com.js
+        witchcraft.queryServerForFile.onCall(++callIndex).resolves(fooCode);  // foo.js (included from com.js)
+        witchcraft.queryServerForFile.onCall(++callIndex).resolves(null);  // com.css
         const location = /** @type {Location} */ {
             hostname: "com",
         };
@@ -407,7 +433,7 @@ describe("Witchcraft", function () {
 
         await witchcraft.onScriptRequest(location, sender);
 
-        const calls = witchcraft.queryLocalServerForFile.getCalls();
+        const calls = witchcraft.queryServerForFile.getCalls();
         assert.strictEqual(calls.length, 5);
         const requestedScripts = calls.map(call => call.args[0]);
         assert.deepStrictEqual(requestedScripts, [

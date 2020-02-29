@@ -7,7 +7,7 @@ const
     Analytics = require("../chrome-extension/analytics"),
     Witchcraft = require("../chrome-extension/witchcraft");
 
-describe("Witchcraft", function () {
+describe("Analytics", function () {
 
     const tabId = 42;
     const sampleCode = "// some javascript code";
@@ -21,7 +21,7 @@ describe("Witchcraft", function () {
 
         witchcraft = new Witchcraft(chrome, undefined);
         witchcraft.analytics = sinon.createStubInstance(Analytics);
-        sinon.stub(witchcraft, "queryLocalServerForFile").resolves(sampleCode);
+        sinon.stub(witchcraft, "queryServerForFile").resolves(sampleCode);
 
         sender = {
             tab: { id: tabId },
