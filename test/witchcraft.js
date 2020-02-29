@@ -63,6 +63,10 @@ describe("Witchcraft", function () {
 
         levels = [...Witchcraft.iteratePathSegments("/foo/bar/index.html")];
         assert.deepStrictEqual(levels, ["/foo", "/foo/bar", "/foo/bar/index.html"]);
+
+        levels = [...Witchcraft.iteratePathSegments("/foo//bar/index.html")];
+        assert.deepStrictEqual(levels, ["/foo", "/foo/bar", "/foo/bar/index.html"],
+            "must deal with double slashes");
     });
 
     it ("should be able to splice strings", function () {

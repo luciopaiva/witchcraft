@@ -154,6 +154,7 @@ class Witchcraft {
      * @param {MessageSender} sender - the sender context of the content script that called us
      */
     async onScriptRequest(location, sender) {
+        console.info(location.hostname, location.pathname);
         this.clearScriptsIfTopFrame(sender);
         this.resetMetrics();
 
@@ -240,6 +241,7 @@ class Witchcraft {
             return undefined;
         }
         let beginAt = 1;  // we don't want to match the leading slash alone
+        pathName = pathName.replace(/\/{2,}/, "/");  // sanitize
         let result = pathName.indexOf("/", beginAt);
         while ((result = pathName.indexOf("/", beginAt)) !== -1) {
             yield pathName.substring(0, result);
