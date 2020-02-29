@@ -131,7 +131,7 @@ class Witchcraft {
             this.isServerReachable = true;
 
             if (response.status === 200) {
-                scriptFileName.endsWith("js") ? this.jsHitCount++ : this.cssHitCount++;
+                scriptFileName.endsWith(Witchcraft.EXT_JS) ? this.jsHitCount++ : this.cssHitCount++;
                 return await response.text();
             } else if (response.status === 404) {
                 return null;
@@ -157,21 +157,30 @@ class Witchcraft {
         this.clearScriptsIfTopFrame(sender);
         this.resetMetrics();
 
-        await this.loadScript(Witchcraft.globalScriptName, Witchcraft.EXT_JS, sender);
-        await this.loadScript(Witchcraft.globalScriptName, Witchcraft.EXT_CSS, sender);
+        await this.loadScript(this.joinNameAndExtension(Witchcraft.globalScriptName, Witchcraft.EXT_JS),
+            Witchcraft.EXT_JS, sender);
+        await this.loadScript(this.joinNameAndExtension(Witchcraft.globalScriptName, Witchcraft.EXT_CSS),
+            Witchcraft.EXT_CSS, sender);
 
         for (const domain of Witchcraft.iterateDomainLevels(location.hostname)) {
-            await this.loadScript(domain, Witchcraft.EXT_JS, sender);
-            await this.loadScript(domain, Witchcraft.EXT_CSS, sender);
+            await this.loadScript(this.joinNameAndExtension(domain, Witchcraft.EXT_JS), Witchcraft.EXT_JS, sender);
+            await this.loadScript(this.joinNameAndExtension(domain, Witchcraft.EXT_CSS), Witchcraft.EXT_CSS, sender);
         }
 
         for (const segment of Witchcraft.iteratePathSegments(location.pathname)) {
-            await this.loadScript(location.hostname + segment, Witchcraft.EXT_JS, sender);
-            await this.loadScript(location.hostname + segment, Witchcraft.EXT_CSS, sender);
+            await this.loadScript(this.joinNameAndExtension(location.hostname + segment, Witchcraft.EXT_JS),
+                Witchcraft.EXT_JS, sender);
+            await this.loadScript(this.joinNameAndExtension(location.hostname + segment, Witchcraft.EXT_CSS),
+                Witchcraft.EXT_CSS, sender);
         }
 
         this.updateInterface(sender.tab.id);
         this.sendMetrics();
+    }
+
+    /** @private */
+    joinNameAndExtension(name, extension) {
+        return `${name}.${extension}`;
     }
 
     sendMetrics() {
@@ -240,24 +249,27 @@ class Witchcraft {
     }
 
     /**
-     * @param {String} domain
+     * @param {String} scriptFileName
      * @param {String} scriptType - either Witchcraft.EXT_JS or Witchcraft.EXT_CSS
      * @param {MessageSender} sender - the sender context of the content script that called us
-     * @returns {Promise<void>}
+     * @param {Boolean} shouldSend - whether should actually send script; false if processing include directives
+     * @returns {Promise<String>}
      */
-    async loadScript(domain, scriptType, sender) {
-        const scriptFileName = `${domain}.${scriptType}`;
+    async loadScript(scriptFileName, scriptType, sender, shouldSend = true) {
         let scriptContents = await this.queryLocalServerForFile(scriptFileName);
         if (scriptContents) {
-            scriptContents = await this.processIncludeDirectives(scriptContents, scriptFileName, scriptType);
-            this.chrome.tabs.sendMessage(sender.tab.id, {
-                scriptType,
-                scriptContents,
-            }, {
-                frameId: sender.frameId
-            });
+            scriptContents = await this.processIncludeDirectives(scriptContents, scriptFileName, scriptType, sender);
+            if (shouldSend) {
+                this.chrome.tabs.sendMessage(sender.tab.id, {
+                    scriptType,
+                    scriptContents,
+                }, {
+                    frameId: sender.frameId
+                });
+            }
             this.registerScriptForTabId(scriptFileName, sender.tab.id);
         }
+        return scriptContents;
     }
 
     /**
@@ -268,11 +280,12 @@ class Witchcraft {
      * @param {String} originalScript - raw script to be processed
      * @param {String} originalScriptFileName - name of the raw script
      * @param {String} scriptType - either JavaScript or CSS
+     * @param {MessageSender} sender - the sender context of the content script that called us
      * @param {Set<String>} visitedScripts
      * @return {Promise<String>} - processed script
      */
     async processIncludeDirectives(originalScript, originalScriptFileName, scriptType,
-                                   visitedScripts = new Set()) {
+                                   sender, visitedScripts = new Set()) {
         visitedScripts.add(originalScriptFileName);
 
         /** @type {Array<{ startIndex: Number, endIndex: Number, scriptContent: String}>} */
@@ -281,16 +294,13 @@ class Witchcraft {
         for (const [scriptFileName, startIndex, endIndex] of this.findIncludedScriptNames(originalScript, scriptType)) {
             // check for dependency cycles
             if (!visitedScripts.has(scriptFileName)) {
-                let scriptContent = await this.queryLocalServerForFile(scriptFileName);
+                let scriptContent = await this.loadScript(scriptFileName, scriptType, sender, false);
                 if (scriptContent) {
-                    // expand it recursively
-                    const expandedScript =
-                        await this.processIncludeDirectives(scriptContent, scriptFileName, scriptType, visitedScripts);
-                    directives.push({ startIndex, endIndex, scriptContent: expandedScript });
+                    directives.push({ startIndex, endIndex, scriptContent });
 
-                    if (scriptFileName.endsWith("js")) {
+                    if (scriptFileName.endsWith(Witchcraft.EXT_JS)) {
                         this.jsIncludesHitCount++;
-                    } else if (scriptFileName.endsWith("css")) {
+                    } else if (scriptFileName.endsWith(Witchcraft.EXT_CSS)) {
                         this.cssIncludesHitCount++;
                     }
                 } else {
@@ -298,9 +308,9 @@ class Witchcraft {
                     directives.push({ startIndex, endIndex, scriptContent:
                             `/* WITCHCRAFT: could not include "${scriptFileName}"; script was not found */`});
 
-                    if (scriptFileName.endsWith("js")) {
+                    if (scriptFileName.endsWith(Witchcraft.EXT_JS)) {
                         this.jsIncludesNotFoundCount++;
-                    } else if (scriptFileName.endsWith("css")) {
+                    } else if (scriptFileName.endsWith(Witchcraft.EXT_CSS)) {
                         this.cssIncludesNotFoundCount++;
                     }
                 }

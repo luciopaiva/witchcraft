@@ -131,14 +131,14 @@ describe("Witchcraft", function () {
     });
 
     it("should load single script", async function () {
-        await witchcraft.loadScript("google.com", "js", sender);
+        await witchcraft.loadScript("google.com.js", Witchcraft.EXT_JS, sender);
 
         // check that the message is being sent to the tab
         assert(chrome.tabs.sendMessage.calledOnce);
         const call = chrome.tabs.sendMessage.getCall(0);
         assert.deepStrictEqual(call.args, [
             tabId, {
-                scriptType: "js",
+                scriptType: Witchcraft.EXT_JS,
                 scriptContents: sampleCode
             }, {
                 frameId: 0
@@ -270,7 +270,7 @@ describe("Witchcraft", function () {
         witchcraft.queryLocalServerForFile.reset();
         witchcraft.queryLocalServerForFile.onCall(0).resolves("// 2");  // bar.js
 
-        const result = await witchcraft.processIncludeDirectives(script, fileName, Witchcraft.EXT_JS);
+        const result = await witchcraft.processIncludeDirectives(script, fileName, Witchcraft.EXT_JS, sender);
 
         assert.strictEqual(witchcraft.queryLocalServerForFile.getCalls().length, 1);
         assert.strictEqual(result, "// 1\n// 2\n// 3");
@@ -283,7 +283,7 @@ describe("Witchcraft", function () {
         witchcraft.queryLocalServerForFile.reset();
         witchcraft.queryLocalServerForFile.onCall(0).resolves(null);  // bar.js not found
 
-        const result = await witchcraft.processIncludeDirectives(script, fileName, Witchcraft.EXT_JS);
+        const result = await witchcraft.processIncludeDirectives(script, fileName, Witchcraft.EXT_JS, sender);
 
         assert.strictEqual(witchcraft.queryLocalServerForFile.getCalls().length, 1);
         // we expect the include directive to have been replaced by a multiline comment with a warning
@@ -300,7 +300,7 @@ describe("Witchcraft", function () {
         witchcraft.queryLocalServerForFile.onCall(0).resolves("// @include third.js");  // bar.js
         witchcraft.queryLocalServerForFile.onCall(1).resolves("// 2");  // third.js
 
-        const result = await witchcraft.processIncludeDirectives(script, fileName, Witchcraft.EXT_JS);
+        const result = await witchcraft.processIncludeDirectives(script, fileName, Witchcraft.EXT_JS, sender);
 
         assert.strictEqual(witchcraft.queryLocalServerForFile.getCalls().length, 2);
         assert.strictEqual(result, "// 1\n// 2\n// 3");
@@ -313,7 +313,7 @@ describe("Witchcraft", function () {
         witchcraft.queryLocalServerForFile.reset();
         witchcraft.queryLocalServerForFile.onCall(0).resolves("// @include bar.js");  // bar.js
 
-        const result = await witchcraft.processIncludeDirectives(script, fileName, Witchcraft.EXT_JS);
+        const result = await witchcraft.processIncludeDirectives(script, fileName, Witchcraft.EXT_JS, sender);
 
         assert.strictEqual(witchcraft.queryLocalServerForFile.getCalls().length, 1);
         // we expect the include directive to have been replaced by a multiline comment with a warning
@@ -328,7 +328,7 @@ describe("Witchcraft", function () {
         witchcraft.queryLocalServerForFile.reset();
         witchcraft.queryLocalServerForFile.onCall(0).resolves(".foo {}");  // bar.js
 
-        const result = await witchcraft.processIncludeDirectives(script, fileName, Witchcraft.EXT_CSS);
+        const result = await witchcraft.processIncludeDirectives(script, fileName, Witchcraft.EXT_CSS, sender);
 
         assert.strictEqual(witchcraft.queryLocalServerForFile.getCalls().length, 1);
         assert.strictEqual(result, "div {}\n.foo {}\n.bar {}");
@@ -341,7 +341,7 @@ describe("Witchcraft", function () {
         witchcraft.queryLocalServerForFile.reset();
         witchcraft.queryLocalServerForFile.onCall(0).resolves(null);  // bar.css not found
 
-        const result = await witchcraft.processIncludeDirectives(script, fileName, Witchcraft.EXT_CSS);
+        const result = await witchcraft.processIncludeDirectives(script, fileName, Witchcraft.EXT_CSS, sender);
 
         assert.strictEqual(witchcraft.queryLocalServerForFile.getCalls().length, 1);
         // we expect the include directive to have been replaced by a multiline comment with a warning
@@ -358,7 +358,7 @@ describe("Witchcraft", function () {
         witchcraft.queryLocalServerForFile.onCall(0).resolves("/* @include third.css */");  // bar.css
         witchcraft.queryLocalServerForFile.onCall(1).resolves(".foo {}");  // third.css
 
-        const result = await witchcraft.processIncludeDirectives(script, fileName, Witchcraft.EXT_CSS);
+        const result = await witchcraft.processIncludeDirectives(script, fileName, Witchcraft.EXT_CSS, sender);
 
         assert.strictEqual(witchcraft.queryLocalServerForFile.getCalls().length, 2);
         assert.strictEqual(result, "div {}\n.foo {}\n.bar {}");
@@ -371,7 +371,7 @@ describe("Witchcraft", function () {
         witchcraft.queryLocalServerForFile.reset();
         witchcraft.queryLocalServerForFile.onCall(0).resolves("/* @include bar.css */");  // bar.css
 
-        const result = await witchcraft.processIncludeDirectives(script, fileName, Witchcraft.EXT_CSS);
+        const result = await witchcraft.processIncludeDirectives(script, fileName, Witchcraft.EXT_CSS, sender);
 
         assert.strictEqual(witchcraft.queryLocalServerForFile.getCalls().length, 1);
         // we expect the include directive to have been replaced by a multiline comment with a warning
@@ -414,5 +414,10 @@ describe("Witchcraft", function () {
         const tabMessageCall = chrome.tabs.sendMessage.getCall(0);
         assert.strictEqual(tabMessageCall.args.length, 3);
         assert.strictEqual(tabMessageCall.args[1].scriptContents, finalCode);
+
+        const loadedScripts = witchcraft.getScriptNamesForTabId(sender.tab.id);
+        assert.strictEqual(loadedScripts.size, 2);
+        assert(loadedScripts.has("com.js"));
+        assert(loadedScripts.has("foo.js"));
     });
 });
