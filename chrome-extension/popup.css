@@ -43,6 +43,13 @@ table.scripts {
     width: calc(100% - 2 * var(--margin));
 }
 
+td.script-name {
+    max-width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 td.js, td.css {
     text-align: center;
     font-size: 10px;

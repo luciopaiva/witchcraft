@@ -71,6 +71,7 @@ class Witchcraft {
         this.includeDirectiveRegexJs = /^[ \t]*(?:\/\/|\/\*)[ \t]*@include[ \t]*(".*?"|[^*\s]+).*$/mg;
         // only `/* @include foo.js */` is acceptable
         this.includeDirectiveRegexCss = /^[ \t]*\/\*[ \t]*@include[ \t]*(".*?"|\S+)[ \t]*\*\/.*$/mg;
+        this.fullUrlRegex = /^https?:\/\//;
 
         // listen for script/stylesheet requests
         this.chrome.runtime.onMessage.addListener(this.onScriptRequest.bind(this));
@@ -123,15 +124,17 @@ class Witchcraft {
 
     /**
      * @param {String} scriptFileName - the script file name to query for
+     * @param {String} scriptType
      * @returns {Promise<String>} file contents or null if file does not exist
      */
-    async queryLocalServerForFile(scriptFileName) {
+    async queryServerForFile(scriptFileName, scriptType) {
         try {
-            const response = await this.fetch(this.serverAddress + scriptFileName);
+            const fullUrl = this.fullUrlRegex.test(scriptFileName) ? scriptFileName : this.serverAddress + scriptFileName;
+            const response = await this.fetch(fullUrl);
             this.isServerReachable = true;
 
             if (response.status === 200) {
-                scriptFileName.endsWith(Witchcraft.EXT_JS) ? this.jsHitCount++ : this.cssHitCount++;
+                scriptType === Witchcraft.EXT_JS ? this.jsHitCount++ : this.cssHitCount++;
                 return await response.text();
             } else if (response.status === 404) {
                 return null;
@@ -258,7 +261,7 @@ class Witchcraft {
      * @returns {Promise<String>}
      */
     async loadScript(scriptFileName, scriptType, sender, shouldSend = true) {
-        let scriptContents = await this.queryLocalServerForFile(scriptFileName);
+        let scriptContents = await this.queryServerForFile(scriptFileName, scriptType);
         if (scriptContents) {
             scriptContents = await this.processIncludeDirectives(scriptContents, scriptFileName, scriptType, sender);
             if (shouldSend) {
