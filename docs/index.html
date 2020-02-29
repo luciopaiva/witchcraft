@@ -133,6 +133,12 @@
 
         <p>You may add multiple directives to the same script. If your script name contains spaces, you can use double quotes to refer to it (see the JavaScript example above).</p>
 
+        <p>It is possible to include remote scripts as well:</p>
+
+        <script src="https://gist.github.com/luciopaiva/8e0d358acf57789f8795dca754ff7f0a.js"></script>
+
+        <p>Useful for loading scripts from gists, for example.</p>
+
         <p>Included scripts can also <span class="code">@include</span> scripts of their own; the parser will recursively iterate through them. Dependency cycles (e.g., <span class="code">foo.js</span> includes <span class="code">bar.js</span>, which includes <span class="code">foo.js</span>) will be automatically resolved and each script won't be loaded more than once.</p>
 
         <p>This directive may be useful for including third-party libraries, like jQuery.</p>
