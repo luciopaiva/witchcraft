@@ -80,7 +80,7 @@ class Witchcraft {
 
         // listen for tab switches
         this.chrome.tabs.onActivated.addListener(
-            /** @type {{tabId: number}} */ activeInfo => this.updateInterface(activeInfo.tabId));
+            /** @type {{tabId: number}} */ activeInfo => this.updateCurrentTabId(activeInfo.tabId));
 
         this.analytics && this.analytics.send("App", "Load");
 
@@ -180,7 +180,8 @@ class Witchcraft {
                 Witchcraft.EXT_CSS, sender);
         }
 
-        this.updateInterface(sender.tab.id);
+        this.updateCurrentTabId(sender.tab.id);
+        this.updateIconAndTitle(sender.tab.id);
         this.sendMetrics();
     }
 
@@ -390,8 +391,9 @@ class Witchcraft {
      * font size, positioning, etc.
      *
      * @param {Number} count
+     * @param {Number} tabId
      */
-    updateIconWithScriptCount(count) {
+    updateIconWithScriptCount(count, tabId) {
         if (!this.iconContext) {
             return;  // will be undefined when running tests
         }
@@ -411,26 +413,32 @@ class Witchcraft {
             this.iconContext.fillText("!", 0, this.iconSize);
         }
 
-        this.chrome.browserAction.setIcon({ imageData: this.iconContext.getImageData(0, 0, this.iconSize, this.iconSize) });
+        const imageData = this.iconContext.getImageData(0, 0, this.iconSize, this.iconSize);
+        this.chrome.browserAction.setIcon({ imageData: imageData, tabId: tabId });
+    }
+
+    /**
+     * @param {number} tabId
+     */
+    updateCurrentTabId(tabId) {
+        // this will be used by the popup when it's opened
+        this.currentTabId = tabId;
     }
 
     /**
      * Updates the icon badge and popup with information about scripts loaded by the currently active Chrome tab.
      *
-     * @param {number} tabId - the id of the tab for which the badge should reflect the number of scripts loaded
+     * @param {Number} tabId
      */
-    updateInterface(tabId) {
-        // this will be used by the popup when it's opened
-        this.currentTabId = tabId;
-
+    updateIconAndTitle(tabId) {
         const scripts = this.scriptNamesByTabId.get(tabId);
         const count = scripts ? scripts.size : 0;
 
-        this.updateIconWithScriptCount(count);
+        this.updateIconWithScriptCount(count, tabId);
 
         const countStr = count.toString();
         const title = `Witchcraft (${count === 0 ? "no" : countStr} script${count === 1 ? "" : "s"} loaded)`;
-        this.chrome.browserAction.setTitle({ title: title});
+        this.chrome.browserAction.setTitle({ title: title, tabId: tabId });
     }
 
     /**

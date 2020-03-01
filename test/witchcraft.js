@@ -107,7 +107,7 @@ describe("Witchcraft", function () {
         sinon.spy(witchcraft, "updateIconWithScriptCount");
 
         // non-existing tab id, should report zero scripts
-        witchcraft.updateInterface(1);
+        witchcraft.updateCurrentTabId(1);
         assert(witchcraft.updateIconWithScriptCount.calledOnce);
         assert(witchcraft.updateIconWithScriptCount.calledWith(0));
         assert(chrome.browserAction.setTitle.calledOnce);
@@ -119,7 +119,7 @@ describe("Witchcraft", function () {
         // existing tab id, should report 2 scripts
         witchcraft.registerScriptForTabId("foo", 1);
         witchcraft.registerScriptForTabId("bar", 1);
-        witchcraft.updateInterface(1);
+        witchcraft.updateCurrentTabId(1);
         assert(witchcraft.updateIconWithScriptCount.calledOnce);
         assert(witchcraft.updateIconWithScriptCount.calledWith(2));
         assert(chrome.browserAction.setTitle.calledOnce);
