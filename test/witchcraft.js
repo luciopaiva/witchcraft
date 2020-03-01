@@ -88,27 +88,24 @@ describe("Witchcraft", function () {
     });
 
     it("should not add same script twice for same tab", function () {
-        assert.strictEqual(witchcraft.getScriptNamesForTabId(1).size, 0);
+        assert.strictEqual(witchcraft.getScriptNamesForTab(1).size, 0);
         witchcraft.registerScriptForTabId("foo", 1);
-        assert.strictEqual(witchcraft.getScriptNamesForTabId(1).size, 1);
+        assert.strictEqual(witchcraft.getScriptNamesForTab(1).size, 1);
         witchcraft.registerScriptForTabId("foo", 1);
-        assert.strictEqual(witchcraft.getScriptNamesForTabId(1).size, 1);
+        assert.strictEqual(witchcraft.getScriptNamesForTab(1).size, 1);
     });
 
     it("should clear scripts", function () {
-        assert.strictEqual(witchcraft.getScriptNamesForTabId(sender.tab.id).size, 0);
+        assert.strictEqual(witchcraft.getScriptNamesForTab(sender.tab.id).size, 0);
         witchcraft.registerScriptForTabId("foo", sender.tab.id);
-        assert.strictEqual(witchcraft.getScriptNamesForTabId(sender.tab.id).size, 1);
+        assert.strictEqual(witchcraft.getScriptNamesForTab(sender.tab.id).size, 1);
         witchcraft.clearScriptsIfTopFrame(sender);
-        assert.strictEqual(witchcraft.getScriptNamesForTabId(sender.tab.id).size, 0);
+        assert.strictEqual(witchcraft.getScriptNamesForTab(sender.tab.id).size, 0);
     });
 
     it("should update interface for given tab", function () {
+        const tabId = 1;
         sinon.spy(witchcraft, "updateIconWithScriptCount");
-
-        assert.strictEqual(witchcraft.currentTabId, -1, "should have no tab selected");
-        witchcraft.updateCurrentTabId(1);
-        assert.strictEqual(witchcraft.currentTabId, 1);
 
         // non-existing tab id, should report zero scripts
         witchcraft.updateIconAndTitle(1);
@@ -121,15 +118,15 @@ describe("Witchcraft", function () {
         chrome.browserAction.setTitle.resetHistory();
 
         // existing tab id, should report 2 scripts
-        witchcraft.registerScriptForTabId("foo", 1);
-        witchcraft.registerScriptForTabId("bar", 1);
-        witchcraft.updateIconAndTitle(1);
+        witchcraft.registerScriptForTabId("foo", tabId);
+        witchcraft.registerScriptForTabId("bar", tabId);
+        witchcraft.updateIconAndTitle(tabId);
         assert(witchcraft.updateIconWithScriptCount.calledOnce);
         assert(witchcraft.updateIconWithScriptCount.calledWith(2));
         assert(chrome.browserAction.setTitle.calledOnce);
 
         // take the chance to check if updateInterface() updated the current tab id
-        const scriptNames = witchcraft.getCurrentTabScriptNames();
+        const scriptNames = witchcraft.getScriptNamesForTab(tabId);
         assert.strictEqual(scriptNames.size, 2);
         assert(scriptNames.has("foo"));
         assert(scriptNames.has("bar"));
@@ -453,7 +450,7 @@ describe("Witchcraft", function () {
         assert.strictEqual(tabMessageCall.args.length, 3);
         assert.strictEqual(tabMessageCall.args[1].scriptContents, finalCode);
 
-        const loadedScripts = witchcraft.getScriptNamesForTabId(sender.tab.id);
+        const loadedScripts = witchcraft.getScriptNamesForTab(sender.tab.id);
         assert.strictEqual(loadedScripts.size, 2);
         assert(loadedScripts.has("com.js"));
         assert(loadedScripts.has("foo.js"));

@@ -29,8 +29,6 @@ describe("Background script", function () {
 
         // should be listening for messages from the tab context
         assert(chrome.runtime.onMessage.addListener.calledOnce);
-        // should be listening for tab switches
-        assert(chrome.tabs.onActivated.addListener.calledOnce);
 
         assert.notStrictEqual(typeof context.window.witchcraft, "undefined");
         assert.strictEqual(context.window.witchcraft.constructor.name, "Witchcraft");
