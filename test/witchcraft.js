@@ -460,4 +460,16 @@ describe("Witchcraft", function () {
 
         assert(sendMetricsSpy.calledOnce);
     });
+
+    it("should correctly set server address", function () {
+        function test(address, expectedAddress = address) {
+            witchcraft.setServerAddress(address);
+            assert.strictEqual(witchcraft.getServerAddress(), expectedAddress);
+        }
+
+        test("https://github.com/");
+        test("https://github.com", "https://github.com/");
+        test("", witchcraft.defaultServerAddress);
+        test("  https://github.com   ", "https://github.com/");
+    });
 });
