@@ -50,11 +50,13 @@ class Popup {
             .classList.toggle("offline", !this.witchcraft.isServerReachable);
     }
 
-    renderScriptsTable() {
+    /** @return {void} */
+    async renderScriptsTable() {
         const scriptsTable = document.getElementById("scripts-table");
         const noScriptsElement = document.getElementById("no-scripts");
 
-        const scriptNames = this.witchcraft.getCurrentTabScriptNames();
+        const currentTabId = await this.getCurrentTabId();
+        const scriptNames = this.witchcraft.getScriptNamesForTab(currentTabId);
 
         const serverAddress = this.witchcraft.getServerAddress();
 
@@ -93,6 +95,18 @@ class Popup {
                 scriptsTable.appendChild(tr);
             }
         }
+    }
+
+    async getCurrentTabId() {
+        return new Promise(resolve => {
+            chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
+                if (Array.isArray(tabs) && tabs.length > 0) {
+                    resolve(tabs[0].id);
+                } else {
+                    resolve(undefined);
+                }
+            });
+        });
     }
 
     makeAdvancedPanel() {

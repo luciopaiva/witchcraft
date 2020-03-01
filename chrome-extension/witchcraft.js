@@ -451,6 +451,15 @@ class Witchcraft {
     }
 
     /**
+     * Used by the popup window to show badge with count.
+     *
+     * @returns {Set<string>}
+     */
+    getScriptNamesForTab(tabId) {
+        return this.getScriptNamesForTabId(tabId);
+    }
+
+    /**
      * Used by the popup window to construct the URL of each loaded file.
      *
      * @returns {String}
