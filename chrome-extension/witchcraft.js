@@ -44,7 +44,7 @@ class Witchcraft {
 
         this.serverPort = 5743;
         this.defaultServerAddress = `http://127.0.0.1:${this.serverPort}/`;
-        const savedServerAddress = localStorage.getItem("server-address");
+        const savedServerAddress = typeof localStorage !== "undefined" && localStorage.getItem("server-address");
         this.serverAddress = savedServerAddress || this.defaultServerAddress;
         /** @type {Boolean} */
         this.isServerReachable = true;
@@ -471,7 +471,7 @@ class Witchcraft {
             serverAddress += "/";
         }
         this.serverAddress = serverAddress;
-        localStorage.setItem("server-address", this.serverAddress);
+        typeof localStorage !== "undefined" && localStorage.setItem("server-address", this.serverAddress);
     }
 
     /**
