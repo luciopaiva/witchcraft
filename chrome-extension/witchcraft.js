@@ -52,7 +52,6 @@ class Witchcraft {
         /** @type {Map<Number, Set<String>>} map with set of scripts loaded per tab, with the sole purpose of keeping
          *                                   the badge in the UI up-to-date */
         this.scriptNamesByTabId = new Map();
-        this.currentTabId = -1;
 
         this.iconSize = 16;
 
@@ -77,10 +76,6 @@ class Witchcraft {
 
         // listen for script/stylesheet requests
         this.chrome.runtime.onMessage.addListener(this.onScriptRequest.bind(this));
-
-        // listen for tab switches
-        this.chrome.tabs.onActivated.addListener(
-            /** @type {{tabId: number}} */ activeInfo => this.updateCurrentTabId(activeInfo.tabId));
 
         this.analytics && this.analytics.send("App", "Load");
 
@@ -180,7 +175,6 @@ class Witchcraft {
                 Witchcraft.EXT_CSS, sender);
         }
 
-        this.updateCurrentTabId(sender.tab.id);
         this.updateIconAndTitle(sender.tab.id);
         this.sendMetrics();
     }
@@ -418,14 +412,6 @@ class Witchcraft {
     }
 
     /**
-     * @param {number} tabId
-     */
-    updateCurrentTabId(tabId) {
-        // this will be used by the popup when it's opened
-        this.currentTabId = tabId;
-    }
-
-    /**
      * Updates the icon badge and popup with information about scripts loaded by the currently active Chrome tab.
      *
      * @param {Number} tabId
@@ -439,24 +425,6 @@ class Witchcraft {
         const countStr = count.toString();
         const title = `Witchcraft (${count === 0 ? "no" : countStr} script${count === 1 ? "" : "s"} loaded)`;
         this.chrome.browserAction.setTitle({ title: title, tabId: tabId });
-    }
-
-    /**
-     * Used by the popup window to show badge with count.
-     *
-     * @returns {Set<string>}
-     */
-    getCurrentTabScriptNames() {
-        return this.getScriptNamesForTabId(this.currentTabId);
-    }
-
-    /**
-     * Used by the popup window to show badge with count.
-     *
-     * @returns {Set<string>}
-     */
-    getScriptNamesForTab(tabId) {
-        return this.getScriptNamesForTabId(tabId);
     }
 
     /**
@@ -490,7 +458,7 @@ class Witchcraft {
      * @param {Number} tabId
      * @returns {Set<String>}
      */
-    getScriptNamesForTabId(tabId) {
+    getScriptNamesForTab(tabId) {
         return this.scriptNamesByTabId.get(tabId) || this.emptySet;
     }
 
