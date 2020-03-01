@@ -467,6 +467,9 @@ class Witchcraft {
      */
     setServerAddress(serverAddress) {
         serverAddress = serverAddress.trim();
+        if (serverAddress.length === 0) {
+            serverAddress = this.defaultServerAddress;
+        }
         if (!serverAddress.endsWith("/")) {
             serverAddress += "/";
         }
