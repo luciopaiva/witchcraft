@@ -106,8 +106,12 @@ describe("Witchcraft", function () {
     it("should update interface for given tab", function () {
         sinon.spy(witchcraft, "updateIconWithScriptCount");
 
-        // non-existing tab id, should report zero scripts
+        assert.strictEqual(witchcraft.currentTabId, -1, "should have no tab selected");
         witchcraft.updateCurrentTabId(1);
+        assert.strictEqual(witchcraft.currentTabId, 1);
+
+        // non-existing tab id, should report zero scripts
+        witchcraft.updateIconAndTitle(1);
         assert(witchcraft.updateIconWithScriptCount.calledOnce);
         assert(witchcraft.updateIconWithScriptCount.calledWith(0));
         assert(chrome.browserAction.setTitle.calledOnce);
@@ -119,7 +123,7 @@ describe("Witchcraft", function () {
         // existing tab id, should report 2 scripts
         witchcraft.registerScriptForTabId("foo", 1);
         witchcraft.registerScriptForTabId("bar", 1);
-        witchcraft.updateCurrentTabId(1);
+        witchcraft.updateIconAndTitle(1);
         assert(witchcraft.updateIconWithScriptCount.calledOnce);
         assert(witchcraft.updateIconWithScriptCount.calledWith(2));
         assert(chrome.browserAction.setTitle.calledOnce);
