@@ -49,7 +49,7 @@ class Witchcraft {
         /** @type {Boolean} */
         this.isServerReachable = true;
 
-        /** @type {Map<number, Set<string>>} map with set of scripts loaded per tab, with the sole purpose of keeping
+        /** @type {Map<Number, Set<String>>} map with set of scripts loaded per tab, with the sole purpose of keeping
          *                                   the badge in the UI up-to-date */
         this.scriptNamesByTabId = new Map();
         this.currentTabId = -1;
