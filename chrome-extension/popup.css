@@ -34,12 +34,8 @@ body, a {
     display: none;
 }
 
-#no-scripts {
-    text-align: center;
-}
-
 table.scripts {
-    width: calc(100% - 2 * var(--container-margin));
+    width: 100%;
 }
 
 td.script-name {
@@ -101,6 +97,10 @@ td.css {
 
 .row.right {
     flex-direction: row-reverse;
+}
+
+.row.center {
+    justify-content: center;
 }
 
 #server-status {
