@@ -328,7 +328,9 @@ class Witchcraft {
         for (const directive of directives) {
             expandedScript = Witchcraft.spliceString(expandedScript, directive.startIndex + delta,
                 directive.endIndex + delta, directive.scriptContent);
-            delta += directive.scriptContent.length;
+            const oldLength = directive.endIndex - directive.startIndex;
+            const newLength = directive.scriptContent.length;
+            delta += newLength - oldLength;
         }
 
         return expandedScript;
