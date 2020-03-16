@@ -308,6 +308,27 @@ describe("Witchcraft", function () {
         assert.strictEqual(result, "// 1\n// 2\n// 3");
     });
 
+    it("should process two consecutive JavaScript include directives", async function () {
+        const fileName = "foo.js";
+        const script = "console.info('start')\n" +
+            "// @include test1.js\n" +
+            "// @include test2.js\n" +
+            "console.info('end')";
+
+        witchcraft.queryServerForFile.reset();
+        witchcraft.queryServerForFile.onCall(0).resolves("console.info('test 1');");  // test1.js
+        witchcraft.queryServerForFile.onCall(1).resolves("console.info('test 2');");  // test2.js
+
+        const result = await witchcraft.processIncludeDirectives(script, fileName, Witchcraft.EXT_JS, sender);
+
+        assert.strictEqual(witchcraft.queryServerForFile.getCalls().length, 2);
+        assert.strictEqual(result, "console.info('start')\n" +
+            "console.info('test 1');\n" +
+            "console.info('test 2');\n" +
+            "console.info('end')"
+        );
+    });
+
     it("should not break if JavaScript include is not found", async function () {
         const fileName = "foo.js";
         const script = `// 1\n// @include bar.js\n// 3`;
