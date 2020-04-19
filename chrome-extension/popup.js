@@ -129,4 +129,4 @@ class Popup {
 
 // this script will run every time the popup is shown (i.e., every time the user clicks on the extension icon)
 // it reads information from the background window and shows it to the user
-window.addEventListener("load", async () => await new Popup());
+window.addEventListener("load", () => new Popup());
