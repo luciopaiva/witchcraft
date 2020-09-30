@@ -154,7 +154,6 @@ class Witchcraft {
      * @param {MessageSender} sender - the sender context of the content script that called us
      */
     async onScriptRequest(location, sender) {
-        console.info(location.hostname, location.pathname);
         this.clearScriptsIfTopFrame(sender);
         this.resetMetrics();
 
