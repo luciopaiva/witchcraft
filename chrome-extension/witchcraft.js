@@ -154,10 +154,6 @@ class Witchcraft {
      * @param {MessageSender} sender - the sender context of the content script that called us
      */
     async onScriptRequest(location, sender) {
-        if (sender.frameId != 0) {
-            // Run on all frames can be not necessary and pricey even the requests are local requests.
-            return;
-        } 
         this.clearScriptsIfTopFrame(sender);
         this.resetMetrics();
 
