@@ -127,7 +127,7 @@ class Witchcraft {
     async queryServerForFile(scriptFileName, scriptType) {
         try {
             const fullUrl = this.fullUrlRegex.test(scriptFileName) ? scriptFileName : this.serverAddress + scriptFileName;
-            const response = await this.fetch(fullUrl);
+            const response = await this.fetch(fullUrl, {cache: "no-store"});
             this.isServerReachable = true;
 
             if (response.status === 200) {
