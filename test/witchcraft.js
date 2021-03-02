@@ -239,7 +239,8 @@ describe("Witchcraft", function () {
         const localFile = "google.com.js";
         await witchcraft.queryServerForFile(localFile, Witchcraft.EXT_JS);
         assert(witchcraft.fetch.calledOnce);
-        assert(witchcraft.fetch.getCall(0).calledWithExactly(witchcraft.serverAddress + localFile));
+        assert(witchcraft.fetch.getCall(0)
+            .calledWithExactly(witchcraft.serverAddress + localFile, witchcraft.fetchOptions));
     });
 
     it("should handle remote URL", async function () {
@@ -250,7 +251,7 @@ describe("Witchcraft", function () {
         const url = "https://google.com/foo.js";
         await witchcraft.queryServerForFile(url, Witchcraft.EXT_JS);
         assert(witchcraft.fetch.calledOnce);
-        assert(witchcraft.fetch.getCall(0).calledWithExactly(url));
+        assert(witchcraft.fetch.getCall(0).calledWithExactly(url, witchcraft.fetchOptions));
     });
 
     it("should correctly match JavaScript include directives", function () {
