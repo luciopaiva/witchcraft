@@ -67,6 +67,7 @@ class Witchcraft {
 
         // fetch is only undefined during tests
         this.fetch = typeof fetch === "undefined" ? (async () => {}) : fetch.bind(window);
+        this.fetchOptions = { cache: "no-store" };
 
         // either `// @include foo.js` or `/* @include foo.js */`
         this.includeDirectiveRegexJs = /^[ \t]*(?:\/\/|\/\*)[ \t]*@include[ \t]*(".*?"|[^*\s]+).*$/mg;
@@ -127,7 +128,7 @@ class Witchcraft {
     async queryServerForFile(scriptFileName, scriptType) {
         try {
             const fullUrl = this.fullUrlRegex.test(scriptFileName) ? scriptFileName : this.serverAddress + scriptFileName;
-            const response = await this.fetch(fullUrl);
+            const response = await this.fetch(fullUrl, this.fetchOptions);
             this.isServerReachable = true;
 
             if (response.status === 200) {
