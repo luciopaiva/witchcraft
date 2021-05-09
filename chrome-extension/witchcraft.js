@@ -3,17 +3,6 @@
     background-persistent mode, a single instance will run, guaranteed not to leave memory and thus keeping its state.
  */
 
-// some declarations just to make linters stop complaining
-/**
- * @class chrome
- * @property runtime.onMessage.addListener
- * @property chrome.extension.getURL
- * @property tabs.onActivated
- * @property tabs.sendMessage
- * @property browserAction.setBadgeText
- * @property chrome.browserAction.setIcon
- * @property chrome.browserAction.setTitle
- */
 /**
  * // https://developer.chrome.com/extensions/tabs#type-Tab
  * @class Tab

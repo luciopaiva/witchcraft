@@ -2,20 +2,24 @@
 // some declarations just to make linters stop complaining
 /**
  * @class chrome
- * @property extension.getBackgroundPage
- * @property chrome.extension.getURL
+ * @property browserAction.setBadgeText
+ * @property browserAction.setIcon
+ * @property browserAction.setTitle
+ * @property extension.getURL
+ * @property runtime.getManifest
+ * @property runtime.getBackgroundPage
+ * @property runtime.onMessage.addListener
  * @property tabs.onActivated
  * @property tabs.sendMessage
- * @property browserAction.setBadgeText
- * @property chrome.browserAction.setIcon
- * @property chrome.browserAction.setTitle
  */
 
 class Popup {
 
     constructor () {
-        const background = chrome.extension.getBackgroundPage();
+        chrome.runtime.getBackgroundPage(this.init.bind(this));
+    }
 
+    init(background) {
         this.fullUrlRegex = /^https?:\/\//;
 
         /** @type {Witchcraft} */
