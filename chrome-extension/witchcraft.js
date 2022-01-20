@@ -262,9 +262,12 @@ class Witchcraft {
         if (scriptContents) {
             scriptContents = await this.processIncludeDirectives(scriptContents, scriptFileName, scriptType, sender);
             if (shouldSend) {
+                let scriptMode = this.evaluateScriptMode(scriptContents)
+
                 this.chrome.tabs.sendMessage(sender.tab.id, {
                     scriptType,
                     scriptContents,
+                    scriptMode
                 }, {
                     frameId: sender.frameId
                 });
@@ -272,6 +275,28 @@ class Witchcraft {
             this.registerScriptForTabId(scriptFileName, sender.tab.id);
         }
         return scriptContents;
+    }
+
+    /**
+     * @description parse the first line of a script to see what mode the script should be declared as. defaults to MODE_FN
+     * @param {String} scriptContents
+     * @return {number}
+     */
+    evaluateScriptMode(scriptContents){
+        let scriptMode = Witchcraft.MODE_FN;
+
+        if(scriptContents.length){
+            let firstLine = scriptContents.match(/^.*$/m)[0];
+            let scriptModeStr =  firstLine.match(/(?<=^\s*\/\/@mode[=: ])([0-3])(?=\b.*$)/g);
+            if(Array.isArray(scriptModeStr)){
+                scriptMode = [ null, 'MODE_IMMEDIATE_TAG', 'MODE_WINDOWLOAD_TAG', 'MODE_DOCUMENTLOAD_TAG' ].reduce((_scriptMode, modeStr) => {
+                    let staticVal = Witchcraft[modeStr];
+                    return `${scriptModeStr}` === `${staticVal}` ? staticVal : _scriptMode;
+                }, 0);
+            }
+        }
+
+        return scriptMode;
     }
 
     /**
@@ -470,6 +495,10 @@ class Witchcraft {
 
     static get EXT_JS() { return "js" }
     static get EXT_CSS() { return "css" }
+    static get MODE_FN(){ return 0 }
+    static get MODE_IMMEDIATE_TAG(){ return 1 }
+    static get MODE_WINDOWLOAD_TAG(){ return 2 }
+    static get MODE_DOCUMENTLOAD_TAG(){ return 3 }
 }
 
 Witchcraft.JS_HITS = ["Scripts", "JS hits", undefined];
