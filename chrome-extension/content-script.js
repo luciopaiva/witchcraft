@@ -13,24 +13,19 @@ chrome.runtime.onMessage.addListener(({ scriptType, scriptContents, scriptMode =
       document[node].appendChild(scriptEl);
     };
 
-    if ( scriptMode === 0 ){
-      Function(scriptContents)();
-    }
-
-    if ( scriptMode === 1 ){
-      createScriptEl({ node : 'head', scriptContents })
-    }
-
-    if ( scriptMode === 2 ){
-      window.addEventListener('load', (ev) => {
-        createScriptEl({ node : 'body', scriptContents });
-      })
-    }
-
-    if ( scriptMode === 3 ){
-      document.addEventListener('DOMContentLoaded', (ev) => {
-        createScriptEl({ node : 'body', scriptContents });
-      });
+    let ev, node;
+    switch ( scriptMode ){
+      case 0:
+        return Function(scriptContents)();
+      case 1:
+        node = 'head';
+        return createScriptEl({ node, scriptContents });
+      case 2:
+        [ ev, node ] = [ 'load', 'body' ];
+        return window.addEventListener(ev, () => ( createScriptEl({ node, scriptContents }) ));
+      case 3:
+        [ ev, node ] = [ 'DOMContentLoaded', 'body' ];
+        return document.addEventListener(ev, () => ( createScriptEl({ node, scriptContents }) ));
     }
 
   } else if ( scriptType === "css" ){
