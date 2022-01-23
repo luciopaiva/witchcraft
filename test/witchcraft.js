@@ -445,7 +445,7 @@ describe("Witchcraft", function (){
     assert(result.endsWith("*/\n.bar {}"));
   });
 
-  it('should return corect scriptMode for mode directives', async function (){
+  it('should return correct scriptMode for mode directives', async function (){
     const defaultValue = 0;
     const scriptContents = [
       {
