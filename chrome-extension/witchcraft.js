@@ -76,6 +76,7 @@ class Witchcraft {
     this.includeDirective2RegexJs = /^[ \t]*(?:\/\/|\/\*)[ \t]*@include\s*(.*?)[ \t]*($|\*\/)/mg;
     // only `/* @include foo.js */` is acceptable
     this.includeDirectiveRegexCss = /^[ \t]*\/\*[ \t]*@include[ \t]*(".*?"|\S+)[ \t]*\*\/.*$/mg;
+    this.includeDirective2RegexCss = /^[ \t]*\/\*[ \t]*@include\s*(.*?)[ \t]*($|\*\/)/mg;
     this.fullUrlRegex = /^https?:\/\//;
 
     // listen for script/stylesheet requests
@@ -323,9 +324,9 @@ class Witchcraft {
 
     let tabUrl = sender.url
 
-    for ( const [ scriptFileName, startIndex, endIndex ] of this.findIncludedScriptNames(originalScript, scriptType, tabUrl) ){
+    for ( const [ scriptFileName, startIndex, endIndex, failure ] of this.findIncludedScriptNames(originalScript, scriptType, tabUrl) ){
       // check for dependency cycles
-      if ( !visitedScripts.has(scriptFileName) ){
+      if ( !visitedScripts.has(scriptFileName) && !failure ){
         let scriptContent = await this.loadScript(scriptFileName, scriptType, sender, false);
         if ( scriptContent ){
           directives.push({ startIndex, endIndex, scriptContent });
@@ -339,7 +340,7 @@ class Witchcraft {
           // script not found
           directives.push({
             startIndex, endIndex, scriptContent :
-              `/* WITCHCRAFT: could not include "${scriptFileName}"; script was not found */`
+              `/* WITCHCRAFT: could not include "${scriptFileName}"; script was not found or matched */`
           });
 
           if ( scriptFileName.endsWith(Witchcraft.EXT_JS) ){
@@ -378,7 +379,7 @@ class Witchcraft {
    */
   * findIncludedScriptNames(script, scriptType, tabUrl){
     const includeDirective = scriptType === Witchcraft.EXT_CSS ?
-      this.includeDirectiveRegexCss : this.includeDirective2RegexJs;
+      this.includeDirective2RegexCss : this.includeDirective2RegexJs;
 
     // important to reset the regex cursor before starting
     includeDirective.lastIndex = 0;
@@ -387,7 +388,7 @@ class Witchcraft {
     let skipUrlCheck;
 
     while ( ( result = includeDirective.exec(script) ) !== null ){
-      let file, siteRegex;
+      let file, siteRegex, failure;
       const fullMatchStr = result[0];
 
       const endIndex = includeDirective.lastIndex;
@@ -395,19 +396,35 @@ class Witchcraft {
 
       // determine full path to include file
       let scriptFileName = result[1].replace(/^"|"$/g, "");  // remove quotes, if any
-      if ( scriptFileName.indexOf('{') !== -1 ){
-        ( { file, siteRegex } = JSON.parse(scriptFileName) );
-        siteRegex = new RegExp(siteRegex[0], siteRegex[1]);
-        scriptFileName = file;
-        skipUrlCheck = (typeof tabUrl === 'undefined');
+      if ( /[{}]/.test(scriptFileName) ){
+        try {
+          ( { file, siteRegex } = JSON.parse(scriptFileName) );
+          if ( typeof siteRegex === 'string' )
+            siteRegex = [ siteRegex, 'i' ];
+
+          if ( Array.isArray(siteRegex) )
+            siteRegex = new RegExp(siteRegex[0], siteRegex[1]);
+          else
+            siteRegex = /.*/i;
+          scriptFileName = file;
+          skipUrlCheck = ( typeof tabUrl === 'undefined' );
+          failure = null;
+        }catch(e){
+          failure = 500;
+          scriptFileName = 'unknown';
+        }
       } else {
         skipUrlCheck = true;
+        failure = null;
       }
-      if ( skipUrlCheck || siteRegex.test(tabUrl) )
-        yield [ scriptFileName, startIndex, endIndex ];
-      else {
-        continue;
+      if ( failure !== null){
+        //nothing
+      } else if (skipUrlCheck || siteRegex.test(tabUrl) ){
+        failure = null;
+      }else if(!siteRegex.test(tabUrl)){
+        failure = 404;
       }
+      yield [ scriptFileName, startIndex, endIndex, failure ];
 
       // needed because lastIndex may have been changed outside after the yield above
       includeDirective.lastIndex = endIndex;
