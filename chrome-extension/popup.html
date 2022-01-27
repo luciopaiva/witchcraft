@@ -17,7 +17,42 @@
 </div>
 
 <div class="header">
-    <div>Server</div><div id="server-status"></div>
+    <div>Directive Maker</div>
+    <div id="directive-maker"></div>
+</div>
+
+<div id="directive-panel" class="container">
+    <div class="row">
+        <label for="directive-file">File Path*:</label>
+        <input type="text" value="" id="directive-file" placeholder="full/path/to/file.js">
+    </div>
+    <div class="row">
+        <span style="width:80%">
+            <label for="directive-regexsource">Regex Pattern:</label>
+            <input type="text" value=".*" id="directive-regexsource"/>
+        </span>
+        <span>
+            <label for="directive-regexflags">Flags:</label>
+            <input type="text" value="i" id="directive-regexflags"/>
+        </span>
+    </div>
+    <div class="row">
+        <a id="directive-generatehelp" href="https://regex101.com">❓Help</a>
+        <a id="directive-copy" href="">🖇 Copy</a>
+    </div>
+    <div class="row" id="directive-preview">
+        <label for="directive-hint">Directive:</label>
+        <textarea
+          rows="2"
+          cols="80"
+          id="directive-hint"
+          placeholder="//@include {file:&quot;myfile.js&quot;,siteRegex :&quot;.*&quot;} "></textarea>
+    </div>
+</div>
+
+<div class="header">
+    <div>Server</div>
+    <div id="server-status"></div>
 </div>
 
 <div id="advanced-panel" class="container">
@@ -29,6 +64,7 @@
         <a id="server-address-reset" href="">Reset to default</a>
     </div>
 </div>
+
 
 <div class="header">
     <div class="title">Witchcraft <span id="version"></span></div>
