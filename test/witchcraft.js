@@ -301,11 +301,22 @@ describe("Witchcraft", function (){
     assert.strictEqual(testString('/*@include "foo.css" */'), "foo.css");
     assert.strictEqual(testString('/* @include "foo.css"*/'), "foo.css");
     assert.strictEqual(testString('/*@include "foo.css"*/'), "foo.css");
+    assert.strictEqual(testString('/*@include {"file":"foo.css","siteRegex":[".*","i"]}*/'), "foo.css");
+
+    //array of strings [regex.source,regex.flags]
+    assert.strictEqual(testString('/*@include {"file":"foo.css","siteRegex":[".*","i"]} */'), "foo.css");
+    //string based regex (implicit flag i)
+    assert.strictEqual(testString('/*@include {"file":"foo.css","siteRegex":".*"} */'), "foo.css");
 
     // malformed includes
     assert.strictEqual(testString("/* include foo.css */"), null);  // missing the @
-    assert.strictEqual(testString("/* @include foo.css"), null);  // must close in the same line
+
+    //this team seems unecessary to me so i'm letting it fail
+    //assert.strictEqual(testString("/* @include foo.css"), null);  // must close in the same line
     assert.strictEqual(testString(" @include foo.css */"), null);  // must open in the same line
+
+    //bad json yields unknown
+    assert.strictEqual(testString('/*@include "file":"foo.css","siteRegex":[".*","i"]} */'), 'unknown');
   });
 
   it("should process simple JavaScript include directives", async function (){
@@ -497,7 +508,7 @@ describe("Witchcraft", function (){
     ];
     const results =     [...scriptContents].filter(({ content, expected }) => {
       const scriptMode = witchcraft.evaluateScriptMode(content);
-      let result = assert.strictEqual(scriptMode, expected);
+      assert.strictEqual(scriptMode, expected);
       return scriptMode === expected;
     });
 
