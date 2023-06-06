@@ -31,7 +31,7 @@ export async function loadScripts(url, tabId, frameId) {
         //      interesting to have all of them download asynchronously and then be sent sequentially to the tab
         await loader.loadSingleScript(script, metrics).then(async () => {
             if (script.hasContents) {
-                await loader.sendScript(script, tabId, frameId);
+                await loader.injectScript(script, tabId, frameId);
             }
         });
     }

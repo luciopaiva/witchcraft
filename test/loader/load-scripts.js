@@ -35,7 +35,7 @@ describe("Load scripts", function () {
             contents: undefined,
         });
 
-        const sendScript = sinon.spy(loader, "sendScript");
+        const sendScript = sinon.stub(loader, "injectScript");
 
         await loader.loadScripts(url, tabId, frameId);
 
