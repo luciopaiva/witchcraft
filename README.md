@@ -22,6 +22,10 @@ Then you're ready to run the tests with coverage:
 
 Coverage also works in Webstorm seamlessly thanks to [`c8-as-nyc`](https://youtrack.jetbrains.com/issue/IDEA-315826/missing-c8-coverage-tool-support#focus=Comments-27-6999383.0-0).
 
+# Technical notes
+
+Read it [here](./technical-notes.md).
+
 # Credits
 
 Witchcraft is my rendition of [defunkt](//github.com/defunkt)'s original extension, [dotjs](//github.com/defunkt/dotjs). Although I never got to actually use dotjs (it only worked on macOS and the installation process was not easy), I really wanted something like that. Thanks, defunkt, for having such a cool idea.
