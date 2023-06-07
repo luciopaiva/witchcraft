@@ -37,6 +37,6 @@ export async function loadScripts(url, tabId, frameId) {
     }
 
     // ToDo persist state to chrome.storage
-    // ToDo update popup
+    // ToDo update popup (should it show an aggregation of all scripts loaded throughout all frames?)
     // ToDo dispatch metrics
 }
