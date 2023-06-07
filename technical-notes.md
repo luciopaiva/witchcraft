@@ -27,17 +27,31 @@ Which is effectively doing an `eval()` on the loaded text. CSS on its turn would
 
 ## Version 3
 
-And then came Witchcraft v3. It was a complete rewrite of the extension logic having as excuse the fact that Chrome changed behavior at some point and started unloading extensions at its own will. Extensions that relied on caching data in memory would lose information and break - and that affected Witchcraft v2.
+And then came Witchcraft v3. It was a complete rewrite of the extension logic having as excuse the fact that Chrome had just recently changed behavior and started unloading extensions at its own will. Extensions that relied on caching data in memory would lose information and stop working - and that affected Witchcraft v2.
 
-The intention was to take the chance to upgrade the extension manifest to version 3, since version 2 was getting deprecated at the time. However, version 3 at that moment did not support loading arbitrary scripts for security reasons - which rendered it impractical to upgrade the manifest.
+The intention was to take the chance to upgrade the extension manifest to version 3, since version 2 was getting deprecated at the time. However, for security reasons, version 3 did not support loading of arbitrary scripts - which rendered it impractical to upgrade the manifest.
 
-The new security policy forbids `eval()` and similar script evaluation methods, something that manifest v2 allows given that you specify `unsafe-eval` in the security policy property in `manifest.json`:
+The new security policy forbids `eval()` and similar script evaluation methods (like `Function()`), something that manifest v2 allows as long as you specify `unsafe-eval` in the security policy property in `manifest.json`:
 
     "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'"
 
-I wonder if injecting the script via a `script` tag (like Witchcraft v2 did) would work to bypass the security policy in manifest v3, but I did not test that because I got rid of the content script in the new architecture.
+I tried running `Function()` in both the content script and the background script with manifest v3, but Chrome simply refuses it:
 
-The reason I deleted the content script was to make the implementation simpler. I'm not sure if it was not available at the time I first implemented Witchcraft, but the fact is that the API offers ways for the background script to be called whenever a navigation event happens; specifically, the event `chrome.webNavigation.onCommitted`.
+    Error in event handler: EvalError: Refused to evaluate a string as JavaScript because 'unsafe-eval' is not an allowed source of script in the following Content Security Policy directive: "script-src 'self' 'wasm-unsafe-eval' 'inline-speculation-rules' http://localhost:* http://127.0.0.1:*".
+
+And trying to add `unsafe-eval` to the security policy gives:
+
+    Error: 'content_security_policy.extension_pages': Insecure CSP value "'unsafe-eval'" in directive 'script-src'.
+
+So there is no way around it, because we cannot work around the fact that the script is loaded as text and needs to be converted to a Function, so it can be passed to `chrome.scripting.executeScript()` (to the parameter `func`).
+
+That's why Witchcraft version 3 will still be based on manifest v2. More on that on the "Upgrading to manifest v3" below.
+
+### Getting rid of the content script
+
+Witchcraft v3 gets rid of the content script and relies solely on the background script. The reason I deleted the content script was to make the implementation simpler. I'm not sure if it was not available at the time I first implemented Witchcraft, but the fact is that the API offers ways for the background script to be called whenever a navigation event happens; specifically, the event `chrome.webNavigation.onCommitted`.
+
+### Background script as a module
 
 I wrote the new background script as an ES6 module, but unfortunately manifest v2 does not accept modules. The workaround for that was to load the script via `background.html`, where we can load the script properly:
 
