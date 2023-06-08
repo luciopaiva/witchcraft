@@ -2,8 +2,13 @@
 import assert from "assert";
 import { describe, it } from "mocha";
 import {iterateDomainLevels} from "../../chrome-extension/path/iterate-domain-levels.js";
+import sinon from "sinon";
 
 describe("Iterate domain levels", function () {
+
+    beforeEach(function () {
+        sinon.restore();
+    });
 
     it("one-level domain", function () {
         const levels = [...iterateDomainLevels("foo")];

@@ -1,10 +1,15 @@
 
 import assert from "assert";
-import { describe, it, setup, teardown } from "mocha";
+import { describe, it } from "mocha";
 import {script} from "../../chrome-extension/script/index.js";
 import {EXT_CSS, EXT_JS} from "../../chrome-extension/path/map-to-js-and-css.js";
+import sinon from "sinon";
 
 describe("Find include directive", function () {
+
+    beforeEach(function () {
+        sinon.restore();
+    });
 
     it("empty script", function () {
         const js = "";

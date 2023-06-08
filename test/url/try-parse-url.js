@@ -2,8 +2,13 @@
 import assert from "assert";
 import { describe, it } from "mocha";
 import {tryParseUrl} from "../../chrome-extension/url/try-parse-url.js";
+import sinon from "sinon";
 
 describe("Parse URL", function () {
+
+    beforeEach(function () {
+        sinon.restore();
+    });
 
     it ("Only host name", function () {
         const result = tryParseUrl("https://www.google.com");

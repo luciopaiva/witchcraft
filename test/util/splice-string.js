@@ -2,8 +2,13 @@
 import assert from "assert";
 import { describe, it } from "mocha";
 import {util} from "../../chrome-extension/util/index.js";
+import sinon from "sinon";
 
 describe("Splice string", function () {
+
+    beforeEach(function () {
+        sinon.restore();
+    });
 
     it("simple splice", async function () {
         const result = util.spliceString("foobarfoo", 3, 6, "foo");

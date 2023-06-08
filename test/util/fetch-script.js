@@ -3,8 +3,13 @@ import assert from "assert";
 import { describe, it } from "mocha";
 import {util} from "../../chrome-extension/util/index.js";
 import {FETCH_RESPONSE_OUTCOME} from "../../chrome-extension/util/fetch-script.js";
+import sinon from "sinon";
 
 describe("Fetch script", function () {
+
+    beforeEach(function () {
+        sinon.restore();
+    });
 
     it("success", async function () {
         const result = await util.fetchScript("", fakeFetch(200, "foo"));

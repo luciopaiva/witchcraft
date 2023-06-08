@@ -1,5 +1,5 @@
 
-import { describe, it, setup, teardown } from "mocha";
+import { describe, it } from "mocha";
 import sinon from "sinon";
 import {loader} from "../../chrome-extension/loader/index.js";
 import {util} from "../../chrome-extension/util/index.js";
@@ -8,7 +8,7 @@ import {SERVER_URL} from "../../chrome-extension/script/prepend-server-origin.js
 
 describe("Load scripts", function () {
 
-    teardown(function () {
+    beforeEach(function () {
         sinon.restore();
     });
 

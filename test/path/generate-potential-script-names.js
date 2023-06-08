@@ -3,10 +3,15 @@ import assert from "assert";
 import { describe, it } from "mocha";
 import {GLOBAL_SCRIPT_NAME} from "../../chrome-extension/path/generate-potential-script-names.js";
 import {path} from "../../chrome-extension/path/index.js";
+import sinon from "sinon";
 
 const {generatePotentialScriptNames} = path;
 
 describe("Script name generator", function () {
+
+    beforeEach(function () {
+        sinon.restore();
+    });
 
     it("host and path", function () {
         const levels = [...generatePotentialScriptNames("https://www.luciopaiva.com/foo/bar/index.html")];

@@ -1,11 +1,14 @@
-
 import vm from "node:vm";
 import assert from "node:assert";
-import { describe, it } from "mocha";
+import {describe, it} from "mocha";
 import sinon from "sinon";
-import {loader} from "../../chrome-extension/loader/index.js";
+import {util} from "../../chrome-extension/util/index.js";
 
 describe("Embed script", function () {
+
+    beforeEach(function () {
+        sinon.restore();
+    });
 
     it("simple embed", function () {
         // step 1: prepare script to embed
@@ -13,13 +16,13 @@ describe("Embed script", function () {
         const contents = `
             window.x = 123;
         `;
-        const code = loader.embedScript(contents);
+        const code = util.embedScript(contents);
+
+        // step 2: pass it to the content script execution environment
 
         const script = {
             text: "",
         }
-
-        // step 2: pass it to the content script execution environment
 
         const appendChildFn = sinon.fake();
 
@@ -51,5 +54,28 @@ describe("Embed script", function () {
         vm.runInNewContext(injectedCode, pageContext);
 
         assert.strictEqual(pageContext.window.x, 123);
+    });
+
+    it("injector", function () {
+        const script = {
+            text: "",
+        }
+
+        const appendChildFn = sinon.fake();
+
+        const document = {
+            createElement: sinon.fake.returns(script),
+            documentElement: {
+                appendChild: appendChildFn,
+            }
+        };
+
+        util.injector(document);
+
+        assert(document.documentElement.appendChild.calledOnce);
+        assert(document.documentElement.appendChild.getCall(0).firstArg === script)
+        console.info(script);
+
+        return script.text;
     });
 });

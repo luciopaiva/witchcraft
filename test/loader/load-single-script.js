@@ -1,6 +1,6 @@
 
 import assert from "assert";
-import { describe, it, setup, teardown } from "mocha";
+import { describe, it } from "mocha";
 import {loader} from "../../chrome-extension/loader/index.js";
 import {script} from "../../chrome-extension/script/index.js";
 import sinon from "sinon";
@@ -57,7 +57,7 @@ describe("Load single script", function () {
         failCount: 0,
     };
 
-    teardown(function () {
+    beforeEach(function () {
         sinon.restore();
     });
 
