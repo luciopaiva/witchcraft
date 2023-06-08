@@ -20,7 +20,7 @@
       "128": "witch-128.png"
     },
     "default_title": "Witchcraft",
-    "default_popup": "popup.html"
+    "default_popup": "popup/popup.html"
   },
   "background": {
     "page": "background.html",
