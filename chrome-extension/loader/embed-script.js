@@ -8,7 +8,12 @@ function injector() {
     document.documentElement.appendChild(script);
 }
 
+const [INJECTOR_PREFIX, INJECTOR_SUFFIX] = injector.toString().split("/*INJECTION_POINT*/");
+const IIFE_BEGIN = "(";
+const IIFE_END = ")()";
+const EMBED_PREFIX = IIFE_BEGIN + INJECTOR_PREFIX;
+const EMBED_SUFFIX = INJECTOR_SUFFIX + IIFE_END;
+
 export function embedScript(contents) {
-    const wrapped = injector.toString().replace("/*INJECTION_POINT*/", contents);
-    return `(${wrapped})()`;
+    return [EMBED_PREFIX, contents, EMBED_SUFFIX].join("");
 }
