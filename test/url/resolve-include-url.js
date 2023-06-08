@@ -2,11 +2,16 @@
 import assert from "assert";
 import { describe, it } from "mocha";
 import {resolveIncludeUrl} from "../../chrome-extension/url/resolve-include-url.js";
+import sinon from "sinon";
 
 const origin = "https://luciopaiva.com:1234";
 const queryAndFragment = "?q=true#hello";
 
 describe("Resolve include URL", function () {
+
+    beforeEach(function () {
+        sinon.restore();
+    });
 
     it ("absolute path", function () {
         const url = origin + "/witchcraft/index.html" + queryAndFragment;

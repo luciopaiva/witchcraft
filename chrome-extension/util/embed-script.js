@@ -1,5 +1,5 @@
 
-function injector() {
+export function injector(document) {
     const fnStr = (function fn() { /*INJECTION_POINT*/ }).toString();
     const script = document.createElement("script");
     script.text = `(${fnStr})()`;
@@ -10,7 +10,7 @@ function injector() {
 
 const [INJECTOR_PREFIX, INJECTOR_SUFFIX] = injector.toString().split("/*INJECTION_POINT*/");
 const IIFE_BEGIN = "(";
-const IIFE_END = ")()";
+const IIFE_END = ")(document)";
 const EMBED_PREFIX = IIFE_BEGIN + INJECTOR_PREFIX;
 const EMBED_SUFFIX = INJECTOR_SUFFIX + IIFE_END;
 

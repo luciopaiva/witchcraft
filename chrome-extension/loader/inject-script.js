@@ -1,5 +1,6 @@
 import {EXT_CSS, EXT_JS} from "../path/map-to-js-and-css.js";
-import {loader} from "./index.js";
+import {browser} from "../browser/index.js";
+import {util} from "../util/index.js";
 
 /**
  * @param {ScriptContext} script
@@ -16,23 +17,17 @@ export async function injectScript(script, tabId, frameId) {
 }
 
 function injectJs(url, contents, tabId, frameId) {
-    chrome.tabs.executeScript(tabId, {
-        code: loader.embedScript(contents),
-        frameId: frameId,
-        runAt: "document_start",
-    });
+    browser.api.injectJs(util.embedScript(contents), tabId, frameId);
     logInjection(tabId, "JS", url);
 }
 
 function injectCss(url, contents, tabId, frameId) {
-    chrome.tabs.insertCSS(tabId, {
-        code: contents,
-        frameId: frameId,
-        runAt: "document_start",
-    });
+    browser.api.injectCss(contents, tabId, frameId);
     logInjection(tabId, "CSS", url);
 }
 
 function logInjection(tabId, type, scriptUrl) {
-    chrome.tabs.get(tabId, details => console.info(`Injected ${type} ${scriptUrl} into ${details.url}`));
+    browser.api.getTabUrl(tabId).then(tabUrl => {
+        console.info(`Injected ${type} ${scriptUrl} into ${tabUrl}`);
+    });
 }

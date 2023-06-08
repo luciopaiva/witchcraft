@@ -1,5 +1,5 @@
 
-import { describe, it, setup, teardown } from "mocha";
+import { describe, it } from "mocha";
 import sinon from "sinon";
 import {loader} from "../../chrome-extension/loader/index.js";
 import {script} from "../../chrome-extension/script/index.js";
@@ -11,7 +11,7 @@ const {Metrics} = analytics;
 
 describe("Load includes", function () {
 
-    teardown(function () {
+    beforeEach(function () {
         sinon.restore();
     });
 

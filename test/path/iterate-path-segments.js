@@ -2,8 +2,13 @@
 import assert from "assert";
 import { describe, it } from "mocha";
 import { iteratePathSegments } from "../../chrome-extension/path/iterate-path-segments.js";
+import sinon from "sinon";
 
 describe("Iterate path segments", function () {
+
+    beforeEach(function () {
+        sinon.restore();
+    });
 
     it ("empty string", function () {
         const segments = [...iteratePathSegments("")];
