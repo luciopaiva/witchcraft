@@ -3,8 +3,13 @@ import {path} from "../path/index.js";
 import Metrics from "../analytics/metrics.js";
 import {loader} from "./index.js";
 import {script} from "../script/index.js";
+import {util} from "../util/index.js";
 
 export async function loadScripts(url, tabId, frameId) {
+
+    if (!util.isValidUrl(url)) {
+        return;
+    }
 
     /** @type {ScriptContext[]} */
     const scripts = path.generatePotentialScriptNames(url)
