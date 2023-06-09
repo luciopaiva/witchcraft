@@ -18,16 +18,23 @@ export async function injectScript(script, tabId, frameId) {
 
 function injectJs(url, contents, tabId, frameId) {
     browser.api.injectJs(util.embedScript(contents), tabId, frameId);
-    logInjection(tabId, "JS", url);
+    logInjection(tabId, frameId, "JS", url);
 }
 
 function injectCss(url, contents, tabId, frameId) {
     browser.api.injectCss(contents, tabId, frameId);
-    logInjection(tabId, "CSS", url);
+    logInjection(tabId, frameId, "CSS", url);
 }
 
-function logInjection(tabId, type, scriptUrl) {
-    browser.api.getTabUrl(tabId).then(tabUrl => {
-        console.info(`Injected ${type} ${scriptUrl} into ${tabUrl}`);
-    });
+function logInjection(tabId, frameId, type, scriptUrl) {
+    let tabUrl = "failed to obtain URL";
+    browser.api.getTabUrl(tabId)
+        .then(retrievedUrl => {
+            tabUrl = retrievedUrl ?? "blank URL";
+        })
+        .catch(() => { /* do nothing */ })
+        .finally(() => {
+            const tabAndFrame = `tab ${tabId}, frame ${frameId}`;
+            console.info(`Injected ${type} ${scriptUrl} into [${tabAndFrame}] (${tabUrl})`);
+        });
 }
