@@ -64,13 +64,25 @@
             <li>
                 <b>Cross-platform</b>
 
-                <p>Since Witchcraft runs as a Chrome extension, it is also cross-platform. It has been tested on Windows, MacOS and Linux;</p>
+                <p>Since Witchcraft runs as a Chrome extension, it is also cross-platform. It has been tested on Windows, macOS and Linux;</p>
             </li>
 
             <li>
                 <b>Runs on all frames</b>
 
-                <p>Witchcraft is listening for pages loading everywhere, not just on the top frame. This means it will run even on pages loaded inside other pages.</p>
+                <p>Witchcraft is listening for pages loading everywhere, not just on the top frame. This means it will run even on pages loaded inside other pages;</p>
+            </li>
+
+            <li>
+                <b>Gives you full control of the page</b>
+
+                <p>Witchcraft gives you the chance to run code on any page even before Chrome finished loading it - so early you can even prevent page scripts from running by intercepting their script tags before they have tha chance to execute;</p>
+            </li>
+
+            <li>
+                <b>Open source</b>
+
+                <p>Unlike other popular tools (e.g.: Tampermonkey), Witchcraft is open source, so you can have full understanding of what it's doing. If you don't trust the Chrome Store packaged extension, it's easy to build it yourself from the sources.</p>
             </li>
 
         </ul>
@@ -81,7 +93,7 @@
 
         <h3>Domain level scripts</h3>
 
-        <p>Witchcraft also looks for scripts on all domain levels. For instance, if one accesses <span class="code">https://gist.github.com</span>, it will try to load all domain levels for which there are existing scripts, in this very order:
+        <p>Witchcraft also looks for scripts on all domain levels. For instance, if one accesses <span class="code">https://gist.github.com</span>, it will try to load all domain levels for which there are existing scripts, in this very guaranteed order:
 
         <ul>
             <li><span class="code">_global.js</span> <i>(see next section for more details)</i></li>
