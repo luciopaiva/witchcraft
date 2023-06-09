@@ -21,7 +21,9 @@ chrome.runtime.onSuspend.addListener(() => {
     console.info("Suspended!");
 });
 
+const NAVIGATION_FILTER = { url: [{ schemes: ["http", "https", "file", "ftp"] }] };
+
 chrome.webNavigation.onCommitted.addListener(async (details) => {
     const { url, tabId, frameId } = details;
     await loader.loadScripts(url, tabId, frameId);
-});
+}, NAVIGATION_FILTER);
