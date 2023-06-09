@@ -1,7 +1,7 @@
 import assert from "node:assert";
 import {describe, it} from "mocha";
 import sinon from "sinon";
-import {chromeApi} from "../../../chrome-extension/chrome-api/index.js";
+import {chromeApi} from "../../../chrome-extension/browser/chrome-api/index.js";
 
 describe("Chrome API - Inject CSS", function () {
 

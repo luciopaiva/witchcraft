@@ -12,23 +12,37 @@ describe("Inject script", function () {
         sinon.restore();
     });
 
+    const tabUrl = "https://bar.com";
+    const tabId = 10;
+    const frameId = 20;
+
     [EXT_JS, EXT_CSS].forEach(type => {
+        const script = {
+            type: type,
+            url: "https://foo.com",
+            contents: "/** foo **/",
+        };
+
         it(`inject ${type}`, async function () {
-            const tabUrl = "https://bar.com";
-            const mockBrowser = {
+            await runTest({
                 injectJs: sinon.fake(),
                 injectCss: sinon.fake(),
                 getTabUrl: sinon.fake.resolves(tabUrl),
-            };
+            });
+        });
+
+        it(`fails to get tab URL when injecting ${type}`, async function () {
+            await runTest({
+                injectJs: sinon.fake(),
+                injectCss: sinon.fake(),
+                // failing to get tab URL should not prevent script from loading
+                getTabUrl: sinon.fake.rejects(),
+            });
+        });
+
+        async function runTest(mockBrowser) {
             sinon.replace(browser, "api", mockBrowser);
 
-            const script = {
-                type: type,
-                url: "https://foo.com",
-                contents: "/** foo **/",
-            };
-            const tabId = 10;
-            const frameId = 20;
             await loader.injectScript(script, tabId, frameId);
 
             if (type === EXT_JS) {
@@ -42,6 +56,6 @@ describe("Inject script", function () {
             }
             assert(mockBrowser.getTabUrl.calledOnce);
             assert(mockBrowser.getTabUrl.calledWithExactly(tabId));
-        });
+        }
     });
 });

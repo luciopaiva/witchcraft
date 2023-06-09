@@ -1,4 +1,4 @@
-import {util} from "../util/index.js";
+import {util} from "../../util/index.js";
 import {chromeApi} from "./index.js";
 
 export function injectJs(contents, tabId, frameId) {
