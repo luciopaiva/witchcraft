@@ -13,20 +13,12 @@
 
 import {loader} from "./loader/index.js";
 import {storage} from "./storage/index.js";
-import {DEFAULT_SERVER_ADDRESS} from "./constants.js";
+import {browser} from "./browser/index.js";
 
-chrome.runtime.onInstalled.addListener(async () => {
-    console.info("Extension installed!");
-});
-
-chrome.runtime.onSuspend.addListener(() => {
-    console.info("Suspended!");
-});
-
-const NAVIGATION_FILTER = { url: [{ schemes: ["http", "https", "file", "ftp"] }] };
-
-chrome.webNavigation.onCommitted.addListener(async (details) => {
+browser.api.onInstalled(() => console.info("Extension installed!"));
+browser.api.onSuspend(() => console.info("Suspended!"));
+browser.api.onNewFrame(async details => {
     const { url, tabId, frameId } = details;
     await loader.loadScripts(url, tabId, frameId);
     storage.evictStale().then(() => { /* fire and forget */ });
-}, NAVIGATION_FILTER);
+});
