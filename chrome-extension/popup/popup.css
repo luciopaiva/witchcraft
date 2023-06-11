@@ -5,6 +5,7 @@
     --primary-color: #c9b320;
     --secondary-color: #b66ac3;
     --text-color: #bebebe;
+    --highlighted-color: white;
     --js-color: #eddd51;
     --js-text-color: black;
     --css-color: #3d91f2;
@@ -15,13 +16,14 @@
     --server-offline-stroke: #d20000;
     --container-margin: 4px;
     --panel-label-padding: 3px;
-    --panel-label-width: 45px;
+    --panel-label-width: 60px;
 }
 
 body {
+    font-family: Roboto, sans-serif;
     background-color: var(--background-color);
-    font-size: 10px;
-    min-width: 200px;
+    font-size: 12px;
+    min-width: 300px;
 }
 
 body, a {
@@ -30,25 +32,49 @@ body, a {
     padding: 0;
 }
 
+a:hover {
+    color: var(--highlighted-color);
+}
+
+input {
+    font-family: Roboto, sans-serif;
+}
+
 .hidden {
     display: none !important;
 }
 
 table.scripts {
     width: 100%;
+    border-collapse: collapse;
+}
+
+table.scripts tr {
+    height: 20px;
+}
+
+table.scripts td {
+    padding-left: 7px;
 }
 
 td.script-name {
-    max-width: 200px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     font-family: monospace;
 }
 
+tr.page-frame {
+    background-color: #232b28;
+    color: #505953;
+}
+
 td.js, td.css {
     text-align: center;
     font-weight: bold;
+    border-radius: 10px;
+    max-width: 18px;
+    font-size: 95%;
 }
 
 td.js {
@@ -66,14 +92,14 @@ td.css {
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    height: 10px;
+    height: 18px;
     padding: 6px;
-
+    font-size: 120%;
     background-color: var(--background-color-lighter);
 }
 
 .container {
-    margin: var(--container-margin);
+    /*margin: var(--container-margin);*/
     background-color: var(--background-color);
 }
 

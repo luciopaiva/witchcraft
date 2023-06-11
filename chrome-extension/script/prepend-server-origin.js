@@ -1,7 +1,7 @@
 
-export const SERVER_URL = "http://localhost:5743";
+import {url} from "../url/index.js";
 
-export function prependServerOrigin(script) {
-    script.url = `${SERVER_URL}/${script.path}`;
+export function prependServerOrigin(serverOrigin, script) {
+    script.url = url.composeUrl(serverOrigin, script.path);
     return script;
 }
