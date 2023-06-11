@@ -14,7 +14,7 @@ import {url} from "../url/index.js";
  * @return {Promise<void>}
  */
 export async function processIncludeDirective(scriptContext, include, metrics, visitedUrls) {
-    const includeUrl = include.script.url = url.resolveIncludeUrl(scriptContext.url, include.script.path);
+    const includeUrl = include.script.url = url.composeUrl(scriptContext.url, include.script.path);
 
     // check for dependency cycles
     if (!visitedUrls.has(includeUrl)) {

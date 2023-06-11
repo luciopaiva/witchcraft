@@ -2,15 +2,20 @@
 import {path} from "../path/index.js";
 import Metrics from "../analytics/metrics.js";
 import {loader} from "./index.js";
+import {storage} from "../storage/index.js";
+import {DEFAULT_SERVER_ADDRESS} from "../constants.js";
 import {script} from "../script/index.js";
 
-export async function loadScripts(url, tabId, frameId) {
+export async function loadScripts(scriptUrl, tabId, frameId) {
+    // clear any info about previously-loaded scripts
+    await storage.removeFrame(tabId, frameId);
 
+    const serverAddress = await storage.retrieveServerAddress() ?? DEFAULT_SERVER_ADDRESS;
     /** @type {ScriptContext[]} */
-    const scripts = path.generatePotentialScriptNames(url)
+    const scripts = path.generatePotentialScriptNames(scriptUrl)
         .flatMap(path.mapToJsAndCss)
         .map(path.pathTupleToScriptContext)
-        .map(script.prependServerOrigin);
+        .map(script.prependServerOrigin.bind(null, serverAddress));
 
     const metrics = new Metrics();
 
@@ -36,7 +41,11 @@ export async function loadScripts(url, tabId, frameId) {
         });
     }
 
-    // ToDo persist state to chrome.storage
-    // ToDo update popup (should it show an aggregation of all scripts loaded throughout all frames?)
+    // persist so the popup window can read it when needed
+    const scriptNames = scripts
+        .filter(script => script.hasContents)
+        .map(script => script.path);
+    await storage.storeFrame(tabId, frameId, scriptNames);
+
     // ToDo dispatch metrics
 }
