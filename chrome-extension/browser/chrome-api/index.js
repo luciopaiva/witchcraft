@@ -13,6 +13,7 @@ import {onSuspend} from "./on-suspend.js";
 import {onNewFrame} from "./on-new-frame.js";
 import {getManifestVersion} from "./get-manifest-version.js";
 import {createTab} from "./create-tab.js";
+import {onStorageChanged} from "./on-storage-changed.js";
 
 export const chromeApi = {
     chrome: () => chrome,  // for mocking purposes
@@ -26,6 +27,7 @@ export const chromeApi = {
     injectJs,
     onInstalled,
     onNewFrame,
+    onStorageChanged,
     onSuspend,
     removeKey,
     retrieveAllEntries,

@@ -2,6 +2,7 @@
 import {browser} from "../browser/index.js";
 import {storage} from "../storage/index.js";
 import {DEFAULT_SERVER_ADDRESS} from "../constants.js";
+import Debouncer from "../util/debouncer.js";
 
 // some declarations just to make linters stop complaining
 /**
@@ -32,8 +33,11 @@ class Popup {
         this.makeButtonFromAnchor("report-issue");
         this.showVersion();
         this.showServerStatus();
-        this.renderScriptsTable();
+        this.renderScripts();
         this.makeAdvancedPanel();
+
+        this.scriptsDebouncer = new Debouncer(100);
+        browser.api.onStorageChanged(() => this.scriptsDebouncer.debounce(() => this.renderScripts()));
     }
 
     showVersion() {
@@ -56,7 +60,7 @@ class Popup {
     }
 
     /** @return {void} */
-    async renderScriptsTable() {
+    async renderScripts() {
         const scriptsTable = document.getElementById("scripts-table");
         scriptsTable.innerHTML = "";
         const noScriptsElement = document.getElementById("no-scripts");
@@ -138,6 +142,7 @@ class Popup {
         return tdType;
     }
 
+    /** @return {void} */
     async makeAdvancedPanel() {
         async function readServerAddress() {
             const serverAddressInput = document.getElementById("server-address");
@@ -159,9 +164,7 @@ class Popup {
     }
 }
 
-// this script will run every time the popup is shown (i.e., every time the user clicks on the extension icon)
-// it reads information from the background window and shows it to the user
-window.addEventListener("load", () => new Popup());
+new Popup();
 
 // chrome.storage.onChanged.addListener((changes, namespace) => {
 //     for (let [key, { oldValue, newValue }] of Object.entries(changes)) {
