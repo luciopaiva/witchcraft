@@ -37,13 +37,13 @@ class Popup {
     }
 
     showVersion() {
-        document.getElementById("version").innerText = chrome.runtime.getManifest().version;
+        document.getElementById("version").innerText = browser.api.getManifestVersion();
     }
 
     makeButtonFromAnchor(id, pageName = id) {
         const anchor = typeof id === "string" ? document.getElementById(id) : id;
-        anchor.addEventListener("click", () => {
-            chrome.tabs.create({ url: anchor.getAttribute("href") });
+        anchor.addEventListener("click", async () => {
+            await browser.api.createTab(anchor.getAttribute("href"));
             // this.analytics.pageView("/popup/" + pageName);
             return false;
         });
