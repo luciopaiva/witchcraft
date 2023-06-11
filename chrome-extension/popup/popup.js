@@ -123,14 +123,18 @@ class Popup {
 
     renderScriptType(scriptName) {
         const tdType = document.createElement("td");
+        tdType.classList.add("script-type");
+        const badge = document.createElement("div");
+
         const extensionMatch = scriptName.match(/\.([^.]+)$/);
         if (extensionMatch) {
             const extension = extensionMatch[1];
-            tdType.classList.add(extension.toLowerCase());
-            tdType.innerText = extension.toUpperCase();
+            badge.classList.add(extension.toLowerCase());
+            badge.innerText = extension.toUpperCase();
         } else {
-            tdType.innerText = "?";
+            badge.innerText = "?";
         }
+        tdType.appendChild(badge);
         return tdType;
     }
 

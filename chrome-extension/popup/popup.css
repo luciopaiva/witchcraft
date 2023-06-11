@@ -17,6 +17,7 @@
     --container-margin: 4px;
     --panel-label-padding: 3px;
     --panel-label-width: 60px;
+    --row-height: 20px;
 }
 
 body {
@@ -50,11 +51,7 @@ table.scripts {
 }
 
 table.scripts tr {
-    height: 20px;
-}
-
-table.scripts td {
-    padding-left: 7px;
+    height: var(--row-height);
 }
 
 td.script-name {
@@ -69,20 +66,37 @@ tr.page-frame {
     color: #505953;
 }
 
-td.js, td.css {
-    text-align: center;
-    font-weight: bold;
-    border-radius: 10px;
-    max-width: 18px;
-    font-size: 95%;
+tr.page-frame td {
+    padding-left: 5px;
 }
 
-td.js {
+td.script-name {
+    padding-left: 5px;
+}
+
+td.script-type {
+    width: 15%;
+    padding: 0;
+}
+
+div.js, div.css {
+    box-sizing: border-box;
+    font-weight: bold;
+    border-radius: 10px;
+    font-size: 95%;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: calc(var(--row-height) - 2px);
+}
+
+div.js {
     background-color: var(--js-color);
     color: var(--js-text-color);
 }
 
-td.css {
+div.css {
     background-color: var(--css-color);
     color: var(--css-text-color);
 }
@@ -93,7 +107,7 @@ td.css {
     align-items: center;
     justify-content: space-between;
     height: 18px;
-    padding: 6px;
+    padding: 5px;
     font-size: 120%;
     background-color: var(--background-color-lighter);
 }
