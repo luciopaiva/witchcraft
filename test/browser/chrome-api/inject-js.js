@@ -1,7 +1,6 @@
 import assert from "node:assert";
 import {describe, it} from "mocha";
 import sinon from "sinon";
-import {util} from "../../../chrome-extension/util/index.js";
 import {chromeApi} from "../../../chrome-extension/browser/chrome-api/index.js";
 
 describe("Chrome API - Inject JS", function () {
@@ -25,7 +24,7 @@ describe("Chrome API - Inject JS", function () {
         chromeApi.injectJs(contents, tabId, frameId);
 
         assert(chrome.tabs.executeScript.calledWithExactly(tabId, {
-            code: util.embedScript(contents),
+            code: contents,
             frameId: frameId,
             runAt: "document_start",
         }));
