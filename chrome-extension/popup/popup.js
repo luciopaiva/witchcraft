@@ -4,27 +4,9 @@ import {storage} from "../storage/index.js";
 import {DEFAULT_SERVER_ADDRESS} from "../constants.js";
 import Debouncer from "../util/debouncer.js";
 
-// some declarations just to make linters stop complaining
-/**
- * @class chrome
- * @property extension.getBackgroundPage
- * @property chrome.extension.getURL
- * @property tabs.onActivated
- * @property tabs.sendMessage
- * @property browserAction.setBadgeText
- * @property chrome.browserAction.setIcon
- * @property chrome.browserAction.setTitle
- */
-
 class Popup {
 
     constructor () {
-        // const background = chrome.extension.getBackgroundPage();
-
-        // this.fullUrlRegex = /^https?:\/\//;
-
-        /** @type {Witchcraft} */
-        // this.witchcraft = background.window.witchcraft;
         /** @type {Analytics} */
         // this.analytics = background.window.analytics;
         // this.analytics.pageView("/popup");
@@ -35,9 +17,15 @@ class Popup {
         this.showServerStatus();
         this.renderScripts();
         this.makeAdvancedPanel();
+        this.listenToStorageChanges();
+    }
 
-        this.scriptsDebouncer = new Debouncer(100);
-        browser.api.onStorageChanged(() => this.scriptsDebouncer.debounce(() => this.renderScripts()));
+    listenToStorageChanges() {
+        const scriptsDebouncer = new Debouncer(100);
+        const callback = () => scriptsDebouncer.debounce(() => this.renderScripts());
+        const removeListener = browser.api.onStorageChanged(callback);
+        // otherwise we'll have a registered listener for every time the popup opened:
+        window.addEventListener("beforeunload", removeListener);
     }
 
     showVersion() {
@@ -165,12 +153,3 @@ class Popup {
 }
 
 new Popup();
-
-// chrome.storage.onChanged.addListener((changes, namespace) => {
-//     for (let [key, { oldValue, newValue }] of Object.entries(changes)) {
-//         console.log(
-//             `Storage key "${key}" in namespace "${namespace}" changed.`,
-//             `Old value was "${oldValue}", new value is "${newValue}".`
-//         );
-//     }
-// });
