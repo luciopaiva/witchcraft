@@ -19,26 +19,12 @@ export async function loadScripts(scriptUrl, tabId, frameId) {
 
     const metrics = new Metrics();
 
-    // // load all scripts concurrently
-    // const promises = scripts
-    //     .map(script => loader.loadSingleScript(script, metrics)
-    //         .then(async () => {
-    //             if (script.hasContents) {
-    //                 await loader.sendScript(script, tabId, frameId);
-    //             }
-    //         }));
-    //
-    // // wait until everything is loaded
-    // await Promise.allSettled(promises);
+    await Promise.all(scripts.map(script => loader.loadSingleScript(script, metrics)));
 
     for (const script of scripts) {
-        // ToDo scripts are loaded sequentially in order to the final effect to be deterministic, but it would be
-        //      interesting to have all of them download asynchronously and then be sent sequentially to the tab
-        await loader.loadSingleScript(script, metrics).then(async () => {
-            if (script.hasContents) {
-                await loader.injectScript(script, tabId, frameId);
-            }
-        });
+        if (script.hasContents) {
+            await loader.injectScript(script, tabId, frameId);
+        }
     }
 
     // persist so the popup window can read it when needed
