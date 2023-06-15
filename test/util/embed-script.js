@@ -74,7 +74,6 @@ describe("Embed script", function () {
 
         assert(document.documentElement.appendChild.calledOnce);
         assert(document.documentElement.appendChild.getCall(0).firstArg === script)
-        console.info(script);
 
         return script.text;
     });
