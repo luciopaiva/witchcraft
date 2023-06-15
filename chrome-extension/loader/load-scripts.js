@@ -1,10 +1,9 @@
 
 import {path} from "../path/index.js";
-import Metrics from "../analytics/metrics.js";
-import {loader} from "./index.js";
 import {storage} from "../storage/index.js";
 import {DEFAULT_SERVER_ADDRESS} from "../constants.js";
 import {script} from "../script/index.js";
+import {loader} from "./index.js";
 
 export async function loadScripts(scriptUrl, tabId, frameId) {
     // clear any info about previously-loaded scripts
@@ -17,15 +16,7 @@ export async function loadScripts(scriptUrl, tabId, frameId) {
         .map(path.pathTupleToScriptContext)
         .map(script.prependServerOrigin.bind(null, serverAddress));
 
-    const metrics = new Metrics();
-
-    await Promise.all(scripts.map(script => loader.loadSingleScript(script, metrics)));
-
-    for (const script of scripts) {
-        if (script.hasContents) {
-            await loader.injectScript(script, tabId, frameId);
-        }
-    }
+    const metrics = await loader.fetchAndInject(scripts, tabId, frameId);
 
     // persist so the popup window can read it when needed
     const scriptNames = scripts
