@@ -4,7 +4,8 @@ import sinon from "sinon";
 import {loader} from "../../chrome-extension/loader/index.js";
 import {util} from "../../chrome-extension/util/index.js";
 import {FETCH_RESPONSE_OUTCOME} from "../../chrome-extension/util/fetch-script.js";
-import {SERVER_URL} from "../../chrome-extension/script/prepend-server-origin.js";
+import {DEFAULT_SERVER_ADDRESS} from "../../chrome-extension/constants.js";
+import {browser} from "../../chrome-extension/browser/index.js";
 
 describe("Load scripts", function () {
 
@@ -13,18 +14,22 @@ describe("Load scripts", function () {
     });
 
     it("load simple scripts", async function () {
+        sinon.replace(browser.api, "retrieveKey", async () => DEFAULT_SERVER_ADDRESS);
+        sinon.replace(browser.api, "removeKey", async () => {});
+        sinon.replace(browser.api, "storeKey", async () => {});
+
         const url = "https://google.com";
         const tabId = 123;
         const frameId = 456;
 
         const fetchScript = sinon.stub(util, "fetchScript");
         fetchScript
-            .withArgs(`${SERVER_URL}/_global.js`)
+            .withArgs(`${DEFAULT_SERVER_ADDRESS}/_global.js`)
             .returns({
                 outcome: FETCH_RESPONSE_OUTCOME.SUCCESS,
                 contents: `console.info("global");`,
             })
-            .withArgs(`${SERVER_URL}/google.com.js`)
+            .withArgs(`${DEFAULT_SERVER_ADDRESS}/google.com.js`)
             .returns({
                 outcome: FETCH_RESPONSE_OUTCOME.SUCCESS,
                 contents: `console.info("google.com");`,
