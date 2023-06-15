@@ -20,5 +20,5 @@ browser.api.onSuspend(() => console.info("Suspended!"));
 browser.api.onNewFrame(async details => {
     const { url, tabId, frameId } = details;
     await loader.loadScripts(url, tabId, frameId);
-    storage.evictStale().then(() => { /* fire and forget */ });
+    await storage.evictStale();
 });
