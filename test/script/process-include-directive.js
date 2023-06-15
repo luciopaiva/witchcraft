@@ -19,7 +19,7 @@ describe("Process include directive", function () {
     let visitedUrls;
 
     setup(function () {
-        sinon.stub(url, "resolveIncludeUrl").callsFake((_, path) => "https://www.google.com" + path);
+        sinon.stub(url, "composeUrl").callsFake((_, path) => "https://www.google.com" + path);
 
         metrics = new Metrics();
         ctx = new ScriptContext("/foo/bar", EXT_JS);
