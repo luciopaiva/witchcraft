@@ -29,6 +29,8 @@ Which is effectively doing an `eval()` on the loaded text. CSS on its turn would
 
 And then came Witchcraft v3. It was a complete rewrite of the extension logic having as excuse the fact that Chrome had just recently changed behavior and started unloading extensions at its own will. Extensions that relied on caching data in memory would lose information and stop working - and that affected Witchcraft v2.
 
+### Failed attempt at upgrading to manifest v3
+
 The intention was to take the chance to upgrade the extension manifest to version 3, since version 2 was getting deprecated at the time. However, for security reasons, version 3 did not support loading of arbitrary scripts - which rendered it impractical to upgrade the manifest.
 
 The new security policy forbids `eval()` and similar script evaluation methods (like `Function()`), something that manifest v2 allows as long as you specify `unsafe-eval` in the security policy property in `manifest.json`:
@@ -50,6 +52,14 @@ That's why Witchcraft version 3 will still be based on manifest v2. More on that
 ### Getting rid of the content script
 
 Witchcraft v3 gets rid of the content script and relies solely on the background script. The reason I deleted the content script was to make the implementation simpler. I'm not sure if it was not available at the time I first implemented Witchcraft, but the fact is that the API offers ways for the background script to be called whenever a navigation event happens; specifically, the event `chrome.webNavigation.onCommitted`.
+
+### New architecture
+
+Having no content script, the new architecture relies solely on the background script. It listens for page loads and then proceeds to run the logic that looks for scripts and injects them. For the actual injection, the API `chrome.tabs.executeScript()` is used. Although being a deprecated call (see [Upgrading to manifest v3](#upgrading-to-manifest-v3)), it is the only option in manifest v2.
+
+There is one caveat, though: `executeScript()` runs in the context script environment. Although it can access the page's DOM just fine, the `window` object it sees is the one from the context script page, not the actual page's. This was exactly how Witchcraft v2 operated, but this behavior caused some confusion among scripters, so it is being changed in the new architecture.
+
+To overcome the limitation imposed by `executeScript()`, Witchcraft wraps the user script into a `<script>` tag that is then embedded into the DOM. It does this by passing the context script a string that contains JavaScript code to create a script tag whose contents will be the user script. The context script then creates the `<script>` tag into the DOM, and then the actual page proceeds to executing it, causing the user script to effectively run in the intended context. The wrapper logic can be seen in [chrome-extension/util/embed-script.js](./chrome-extension/util/embed-script.js)
 
 ### Background script as a module
 
