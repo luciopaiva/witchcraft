@@ -17,6 +17,7 @@ describe("Load scripts", function () {
         sinon.replace(browser.api, "retrieveKey", async () => DEFAULT_SERVER_ADDRESS);
         sinon.replace(browser.api, "removeKey", async () => {});
         sinon.replace(browser.api, "storeKey", async () => {});
+        sinon.replace(browser.api, "setBadgeText", async () => {});
 
         const url = "https://google.com";
         const tabId = 123;
