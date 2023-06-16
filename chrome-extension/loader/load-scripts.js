@@ -4,10 +4,14 @@ import {storage} from "../storage/index.js";
 import {DEFAULT_SERVER_ADDRESS} from "../constants.js";
 import {script} from "../script/index.js";
 import {loader} from "./index.js";
+import {badge} from "../browser/badge/index.js";
 
 export async function loadScripts(scriptUrl, tabId, frameId) {
     // clear any info about previously-loaded scripts
     await storage.removeFrame(tabId, frameId);
+    if (frameId === 0) {
+        await badge.clear(tabId);
+    }
 
     const serverAddress = await storage.retrieveServerAddress() ?? DEFAULT_SERVER_ADDRESS;
     /** @type {ScriptContext[]} */
@@ -23,6 +27,9 @@ export async function loadScripts(scriptUrl, tabId, frameId) {
         .filter(script => script.hasContents)
         .map(script => script.path);
     await storage.storeFrame(tabId, frameId, scriptNames);
+
+    // update the icon badge for this tab
+    await badge.increment(tabId, scriptNames.length);
 
     // ToDo dispatch metrics
 }

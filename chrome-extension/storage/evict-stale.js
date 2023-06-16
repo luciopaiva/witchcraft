@@ -16,24 +16,39 @@ async function lookForKeysToEvict() {
 
     let removedCount = 0;
     for (const entry of await browser.api.retrieveAllEntries()) {
-        const [key,value] = entry;
+        const [key, value] = entry;
         if (key.startsWith(storage.FRAME_KEY_PREFIX)) {
             const {tabId, frameId} = value;
-            removedCount += (await tryEvictKey(tabId, frameId)) ? 1 : 0;
+            removedCount += (await tryEvictFrameKey(key, tabId, frameId)) ? 1 : 0;
+        } else if (key.startsWith(storage.TAB_SCRIPT_COUNT_KEY_PREFIX)) {
+            const {tabId} = value;
+            removedCount += (await tryEvictTabScriptCountKey(key, tabId)) ? 1 : 0;
         }
     }
 
     console.info(`Entries removed: ${removedCount}`);
 }
 
-async function tryEvictKey(tabId, frameId) {
-    const frame = await browser.api.getFrame(tabId, frameId);
-    if (!frame) {
-        console.info(`Removing ${tabId}:${frameId}...`);
+async function tryEvictFrameKey(key, tabId, frameId) {
+    if (!(await doesFrameExist(tabId, frameId))) {
+        console.info(`Removing key ${key}...`);
         await storage.removeFrame(tabId, frameId);
         return true;
     }
     return false;
+}
+
+async function tryEvictTabScriptCountKey(key, tabId) {
+    if (!(await doesFrameExist(tabId, 0))) {
+        console.info(`Removing key ${key}...`);
+        await storage.removeTabScriptCount(tabId);
+        return true;
+    }
+    return false;
+}
+
+async function doesFrameExist(tabId, frameId) {
+    return !!(await browser.api.getFrame(tabId, frameId));
 }
 
 async function isItTimeToEvict(now) {
