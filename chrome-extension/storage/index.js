@@ -11,13 +11,11 @@ import {removeTabScriptCount} from "./remove-tab-script-count.js";
 
 const EVICTION_TIME_KEY = "eviction-time";
 const FRAME_KEY_PREFIX = "frame";
-const FRAME_KEY_RE = new RegExp(`^${FRAME_KEY_PREFIX}:(?<tab>.*?):(?<frame>.*?)$`);
 const TAB_SCRIPT_COUNT_KEY_PREFIX = "tab-script-count";
 
 export const storage = {
     EVICTION_TIME_KEY,
     FRAME_KEY_PREFIX,
-    FRAME_KEY_RE,
     TAB_SCRIPT_COUNT_KEY_PREFIX,
     removeTabScriptCount,
     evictStale,
