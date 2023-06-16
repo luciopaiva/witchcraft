@@ -5,5 +5,5 @@ export function injectCss(contents, tabId, frameId) {
         code: contents,
         frameId: frameId,
         runAt: "document_start",
-    });
+    }, chromeApi.captureRuntimeError);
 }

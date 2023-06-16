@@ -27,6 +27,6 @@ describe("Chrome API - Inject JS", function () {
             code: contents,
             frameId: frameId,
             runAt: "document_start",
-        }));
+        }, sinon.match.func));
     });
 });
