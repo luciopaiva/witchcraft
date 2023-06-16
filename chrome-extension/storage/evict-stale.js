@@ -17,7 +17,7 @@ async function lookForKeysToEvict() {
     let removedCount = 0;
     for (const entry of await browser.api.retrieveAllEntries()) {
         const [key, value] = entry;
-        if (key.startsWith(storage.FRAME_KEY_PREFIX)) {
+        if (key.startsWith(storage.FRAME_SCRIPTS_KEY_PREFIX)) {
             const {tabId, frameId} = value;
             removedCount += (await tryEvictFrameKey(key, tabId, frameId)) ? 1 : 0;
         } else if (key.startsWith(storage.TAB_SCRIPT_COUNT_KEY_PREFIX)) {
