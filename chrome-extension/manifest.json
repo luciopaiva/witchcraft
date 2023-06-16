@@ -27,6 +27,7 @@
     "persistent": false
   },
   "permissions": [
+    "tabs",
     "webNavigation",
     "storage",
     "*://*/*"

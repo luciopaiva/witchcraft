@@ -15,7 +15,7 @@ import {getManifestVersion} from "./get-manifest-version.js";
 import {createTab} from "./create-tab.js";
 import {onStorageChanged} from "./on-storage-changed.js";
 import {captureRuntimeError} from "./capture-runtime-error.js";
-import {onTabActivated} from "./on-tab-activated.js";
+import {setBadgeText} from "./set-badge-text.js";
 
 export const chromeApi = {
     captureRuntimeError,
@@ -32,9 +32,9 @@ export const chromeApi = {
     onNewFrame,
     onStorageChanged,
     onSuspend,
-    onTabActivated,
     removeKey,
     retrieveAllEntries,
     retrieveKey,
+    setBadgeText,
     storeKey,
 };
