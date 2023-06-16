@@ -14,8 +14,10 @@ import {onNewFrame} from "./on-new-frame.js";
 import {getManifestVersion} from "./get-manifest-version.js";
 import {createTab} from "./create-tab.js";
 import {onStorageChanged} from "./on-storage-changed.js";
+import {captureRuntimeError} from "./capture-runtime-error.js";
 
 export const chromeApi = {
+    captureRuntimeError,
     chrome: () => chrome,  // for mocking purposes
     createTab,
     getActiveTabId,

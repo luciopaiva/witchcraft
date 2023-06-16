@@ -27,6 +27,6 @@ describe("Chrome API - Inject CSS", function () {
             code: contents,
             frameId: frameId,
             runAt: "document_start",
-        }));
+        }, sinon.match.func));
     });
 });
