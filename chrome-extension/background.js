@@ -14,6 +14,8 @@
 import {loader} from "./loader/index.js";
 import {storage} from "./storage/index.js";
 import {browser} from "./browser/index.js";
+import {icon} from "./icon/index.js";
+
 
 browser.api.onInstalled(() => console.info("Extension installed!"));
 browser.api.onSuspend(() => console.info("Suspended!"));
@@ -22,3 +24,5 @@ browser.api.onNewFrame(async details => {
     await loader.loadScripts(url, tabId, frameId);
     await storage.evictStale();
 });
+
+await icon.initialize();
