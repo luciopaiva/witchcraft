@@ -29,7 +29,7 @@ class Popup {
     }
 
     showVersion() {
-        document.getElementById("version").innerText = browser.api.getManifestVersion();
+        document.getElementById("version").innerText = browser.api.getAppVersion();
     }
 
     makeButtonFromAnchor(id, pageName = id) {

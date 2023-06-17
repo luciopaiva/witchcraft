@@ -1,5 +1,5 @@
 import {chromeApi} from "./index.js";
 
-export function getManifestVersion() {
+export function getAppVersion() {
     return chromeApi.chrome().runtime.getManifest().version;
 }

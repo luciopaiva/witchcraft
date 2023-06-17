@@ -11,7 +11,7 @@ import {getAllFrames} from "./get-all-frames.js";
 import {onInstalled} from "./on-installed.js";
 import {onSuspend} from "./on-suspend.js";
 import {onNewFrame} from "./on-new-frame.js";
-import {getManifestVersion} from "./get-manifest-version.js";
+import {getAppVersion} from "./get-app-version.js";
 import {createTab} from "./create-tab.js";
 import {onStorageChanged} from "./on-storage-changed.js";
 import {captureRuntimeError} from "./capture-runtime-error.js";
@@ -29,7 +29,7 @@ export const chromeApi = {
     getAllFrames,
     getFileUrl,
     getFrame,
-    getManifestVersion,
+    getAppVersion,
     getTabUrl,
     injectCss,
     injectJs,
