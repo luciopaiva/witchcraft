@@ -1,30 +1,22 @@
-// ToDo import analytics from sss.google-analytics.com
-// import "./analytics";
-// import "./witchcraft";
-
-// // bind it to window so it can be accessed from the popup screen
-// if (typeof Analytics === "function") {  // will be undefined during tests
-//     window.analytics = new Analytics();
-//     window.analytics.send("Background", "Load");
-// }
-
-// // bind it to window so it can be accessed from the popup screen
-// window.witchcraft = new Witchcraft(chrome, typeof document !== "undefined" ? document : undefined, window.analytics);
-
 import {loader} from "./loader/index.js";
 import {storage} from "./storage/index.js";
 import {browser} from "./browser/index.js";
 import {icon} from "./icon/index.js";
 import {analytics} from "./analytics/index.js";
 
+analytics.event.backgroundLoaded();
 browser.api.onInstalled(async () => {
-    console.info("Extension installed!");
-    await analytics.fireInstall();
+    console.info("Extension installed.");
+    analytics.event.installed();
 });
-browser.api.onSuspend(() => console.info("Suspended!"));
+browser.api.onSuspend(async () => {
+    console.info("Extension suspended");
+    analytics.event.suspended();
+});
 browser.api.onNewFrame(async details => {
     const { url, tabId, frameId } = details;
-    await loader.loadScripts(url, tabId, frameId);
+    const metrics = await loader.loadScripts(url, tabId, frameId);
+    metrics.hasData && analytics.event.scriptsLoaded(metrics);
     await storage.evictStale();
 });
 

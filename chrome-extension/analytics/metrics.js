@@ -10,6 +10,7 @@ export default class Metrics {
     #cssIncludesHitCount = 0;
     #jsIncludesNotFoundCount = 0;
     #cssIncludesNotFoundCount = 0;
+    #hasData = false;
 
     incrementHitCount(type) {
         if (type === EXT_JS) {
@@ -17,14 +18,17 @@ export default class Metrics {
         } else if (type === EXT_CSS) {
             this.#cssHitCount++;
         }
+        this.#hasData = true;
     }
 
     incrementErrorCount() {
         this.#errorCount++;
+        this.#hasData = true;
     }
 
     incrementFailCount() {
         this.#failCount++;
+        this.#hasData = true;
     }
 
     incrementIncludesHit(type) {
@@ -33,6 +37,7 @@ export default class Metrics {
         } else if (type === EXT_CSS) {
             this.#cssIncludesHitCount++;
         }
+        this.#hasData = true;
     }
 
     incrementIncludesNotFound(type) {
@@ -41,6 +46,7 @@ export default class Metrics {
         } else if (type === EXT_CSS) {
             this.#cssIncludesNotFoundCount++;
         }
+        this.#hasData = true;
     }
 
     get jsHitCount() {
@@ -73,5 +79,9 @@ export default class Metrics {
 
     get cssIncludesNotFoundCount() {
         return this.#cssIncludesNotFoundCount;
+    }
+
+    get hasData() {
+        return this.#hasData;
     }
 }
