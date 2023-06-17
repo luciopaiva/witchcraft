@@ -15,11 +15,12 @@ import {loader} from "./loader/index.js";
 import {storage} from "./storage/index.js";
 import {browser} from "./browser/index.js";
 import {icon} from "./icon/index.js";
+import {analytics} from "./analytics/index.js";
 
-// erase any potentially incompatible data from an eventual previous version
-await storage.clear();
-
-browser.api.onInstalled(() => console.info("Extension installed!"));
+browser.api.onInstalled(async () => {
+    console.info("Extension installed!");
+    await analytics.fireInstall();
+});
 browser.api.onSuspend(() => console.info("Suspended!"));
 browser.api.onNewFrame(async details => {
     const { url, tabId, frameId } = details;

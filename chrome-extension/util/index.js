@@ -6,6 +6,7 @@ import {sequential} from "./sequential.js";
 import {ping} from "./ping.js";
 import {base64ToTypedArray} from "./base-64-to-typed-array.js";
 import {typedArrayToBase64} from "./typed-array-to-base-64.js";
+import {loadJson} from "./load-json.js";
 
 /*
  * Functions are exported like this instead of directly exposed so that they can be unit-tested.
@@ -16,6 +17,7 @@ export const util = {
     embedScript,
     fetchScript,
     injector,
+    loadJson,
     ping,
     sequential,
     spliceString,
