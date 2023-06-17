@@ -3,13 +3,12 @@ import {browser} from "../browser/index.js";
 import {storage} from "../storage/index.js";
 import {DEFAULT_SERVER_ADDRESS} from "../constants.js";
 import Debouncer from "../util/debouncer.js";
+import {analytics} from "../analytics/index.js";
 
 class Popup {
 
     constructor () {
-        /** @type {Analytics} */
-        // this.analytics = background.window.analytics;
-        // this.analytics.pageView("/popup");
+        analytics.page("/popup", "popup");
 
         this.makeButtonFromAnchor("docs");
         this.makeButtonFromAnchor("report-issue");
@@ -32,11 +31,11 @@ class Popup {
         document.getElementById("version").innerText = browser.api.getAppVersion();
     }
 
-    makeButtonFromAnchor(id, pageName = id) {
+    makeButtonFromAnchor(id) {
         const anchor = typeof id === "string" ? document.getElementById(id) : id;
         anchor.addEventListener("click", async () => {
             await browser.api.createTab(anchor.getAttribute("href"));
-            // this.analytics.pageView("/popup/" + pageName);
+            analytics.page("/popup/" + id, id);
             return false;
         });
     }

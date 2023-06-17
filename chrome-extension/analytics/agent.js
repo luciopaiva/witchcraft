@@ -5,9 +5,6 @@ import {browser} from "../browser/index.js";
 import {util} from "../util/index.js";
 
 const GA_ENDPOINT = 'https://www.google-analytics.com/mp/collect';
-const GA_DEBUG_ENDPOINT = 'https://www.google-analytics.com/debug/mp/collect';
-
-// Get via https://developers.google.com/analytics/devguides/collection/protocol/ga4/sending-events?client_type=gtag#recommended_parameters_for_reports
 
 const credentials = await util.loadJson("/credentials.json");
 if (credentials) {
@@ -22,7 +19,7 @@ const DEFAULT_ENGAGEMENT_TIME_MSEC = 100;
 const SESSION_EXPIRATION_IN_MIN = 30;
 
 export class Agent {
-    constructor(measurementId, apiSecret, debug = false) {
+    constructor(measurementId, apiSecret, debug = true) {
         this.measurementId = measurementId;
         this.apiSecret = apiSecret;
         this.hasCredentials = measurementId && apiSecret;
@@ -82,7 +79,7 @@ export class Agent {
     // Fires an event with optional params. Event names must only include letters and underscores.
     async fireEvent(name, params = {}) {
         if (!this.hasCredentials) {
-            console.info("Skipping GA event");
+            this.debug && console.info("Skipping GA event");
             return;
         }
 
@@ -94,9 +91,14 @@ export class Agent {
         if (!params.engagement_time_msec) {
             params.engagement_time_msec = DEFAULT_ENGAGEMENT_TIME_MSEC;
         }
+        if (this.debug) {
+            params.debug_mode = true;
+        }
+        params.app_version = browser.api.getAppVersion();
 
-        const origin = this.debug ? GA_DEBUG_ENDPOINT : GA_ENDPOINT;
-        const url = `${origin}?measurement_id=${this.measurementId}&api_secret=${this.apiSecret}`;
+        this.debug && console.info(`GA event`, name, params);
+
+        const url = `${GA_ENDPOINT}?measurement_id=${this.measurementId}&api_secret=${this.apiSecret}`;
         try {
             const response = await fetch(url, {
                     method: 'POST',
@@ -111,30 +113,17 @@ export class Agent {
                     }),
                 }
             );
-            if (!this.debug) {
-                return;
-            }
-            console.log(await response.text());
+            this.debug && console.info(await response.text());
         } catch (e) {
             console.error('Google Analytics request failed with an exception', e);
         }
     }
 
     // Fire a page view event.
-    async firePageViewEvent(pageTitle, pageLocation, additionalParams = {}) {
+    async firePageViewEvent(pageLocation, pageTitle, additionalParams = {}) {
         return this.fireEvent('page_view', {
             page_title: pageTitle,
             page_location: pageLocation,
-            ...additionalParams
-        });
-    }
-
-    // Fire an error event.
-    async fireErrorEvent(error, additionalParams = {}) {
-        // Note: 'error' is a reserved event name and cannot be used
-        // see https://developers.google.com/analytics/devguides/collection/protocol/ga4/reference?client_type=gtag#reserved_names
-        return this.fireEvent('extension_error', {
-            ...error,
             ...additionalParams
         });
     }

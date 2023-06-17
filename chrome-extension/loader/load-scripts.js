@@ -30,5 +30,5 @@ export async function loadScripts(scriptUrl, tabId, frameId) {
     // update the icon badge for this tab
     await badge.increment(tabId, scriptNames.length);
 
-    // ToDo dispatch metrics
+    return metrics;
 }
