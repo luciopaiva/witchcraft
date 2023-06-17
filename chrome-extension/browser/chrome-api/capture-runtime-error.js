@@ -3,6 +3,8 @@ import {chromeApi} from "./index.js";
 const IGNORED_ERRORS = new RegExp([
     "No frame with id \\d+ in tab \\d+",
     "No tab with id: \\d+",
+    "Cannot access a chrome:// URL",
+    "The extensions gallery cannot be scripted",  // shown when user navigates the Chrome extension store page
 ].join("|"));
 
 export function captureRuntimeError(logger = console) {
