@@ -16,6 +16,8 @@ import {storage} from "./storage/index.js";
 import {browser} from "./browser/index.js";
 import {icon} from "./icon/index.js";
 
+// erase any potentially incompatible data from an eventual previous version
+await storage.clear();
 
 browser.api.onInstalled(() => console.info("Extension installed!"));
 browser.api.onSuspend(() => console.info("Suspended!"));
