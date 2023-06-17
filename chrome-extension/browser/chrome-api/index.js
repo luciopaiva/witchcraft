@@ -16,6 +16,8 @@ import {createTab} from "./create-tab.js";
 import {onStorageChanged} from "./on-storage-changed.js";
 import {captureRuntimeError} from "./capture-runtime-error.js";
 import {setBadgeText} from "./set-badge-text.js";
+import {setIcon} from "./set-icon.js";
+import {getFileUrl} from "./get-file-url.js";
 
 export const chromeApi = {
     captureRuntimeError,
@@ -23,6 +25,7 @@ export const chromeApi = {
     createTab,
     getActiveTabId,
     getAllFrames,
+    getFileUrl,
     getFrame,
     getManifestVersion,
     getTabUrl,
@@ -36,5 +39,6 @@ export const chromeApi = {
     retrieveAllEntries,
     retrieveKey,
     setBadgeText,
+    setIcon,
     storeKey,
 };

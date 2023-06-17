@@ -53,7 +53,7 @@ class Popup {
         scriptsTable.innerHTML = "";
         const noScriptsElement = document.getElementById("no-scripts");
 
-        const serverAddress = await browser.api.retrieveKey("server-address");
+        const serverAddress = await storage.retrieveServerAddress();
 
         let gotAnyScripts = false;
         const currentTabId = await browser.api.getActiveTabId();
@@ -134,7 +134,7 @@ class Popup {
     async makeAdvancedPanel() {
         async function readServerAddress() {
             const serverAddressInput = document.getElementById("server-address");
-            serverAddressInput.value = await browser.api.retrieveKey("server-address");
+            serverAddressInput.value = await storage.retrieveServerAddress();
             serverAddressInput.addEventListener("input", async event => {
                 await browser.api.storeKey("server-address", event.target.value);
             });
