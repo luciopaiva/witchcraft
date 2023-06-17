@@ -18,10 +18,12 @@ import {captureRuntimeError} from "./capture-runtime-error.js";
 import {setBadgeText} from "./set-badge-text.js";
 import {setIcon} from "./set-icon.js";
 import {getFileUrl} from "./get-file-url.js";
+import {clearStorage} from "./clear-storage.js";
 
 export const chromeApi = {
     captureRuntimeError,
     chrome: () => chrome,  // for mocking purposes
+    clearStorage,
     createTab,
     getActiveTabId,
     getAllFrames,

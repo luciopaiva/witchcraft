@@ -11,6 +11,7 @@ import {removeTabScriptCount} from "./remove-tab-script-count.js";
 import {storeIcon} from "./store-icon.js";
 import {retrieveIcon} from "./retrieve-icon.js";
 import {makeIconKey} from "./make-icon-key.js";
+import {clear} from "./clear.js";
 
 const EVICTION_TIME_KEY = "eviction-time";
 const FRAME_SCRIPTS_KEY_PREFIX = "frame-scripts";
@@ -22,13 +23,14 @@ export const storage = {
     ICON_KEY_PREFIX,
     FRAME_SCRIPTS_KEY_PREFIX,
     TAB_SCRIPT_COUNT_KEY_PREFIX,
-    removeTabScriptCount,
+    clear,
     evictStale,
     frameScriptsKey,
     incrementTabScriptCount,
     makeIconKey,
     makeTabScriptCountKey,
     removeFrame,
+    removeTabScriptCount,
     retrieveFrame,
     retrieveIcon,
     retrieveServerAddress,
