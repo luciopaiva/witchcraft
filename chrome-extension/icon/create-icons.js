@@ -9,18 +9,13 @@ export async function createIcons() {
 }
 
 async function loadImage(path) {
-    const image = new Image();
-    image.src = browser.api.getFileUrl(path);
-
-    return new Promise(resolve => {
-        image.addEventListener("load", () => resolve(image));
-    });
+    const response = await fetch(browser.api.getFileUrl(path));
+    const blob = await response.blob();
+    return await createImageBitmap(blob);
 }
 
 async function makeIconWithStatusColor(baseImage, color, iconKey) {
-    const canvas = document.createElement("canvas");
-    canvas.width = canvas.height = icon.ICON_SIZE;
-
+    const canvas = new OffscreenCanvas(icon.ICON_SIZE, icon.ICON_SIZE);
     const ctx = canvas.getContext("2d");
     ctx.drawImage(baseImage, 0, 0);
 
