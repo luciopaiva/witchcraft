@@ -15,7 +15,6 @@ browser.api.onSuspend(async () => {
 });
 browser.api.onCommitted(async details => {
     const { url, tabId, frameId } = details;
-    console.info(`Committed url ${url} in tab ${tabId} frame ${frameId}, transition type ${details.transitionType}`);
     const metrics = await loader.loadScripts(url, tabId, frameId);
     metrics.hasData && analytics.event.scriptsLoaded(metrics);
     await storage.evictStale();
