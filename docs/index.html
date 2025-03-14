@@ -46,6 +46,12 @@
 
         <p>Actual practical uses include getting rid of nasty ads, automating clicks and improving page layouts with your own CSS rules. You're only limited by what Javascript and CSS can do.</p>
 
+        <h2>New in version 3.0</h2>
+
+        <p>Witchcraft has been completely revamped to work with <a href="https://developer.chrome.com/docs/extensions/develop/migrate/what-is-mv3">MV3</a>. All outstanding bugs have been fixed and old users should be able to use it just fine now.</p>
+
+        <p>For those that were using the old Web Server Chrome app, be aware that it now only works on ChromeOS. Please see the <a href="how-to-install.html">installation page</a> for alternatives.</p>
+
         <h2>Main features</h2>
 
         <ul>
@@ -58,7 +64,7 @@
             <li>
                 <b>Script changes are seamless</b>
 
-                <p>Whenever you edit or create new scripts, there's no need to reload anything other than the page where the scripts are supposed to run. This is what makes Witchcraft special and different from other popular scripting tools, like Greasemonkey or Tampermonkey;</p>
+                <p>Whenever you edit or create new scripts, there's no need to reload anything other than the page where the scripts are supposed to run. This is part of what makes Witchcraft special and different from other popular scripting tools, like Greasemonkey or Tampermonkey;</p>
             </li>
 
             <li>
@@ -82,7 +88,7 @@
             <li>
                 <b>Open source</b>
 
-                <p>Unlike other popular tools (e.g.: Tampermonkey), Witchcraft is open source, so you can have full understanding of what it's doing. If you don't trust the Chrome Store packaged extension, it's easy to build it yourself from the sources.</p>
+                <p>Unlike other popular tools (e.g.: Tampermonkey), Witchcraft is open source, so you can have full understanding of what it's doing internally. If you don't trust the Chrome Store packaged extension, it's easy to build it yourself from the sources.</p>
             </li>
 
         </ul>
@@ -106,7 +112,7 @@
             <li><span class="code">gist.github.com.css</span></li>
         </ul>
 
-        <p>Every script found is directly executed in the current page's context.</p>
+        <p>Every script found is directly executed in the current page's context. This means you have direct access to the page's window object and its DOM.</p>
 
         <h3>Global scripts</h3>
 
@@ -131,7 +137,7 @@
 
         <p>Notice that path segments are mapped to local folders in your scripts directory.</p>
 
-        <p>Also important to notice is that, if the host name begins with <span class="code">www</span>, it must be part of the directory structure as well. This is important because modern browsers tend to hide the <span class="code">www</span> part, giving the false impression that it is not there.</p>
+        <p>It is also important to notice that if the host name begins with <span class="code">www</span>, it must be part of the directory structure as well. This is important because modern browsers tend to hide the <span class="code">www</span> part, giving the false impression that it is not there.</p>
 
         <h3>Including other scripts</h3><a id="include-directive"></a>
 
@@ -153,7 +159,7 @@
 
         <p>Included scripts can also <span class="code">@include</span> scripts of their own; the parser will recursively iterate through them. Dependency cycles (e.g., <span class="code">foo.js</span> includes <span class="code">bar.js</span>, which includes <span class="code">foo.js</span>) will be automatically resolved and each script won't be loaded more than once.</p>
 
-        <p>This directive may be useful for including third-party libraries, like jQuery.</p>
+        <p>This directive may be useful for including third-party libraries.</p>
 
     </article>
 
