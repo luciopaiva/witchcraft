@@ -13,7 +13,7 @@ browser.api.onSuspend(async () => {
     console.info("Extension suspended");
     analytics.event.suspended();
 });
-browser.api.onNewFrame(async details => {
+browser.api.onCommitted(async details => {
     const { url, tabId, frameId } = details;
     console.info(`Committed url ${url} in tab ${tabId} frame ${frameId}, transition type ${details.transitionType}`);
     const metrics = await loader.loadScripts(url, tabId, frameId);

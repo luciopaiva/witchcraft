@@ -10,7 +10,7 @@ import {getFrame} from "./get-frame.js";
 import {getAllFrames} from "./get-all-frames.js";
 import {onInstalled} from "./on-installed.js";
 import {onSuspend} from "./on-suspend.js";
-import {onNewFrame} from "./on-new-frame.js";
+import {onCommitted} from "./on-committed.js";
 import {getAppVersion} from "./get-app-version.js";
 import {createTab} from "./create-tab.js";
 import {onStorageChanged} from "./on-storage-changed.js";
@@ -34,7 +34,7 @@ export const chromeApi = {
     injectCss,
     injectJs,
     onInstalled,
-    onNewFrame,
+    onCommitted,
     onStorageChanged,
     onSuspend,
     removeKey,
