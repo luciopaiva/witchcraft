@@ -7,6 +7,8 @@
     "doc": "docs"
   },
   "scripts": {
+    "integration-only": "mocha test/integration.js",
+    "unit-only": "mocha --exclude test/integration.js",
     "test": "c8 mocha"
   },
   "nyc": {
@@ -31,6 +33,7 @@
     "c8": "^7.14.0",
     "c8-as-nyc": "^1.1.11",
     "mocha": "^10.2.0",
+    "puppeteer": "^24.4.0",
     "sinon": "^15.1.0",
     "sinon-chrome": "^3.0.1"
   }
