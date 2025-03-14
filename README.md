@@ -5,7 +5,7 @@ Think Greasemonkey (or Tampermonkey, Violentmonkey) for developers.
 
 Witchcraft is a Google Chrome extension for loading custom Javascript and CSS directly from a folder in your file system, injecting them into pages that match their files names.
 
-It works by matching every page domain against script file names available in the scripts folder. For instance, if one navigates to `www.google.com`, Witchcraft will try to load and run `google.com.js` and `google.com.css`.
+It works by matching every page domain against script file names available in the scripts folder. For instance, if one navigates to `google.com`, Witchcraft will try to load and run `google.com.js` and `google.com.css`.
 
 For more information on how to install and use it, head to Witchcraft's [home page](//luciopaiva.com/witchcraft).
 
