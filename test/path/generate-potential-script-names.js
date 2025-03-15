@@ -23,6 +23,9 @@ describe("Script name generator", function () {
             "www.luciopaiva.com/foo",
             "www.luciopaiva.com/foo/bar",
             "www.luciopaiva.com/foo/bar/index.html",
+            `${GLOBAL_SCRIPT_NAME}/foo`,
+            `${GLOBAL_SCRIPT_NAME}/foo/bar`,
+            `${GLOBAL_SCRIPT_NAME}/foo/bar/index.html`,
         ]);
     });
 
