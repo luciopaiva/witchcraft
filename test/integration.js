@@ -35,4 +35,22 @@ describe("Integration", function () {
         const page = await browser.newPage();
         await page.goto(`chrome-extension://${EXTENSION_ID}/popup/popup.html`);
     });
+
+    it("can inject script", async function () {
+        // maybe this should be in the before test setup
+        // ToDo setup dummy page server
+        // ToDo setup dummy scripts server
+
+        // this should be the actual content of this test
+        // ToDo open dummy page
+        // ToDo look for script effects
+
+        // maybe the following should be a separate
+        // ToDo open popup
+        // ToDo check that it shows the list of scripts
+
+        // other test
+        // ToDo verify that the popup shows red LED when the server is down
+        // ToDo verify that the popup shows green LED when the server is up
+    });
 });
