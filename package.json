@@ -7,8 +7,8 @@
     "doc": "docs"
   },
   "scripts": {
-    "integration-only": "mocha test/integration.js",
-    "unit-only": "mocha --exclude test/integration.js",
+    "integration-only": "mocha test/integration/integration.js",
+    "unit-only": "mocha --exclude test/integration/integration.js",
     "test": "c8 mocha"
   },
   "nyc": {
