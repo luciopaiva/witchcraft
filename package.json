@@ -8,7 +8,7 @@
   },
   "scripts": {
     "integration-tests": "mocha test/integration/**/*",
-    "unit-tests": "mocha --exclude test/integration/**/*",
+    "unit-tests": "c8 mocha --exclude test/integration/**/*",
     "test": "c8 mocha"
   },
   "nyc": {
