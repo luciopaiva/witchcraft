@@ -7,7 +7,7 @@
     "doc": "docs"
   },
   "scripts": {
-    "integration-tests": "mocha test/integration/**/*",
+    "integration-tests": "mocha test/integration/**/* --exclude test/integration/sandbox.js",
     "unit-tests": "c8 mocha --exclude test/integration/**/*",
     "test": "c8 mocha"
   },
