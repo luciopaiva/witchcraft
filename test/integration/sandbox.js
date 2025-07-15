@@ -36,6 +36,7 @@ async function setServerAddress(browser, serverAddress) {
 
     const dummyScriptServer = new DummyScriptServer();
     await dummyScriptServer.start();
+    dummyScriptServer.addScript("/_global.js", "console.log('Global script loaded');");
 
     await toggleDevModeOn(browser);
 
