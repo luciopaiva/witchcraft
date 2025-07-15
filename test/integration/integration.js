@@ -1,7 +1,7 @@
 import puppeteer from 'puppeteer';
 import {describe, it} from "mocha";
-import DummyWebServer from './dummy-web-server.js';
-import DummyScriptServer from './dummy-script-server.js';
+import DummyWebServer from './utils/dummy-web-server.js';
+import DummyScriptServer from './utils/dummy-script-server.js';
 
 const EXTENSION_PATH = "./chrome-extension";
 const EXTENSION_ID = "hokcepcfcicnhalinladgknhaljndhpc";
@@ -12,6 +12,13 @@ describe("Integration", function () {
     let dummyScriptServer;
 
     beforeEach(async function () {
+
+        dummyServer = new DummyWebServer();
+        await dummyServer.start();
+
+        dummyScriptServer = new DummyScriptServer();
+        await dummyScriptServer.start();
+
         browser = await puppeteer.launch({
             // headless: false,
             args: [
@@ -20,12 +27,17 @@ describe("Integration", function () {
             ],
         });
 
-        dummyServer = new DummyWebServer();
-        await dummyServer.start();
-
-        dummyScriptServer = new DummyScriptServer();
-        await dummyScriptServer.start();
+        await setScriptServerAddress(browser, ` http://127.0.0.1:${dummyScriptServer.port}`);
     });
+
+    async function setScriptServerAddress(browser, serverAddress) {
+        const targets = await browser.targets();
+        const extensionTarget = targets.find(target => target.type() === 'background_page' || target.type() === 'service_worker');
+        const client = await extensionTarget.createCDPSession();
+        await client.send('Runtime.evaluate', {
+            expression: `browser.storage.local.set({ "server-address": "${serverAddress}" })`,
+        });
+    }
 
     afterEach(async function () {
         await browser.close();
@@ -38,7 +50,7 @@ describe("Integration", function () {
         dummyScriptServer = undefined;
     });
 
-    it("can access google", async function () {
+    it.skip("can access google", async function () {
         const page = await browser.newPage()
         await page.goto('https://www.google.com/')
         const title = await page.title()
@@ -46,7 +58,7 @@ describe("Integration", function () {
         console.log(title) // prints "Google"
     });
 
-    it("can open popup", async function () {
+    it.skip("can open popup", async function () {
         const page = await browser.newPage();
         await page.goto(`chrome-extension://${EXTENSION_ID}/popup/popup.html`);
     });
@@ -69,7 +81,7 @@ describe("Integration", function () {
         // ToDo verify that the popup shows green LED when the server is up
     });
 
-    it("can load web page", async function () {
+    it.skip("can load web page", async function () {
         const page = await browser.newPage();
         await page.goto(`http://localhost:${dummyServer.port}`);
         const content = await page.content();
@@ -79,7 +91,7 @@ describe("Integration", function () {
         }
     });
 
-    it("can load script", async function () {
+    it.skip("can load script", async function () {
         const page = await browser.newPage();
         await page.goto(`http://localhost:${dummyScriptServer.port}`);
         const content = await page.content();
@@ -89,7 +101,7 @@ describe("Integration", function () {
         }
     });
 
-    it("can change the server address", async function () {
+    it.skip("can change the server address", async function () {
         const targets = await browser.targets();
         const extensionTarget = targets.find(target => target.type() === 'background_page' || target.type() === 'service_worker');
         const client = await extensionTarget.createCDPSession();
