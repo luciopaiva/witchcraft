@@ -1,10 +1,7 @@
-import puppeteer from 'puppeteer';
 import {describe, it} from "mocha";
 import DummyWebServer from './utils/dummy-web-server.js';
 import DummyScriptServer from './utils/dummy-script-server.js';
-
-const EXTENSION_PATH = "./chrome-extension";
-const EXTENSION_ID = "hokcepcfcicnhalinladgknhaljndhpc";
+import {setScriptServerAddress, startBrowser} from "./utils/browser-test-utils.js";
 
 describe("Integration", function () {
     let browser;
@@ -19,25 +16,10 @@ describe("Integration", function () {
         dummyScriptServer = new DummyScriptServer();
         await dummyScriptServer.start();
 
-        browser = await puppeteer.launch({
-            // headless: false,
-            args: [
-                `--disable-extensions-except=${EXTENSION_PATH}`,
-                `--load-extension=${EXTENSION_PATH}`,
-            ],
-        });
+        browser = await startBrowser();
 
         await setScriptServerAddress(browser, ` http://127.0.0.1:${dummyScriptServer.port}`);
     });
-
-    async function setScriptServerAddress(browser, serverAddress) {
-        const targets = await browser.targets();
-        const extensionTarget = targets.find(target => target.type() === 'background_page' || target.type() === 'service_worker');
-        const client = await extensionTarget.createCDPSession();
-        await client.send('Runtime.evaluate', {
-            expression: `browser.storage.local.set({ "server-address": "${serverAddress}" })`,
-        });
-    }
 
     afterEach(async function () {
         await browser.close();
@@ -60,7 +42,7 @@ describe("Integration", function () {
 
     it.skip("can open popup", async function () {
         const page = await browser.newPage();
-        await page.goto(`chrome-extension://${EXTENSION_ID}/popup/popup.html`);
+        await page.goto(`chrome-extension://hokcepcfcicnhalinladgknhaljndhpc/popup/popup.html`);
     });
 
     it("can inject script", async function () {
