@@ -24,12 +24,15 @@ export async function startBrowser(headless = true) {
 export async function toggleDevModeOn(browser) {
     // taken from https://github.com/puppeteer/puppeteer/issues/5095#issuecomment-590292518
     const [chromeExtensionsTab] = await browser.pages();
+    // const chromeExtensionsTab = await browser.newPage();
+
     await chromeExtensionsTab.goto("chrome://extensions");
     await chromeExtensionsTab.waitForSelector("body > extensions-manager");
     const devModeToggle = await chromeExtensionsTab.evaluateHandle(
         'document.querySelector("body > extensions-manager").shadowRoot.querySelector("extensions-toolbar").shadowRoot.querySelector("#devMode")'
     );
     await devModeToggle.click();
+    console.info(`DevMode Toggled on`);
 
     await new Promise(resolve => setTimeout(resolve, 1000));
 }
