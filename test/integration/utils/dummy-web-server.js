@@ -30,6 +30,7 @@ class DummyWebServer {
 
             this.server.listen(0, () => {
                 this.port = this.server.address().port;
+                console.log(`DummyWebServer is listening on port ${this.port}`);
                 resolve(this.port);
             });
 

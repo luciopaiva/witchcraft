@@ -1,35 +1,37 @@
 import {describe, it} from "mocha";
 import DummyWebServer from './utils/dummy-web-server.js';
 import DummyScriptServer from './utils/dummy-script-server.js';
-import {setScriptServerAddress, startBrowser} from "./utils/browser-test-utils.js";
+import {setScriptServerAddress, startBrowser, toggleDevModeOn} from "./utils/browser-test-utils.js";
+import {loadResource} from "./utils/resource-utils.js";
 
 describe("Integration", function () {
     let browser;
-    let dummyServer;
-    let dummyScriptServer;
+    let webServer;
+    let scriptsServer;
 
     beforeEach(async function () {
 
-        dummyServer = new DummyWebServer();
-        await dummyServer.start();
+        webServer = new DummyWebServer();
+        await webServer.start();
 
-        dummyScriptServer = new DummyScriptServer();
-        await dummyScriptServer.start();
+        scriptsServer = new DummyScriptServer();
+        await scriptsServer.start();
 
-        browser = await startBrowser();
+        browser = await startBrowser(true);
+        await toggleDevModeOn(browser);
 
-        await setScriptServerAddress(browser, ` http://127.0.0.1:${dummyScriptServer.port}`);
+        await setScriptServerAddress(browser, ` http://127.0.0.1:${scriptsServer.port}`);
     });
 
     afterEach(async function () {
         await browser.close();
         browser = undefined;
 
-        await dummyServer.stop();
-        dummyServer = undefined;
+        await webServer.stop();
+        webServer = undefined;
 
-        await dummyScriptServer.stop();
-        dummyScriptServer = undefined;
+        await scriptsServer.stop();
+        scriptsServer = undefined;
     });
 
     it.skip("can access google", async function () {
@@ -46,26 +48,32 @@ describe("Integration", function () {
     });
 
     it("can inject script", async function () {
-        // maybe this should be in the before test setup
-        // ToDo setup dummy page server
-        // ToDo setup dummy scripts server
+        webServer.addPage("/hello.html", "<html><body><h1>Hello World</h1></body></html>");
 
-        // this should be the actual content of this test
-        // ToDo open dummy page
-        // ToDo look for script effects
+        scriptsServer.addScript("/_global.js", await loadResource("can-inject-script.js"));
+            // `setInterval(() => document.querySelector('h1').innerText = "Goodbye World", 1000)`);
+            // `console.info("Global script loaded")`);
 
-        // maybe the following should be a separate
-        // ToDo open popup
-        // ToDo check that it shows the list of scripts
+        // Open the dummy page
+        const page = await browser.newPage();
 
-        // other test
-        // ToDo verify that the popup shows red LED when the server is down
-        // ToDo verify that the popup shows green LED when the server is up
+        // Listen for console messages and print them
+        page.on('console', msg => {
+            console.log(`[CHROME CONSOLE] ${msg.type()}: ${msg.text()}`);
+        });
+
+        await page.goto(`http://localhost:${webServer.port}/hello.html`);
+
+        // Wait for the script to inject and modify the content
+        await page.waitForFunction(
+            () => document.querySelector('h1').innerText === "Goodbye World",
+            { timeout: 5000 }
+        );
     });
 
     it.skip("can load web page", async function () {
         const page = await browser.newPage();
-        await page.goto(`http://localhost:${dummyServer.port}`);
+        await page.goto(`http://localhost:${webServer.port}`);
         const content = await page.content();
 
         if (!content.includes("Hello, World!")) {
@@ -75,7 +83,7 @@ describe("Integration", function () {
 
     it.skip("can load script", async function () {
         const page = await browser.newPage();
-        await page.goto(`http://localhost:${dummyScriptServer.port}`);
+        await page.goto(`http://localhost:${scriptsServer.port}`);
         const content = await page.content();
 
         if (!content.includes("OK")) {
@@ -88,7 +96,7 @@ describe("Integration", function () {
         const extensionTarget = targets.find(target => target.type() === 'background_page' || target.type() === 'service_worker');
         const client = await extensionTarget.createCDPSession();
         await client.send('Runtime.evaluate', {
-            expression: `browser.storage.local.set({ "server-address": "http://localhost:${dummyScriptServer.port}" })`,
+            expression: `browser.storage.local.set({ "server-address": "http://localhost:${scriptsServer.port}" })`,
         });
     });
 });
