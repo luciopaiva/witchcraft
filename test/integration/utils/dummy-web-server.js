@@ -4,13 +4,28 @@ class DummyWebServer {
     constructor() {
         this.server = null;
         this.port = null;
+        this.pages = new Map();
+    }
+
+    addPage(pagePath, pageContents) {
+        this.pages.set(pagePath, pageContents);
     }
 
     async start() {
         return new Promise((resolve, reject) => {
             this.server = http.createServer((req, res) => {
-                res.writeHead(200, { 'Content-Type': 'text/html' });
-                res.end('<html><body><h1>Hello, World!</h1></body></html>');
+                if (this.pages.has(req.url)) {
+                    let contentType = 'text/html';
+                    if (req.url.endsWith('.css')) {
+                        contentType = 'text/css';
+                    }
+
+                    res.writeHead(200, { 'Content-Type': contentType });
+                    res.end(this.pages.get(req.url));
+                } else {
+                    res.writeHead(404, { 'Content-Type': 'text/plain' });
+                    res.end('Not Found');
+                }
             });
 
             this.server.listen(0, () => {
