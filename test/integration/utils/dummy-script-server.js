@@ -5,18 +5,30 @@ class DummyScriptServer {
         this.server = null;
         this.port = null;
         this.scripts = new Map();
+        this.requests = [];
     }
 
     addScript(scriptPath, scriptContents) {
+        if (typeof scriptContents === "function") {
+            scriptContents = scriptContents.toString().trim();
+            // console.info(scriptContents);
+
+            // check if is lambda function
+            if (scriptContents.startsWith('function')) {
+                scriptContents = scriptContents.substring(scriptContents.indexOf('{') + 1, scriptContents.lastIndexOf('}')).trim();
+            } else if (scriptContents.startsWith('() =>')) {
+                scriptContents = scriptContents.substring(scriptContents.indexOf('() =>') + 6).trim();
+            }
+        }
         this.scripts.set(scriptPath, scriptContents);
     }
 
     async start() {
         return new Promise((resolve, reject) => {
             this.server = http.createServer((req, res) => {
-                console.log(`Request received for path: ${req.url}`);
-
                 if (this.scripts.has(req.url)) {
+                    this.recordRequest(req.url, "HIT");
+
                     let contentType = 'text/plain';
                     if (req.url.endsWith('.js')) {
                         contentType = 'application/javascript';
@@ -27,6 +39,8 @@ class DummyScriptServer {
                     res.writeHead(200, { 'Content-Type': contentType });
                     res.end(this.scripts.get(req.url));
                 } else {
+                    this.recordRequest(req.url, "MISS");
+
                     res.writeHead(404, { 'Content-Type': 'text/plain' });
                     res.end('Not Found');
                 }
@@ -60,6 +74,11 @@ class DummyScriptServer {
                 resolve();
             }
         });
+    }
+
+    recordRequest(url, status) {
+        this.requests.push([url, status]);
+        // console.info(`Script Server Request: ${url} (${status})`);
     }
 }
 

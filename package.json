@@ -7,9 +7,9 @@
     "doc": "docs"
   },
   "scripts": {
-    "integration-tests": "mocha test/integration/**/* --exclude test/integration/sandbox.js",
+    "integration-tests": "mocha test/integration/* --exclude test/integration/sandbox.js --exclude test/integration/resources/* --exclude test/integration/utils/* --timeout 10000",
     "unit-tests": "c8 mocha --exclude test/integration/**/*",
-    "test": "c8 mocha"
+    "test": "c8 mocha --exclude test/integration/**/*"
   },
   "nyc": {
     "all": true,
