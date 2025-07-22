@@ -3,6 +3,7 @@ import DummyWebServer from './utils/dummy-web-server.js';
 import DummyScriptServer from './utils/dummy-script-server.js';
 import {setScriptServerAddress, startBrowser, toggleDevModeOn} from "./utils/browser-test-utils.js";
 import {loadResource} from "./utils/resource-utils.js";
+import assert from "node:assert";
 
 describe("Integration", function () {
     let browser;
@@ -69,6 +70,45 @@ describe("Integration", function () {
             () => document.querySelector('h1').innerText === "Goodbye World",
             { timeout: 5000 }
         );
+    });
+
+    it("checks if all scripts are loaded and in order", async function () {
+        webServer.addPage("/hi/hello.html", "<html><body><h1>Hello World</h1></body></html>");
+
+        // scriptsServer.addScript("/_global.js", () => document.querySelector('h1').innerText = '1');
+        scriptsServer.addScript("/_global.js", () => document.querySelector('h1').innerText = '1');
+        scriptsServer.addScript("/bar.js", () => document.querySelector('h1').innerText += '2');
+        scriptsServer.addScript("/foo.bar.js", () => document.querySelector('h1').innerText += '3');
+        scriptsServer.addScript("/foo.bar/hi/hello.html.js", () => document.querySelector('h1').innerText += '4');
+
+        const page = await browser.newPage();
+
+        page.on('console', msg => console.log(`[CHROME CONSOLE] ${msg.type()}: ${msg.text()}`));
+
+        await page.goto(`http://foo.bar:${webServer.port}/hi/hello.html`);
+
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        // console.info(await page.evaluate(() => document.querySelector('h1').innerText));
+
+        // Wait for the script to inject and modify the content
+        await page.waitForFunction(
+            () => document.querySelector('h1').innerText === "1234",
+            { timeout: 5000 }
+        );
+
+        assert(scriptsServer.requests.toString(), [
+            "/_global.js,HIT",
+            "/_global.css,MISS",
+            "/bar.js,HIT",
+            "/bar.css,MISS",
+            "/foo.bar.js,HIT",
+            "/foo.bar.css,MISS",
+            "/foo.bar/hi.js,MISS",
+            "/foo.bar/hi.css,MISS",
+            "/foo.bar/hi/hello.html.js,HIT",
+            "/foo.bar/hi/hello.html.css,MISS"
+        ].join(","));
     });
 
     it.skip("can load web page", async function () {
