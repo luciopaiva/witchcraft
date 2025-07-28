@@ -36,14 +36,6 @@ describe("Integration", function () {
         scriptsServer = undefined;
     });
 
-    it.skip("can access google", async function () {
-        const page = await browser.newPage()
-        await page.goto('https://www.google.com/')
-        const title = await page.title()
-
-        console.log(title) // prints "Google"
-    });
-
     it("check that popup lists all loaded scripts", async function () {
         webServer.addPage("/hello.html", "<html><body><h1>Hello World</h1></body></html>");
 
@@ -237,34 +229,5 @@ describe("Integration", function () {
             () => document.querySelector('body').innerText === "Save the witch!",
             { timeout: 5000 }
         );
-    });
-
-    it.skip("can load web page", async function () {
-        const page = await browser.newPage();
-        await page.goto(`http://localhost:${webServer.port}`);
-        const content = await page.content();
-
-        if (!content.includes("Hello, World!")) {
-            throw new Error("Page content does not match expected output");
-        }
-    });
-
-    it.skip("can load script", async function () {
-        const page = await browser.newPage();
-        await page.goto(`http://localhost:${scriptsServer.port}`);
-        const content = await page.content();
-
-        if (!content.includes("OK")) {
-            throw new Error("Script server response does not match expected output");
-        }
-    });
-
-    it.skip("can change the server address", async function () {
-        const targets = await browser.targets();
-        const extensionTarget = targets.find(target => target.type() === 'background_page' || target.type() === 'service_worker');
-        const client = await extensionTarget.createCDPSession();
-        await client.send('Runtime.evaluate', {
-            expression: `browser.storage.local.set({ "server-address": "http://localhost:${scriptsServer.port}" })`,
-        });
     });
 });
