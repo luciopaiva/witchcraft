@@ -1,4 +1,3 @@
-
 import {browser} from "../browser/index.js";
 import {storage} from "../storage/index.js";
 import {DEFAULT_SERVER_ADDRESS} from "../constants.js";
@@ -55,7 +54,7 @@ class Popup {
         const serverAddress = await storage.retrieveServerAddress();
 
         let gotAnyScripts = false;
-        const currentTabId = await browser.api.getActiveTabId();
+        const currentTabId = await this.getActiveTabId();
         for (const frameId of await browser.api.getAllFrames(currentTabId)) {
             const frameInfo = await storage.retrieveFrame(currentTabId, frameId);
             const scriptNames = frameInfo?.scriptNames ?? [];
@@ -74,6 +73,23 @@ class Popup {
 
         noScriptsElement.classList.toggle("hidden", gotAnyScripts);
         scriptsTable.classList.toggle("hidden", !gotAnyScripts);
+    }
+
+    async getActiveTabId() {
+        // first try to get tab ID from query parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const activeTabId = urlParams.get('activeTabId');
+
+        if (activeTabId !== null) {
+            // parse to integer if it's a valid number
+            const parsedId = parseInt(activeTabId, 10);
+            if (!isNaN(parsedId)) {
+                return parsedId;
+            }
+        }
+
+        // fall back to browser API if no valid query parameter found
+        return await browser.api.getActiveTabId();
     }
 
     renderFrame(frameId) {
