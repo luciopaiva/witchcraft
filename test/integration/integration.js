@@ -44,6 +44,56 @@ describe("Integration", function () {
         console.log(title) // prints "Google"
     });
 
+    it("check that popup lists all loaded scripts", async function () {
+        webServer.addPage("/hello.html", "<html><body><h1>Hello World</h1></body></html>");
+
+        scriptsServer.addScript("/foo.bar.js", () => "");
+        scriptsServer.addScript("/bar.js", () => "");
+        scriptsServer.addScript("/foo.bar.css", () => "")
+
+        const page = await browser.newPage();
+        await page.goto(`http://foo.bar:${webServer.port}/hello.html`);
+
+        // Get the tab ID by querying Chrome tabs API from extension context
+        const popup = await browser.newPage();
+        await popup.goto(`chrome-extension://hokcepcfcicnhalinladgknhaljndhpc/popup/popup.html`);
+
+        // Get the tab ID of our test page using Chrome tabs API
+        const activeTabId = await popup.evaluate(async (testUrl) => {
+            return new Promise(resolve => {
+                chrome.tabs.query({}, tabs => {
+                    const testTab = tabs.find(tab => tab.url === testUrl);
+                    resolve(testTab ? testTab.id : null);
+                });
+            });
+        }, `http://foo.bar:${webServer.port}/hello.html`);
+
+        // Now reload the popup with the correct tab ID
+        await popup.goto(`chrome-extension://hokcepcfcicnhalinladgknhaljndhpc/popup/popup.html?activeTabId=${activeTabId}`);
+
+        await popup.waitForSelector('#scripts-table');
+        const scripts = await popup.$$eval('#scripts-table tr:not(.page-frame)', rows => {
+            return rows.map(row => {
+                const cells = row.querySelectorAll('td');
+                return {
+                    name: cells[0]?.innerText,
+                    type: cells[1]?.innerText
+                };
+            });
+        });
+        assert.strictEqual(scripts.length, 3, "There should be 3 scripts listed in the popup");
+
+        // Sort scripts by name to make the test order-independent
+        const sortedScripts = scripts.sort((a, b) => a.name.localeCompare(b.name));
+        const expectedScripts = [
+            {name: "bar.js", type: "JS"},
+            {name: "foo.bar.css", type: "CSS"},
+            {name: "foo.bar.js", type: "JS"}
+        ];
+
+        assert.deepStrictEqual(sortedScripts, expectedScripts, "Scripts should be listed correctly in the popup");
+    });
+
     it("check that popup loads server address correctly", async function () {
         const page = await browser.newPage();
         await page.goto(`chrome-extension://hokcepcfcicnhalinladgknhaljndhpc/popup/popup.html`);
