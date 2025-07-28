@@ -27,7 +27,8 @@ import DummyWebServer from "./utils/dummy-web-server.js";
 
     const helloPage = await browser.newPage()
     // await helloPage.goto(`http://127.0.0.1:${dummyWebServer.port}/hello.html`)
-    await helloPage.goto(`http://foo.bar:${dummyWebServer.port}/hello.html`)
+    // await helloPage.goto(`http://foo.bar:${dummyWebServer.port}/hello.html`)
+    await helloPage.goto(`chrome-extension://hokcepcfcicnhalinladgknhaljndhpc/popup/popup.html`);
 
     await new Promise(() => {}); // Keeps the browser open indefinitely
     await browser.close()
