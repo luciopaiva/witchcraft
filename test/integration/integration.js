@@ -4,6 +4,7 @@ import DummyScriptServer from './utils/dummy-script-server.js';
 import {setScriptServerAddress, startBrowser, toggleDevModeOn} from "./utils/browser-test-utils.js";
 import {loadResource} from "./utils/resource-utils.js";
 import assert from "node:assert";
+import {DEFAULT_SERVER_ADDRESS} from "../../chrome-extension/constants.js";
 
 describe("Integration", function () {
     let browser;
@@ -51,6 +52,8 @@ describe("Integration", function () {
 
         const inputValue = await page.$eval('#server-address', input => input.value);
 
+        // check that the popup is showing the correct server address
+
         const expectedAddress = `http://127.0.0.1:${scriptsServer.port}`;
         assert.strictEqual(inputValue, expectedAddress);
 
@@ -64,6 +67,8 @@ describe("Integration", function () {
 
         assert.strictEqual(storageValue, expectedAddress);
 
+        // check that changes in the server address are reflected in the popup
+
         const newAddress = "http://new.address:1234";
         await page.evaluate((address) => {
             return new Promise((resolve) => {
@@ -76,6 +81,22 @@ describe("Integration", function () {
         await page.waitForSelector('#server-address');
         const newInputValue = await page.$eval('#server-address', input => input.value);
         assert.strictEqual(newInputValue, newAddress);
+
+        // now check that the reset button works
+
+        await page.click('#server-address-reset');
+
+        const resetInputValue = await page.$eval('#server-address', input => input.value);
+        assert.strictEqual(resetInputValue, DEFAULT_SERVER_ADDRESS);
+
+        const resetStorageValue = await page.evaluate(() => {
+            return new Promise(resolve => {
+                chrome.storage.local.get('server-address', result => {
+                    resolve(result['server-address']);
+                });
+            });
+        });
+        assert.strictEqual(resetStorageValue, DEFAULT_SERVER_ADDRESS);
     });
 
     it("check JavaScript injection", async function () {
