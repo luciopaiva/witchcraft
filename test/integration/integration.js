@@ -85,7 +85,6 @@ describe("Integration", function () {
     it("check if all scripts are loaded and in order", async function () {
         webServer.addPage("/hi/hello.html", "<html><body><h1>Hello World</h1></body></html>");
 
-        // scriptsServer.addScript("/_global.js", () => document.querySelector('h1').innerText = '1');
         scriptsServer.addScript("/_global.js", () => document.querySelector('h1').innerText = '1');
         scriptsServer.addScript("/bar.js", () => document.querySelector('h1').innerText += '2');
         scriptsServer.addScript("/foo.bar.js", () => document.querySelector('h1').innerText += '3');
@@ -97,11 +96,6 @@ describe("Integration", function () {
 
         await page.goto(`http://foo.bar:${webServer.port}/hi/hello.html`);
 
-        await new Promise(resolve => setTimeout(resolve, 1000));
-
-        // console.info(await page.evaluate(() => document.querySelector('h1').innerText));
-
-        // Wait for the script to inject and modify the content
         await page.waitForFunction(
             () => document.querySelector('h1').innerText === "1234",
             { timeout: 5000 }
@@ -119,6 +113,29 @@ describe("Integration", function () {
             "/foo.bar/hi/hello.html.js,HIT",
             "/foo.bar/hi/hello.html.css,MISS"
         ].join(","));
+    });
+
+    it("check script loaded in iframe", async function () {
+        webServer.addPage("/iframe.html", "<html><body>Burn the witch!</body></html>");
+        webServer.addPage("/hello.html", '<html><body><iframe src="iframe.html"></iframe></body></html>');
+
+        scriptsServer.addScript("/foo.bar/iframe.html.js", () => {
+            document.querySelector('body').innerText = 'Save the witch!';
+        });
+
+        const page = await browser.newPage();
+
+        page.on('console', msg => console.log(`[CHROME CONSOLE] ${msg.type()}: ${msg.text()}`));
+
+        await page.goto(`http://foo.bar:${webServer.port}/hello.html`);
+
+        const iframeElement = await page.waitForSelector('iframe');
+        const frame = await iframeElement.contentFrame();
+
+        await frame.waitForFunction(
+            () => document.querySelector('body').innerText === "Save the witch!",
+            { timeout: 5000 }
+        );
     });
 
     it.skip("can load web page", async function () {
