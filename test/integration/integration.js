@@ -48,31 +48,41 @@ describe("Integration", function () {
         await page.goto(`chrome-extension://hokcepcfcicnhalinladgknhaljndhpc/popup/popup.html`);
     });
 
-    it("can inject script", async function () {
+    it("check JavaScript injection", async function () {
         webServer.addPage("/hello.html", "<html><body><h1>Hello World</h1></body></html>");
 
-        scriptsServer.addScript("/_global.js", await loadResource("can-inject-script.js"));
-            // `setInterval(() => document.querySelector('h1').innerText = "Goodbye World", 1000)`);
-            // `console.info("Global script loaded")`);
+        scriptsServer.addScript("/witchcraft.js", await loadResource("test.js"));
 
-        // Open the dummy page
         const page = await browser.newPage();
 
-        // Listen for console messages and print them
-        page.on('console', msg => {
-            console.log(`[CHROME CONSOLE] ${msg.type()}: ${msg.text()}`);
-        });
+        page.on('console', msg => console.log(`[CHROME CONSOLE] ${msg.type()}: ${msg.text()}`));
 
-        await page.goto(`http://localhost:${webServer.port}/hello.html`);
+        await page.goto(`http://test.witchcraft:${webServer.port}/hello.html`);
 
-        // Wait for the script to inject and modify the content
         await page.waitForFunction(
             () => document.querySelector('h1').innerText === "Goodbye World",
             { timeout: 5000 }
         );
     });
 
-    it("checks if all scripts are loaded and in order", async function () {
+    it("check CSS injection", async function () {
+        webServer.addPage("/hello.html", "<html><body><h1>Hello World</h1></body></html>");
+
+        scriptsServer.addScript("/witchcraft.css", await loadResource("test.css"));
+
+        const page = await browser.newPage();
+
+        page.on('console', msg => console.log(`[CHROME CONSOLE] ${msg.type()}: ${msg.text()}`));
+
+        await page.goto(`http://test.witchcraft:${webServer.port}/hello.html`);
+
+        await page.waitForFunction(
+            () => window.getComputedStyle(document.querySelector('h1')).color === "rgb(0, 0, 255)",
+            { timeout: 5000 }
+        );
+    });
+
+    it("check if all scripts are loaded and in order", async function () {
         webServer.addPage("/hi/hello.html", "<html><body><h1>Hello World</h1></body></html>");
 
         // scriptsServer.addScript("/_global.js", () => document.querySelector('h1').innerText = '1');
