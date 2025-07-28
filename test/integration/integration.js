@@ -21,7 +21,7 @@ describe("Integration", function () {
         browser = await startBrowser(true);
         await toggleDevModeOn(browser);
 
-        await setScriptServerAddress(browser, ` http://127.0.0.1:${scriptsServer.port}`);
+        await setScriptServerAddress(browser, `http://127.0.0.1:${scriptsServer.port}`);
     });
 
     afterEach(async function () {
@@ -43,9 +43,39 @@ describe("Integration", function () {
         console.log(title) // prints "Google"
     });
 
-    it.skip("can open popup", async function () {
+    it("check that popup loads server address correctly", async function () {
         const page = await browser.newPage();
         await page.goto(`chrome-extension://hokcepcfcicnhalinladgknhaljndhpc/popup/popup.html`);
+
+        await page.waitForSelector('#server-address');
+
+        const inputValue = await page.$eval('#server-address', input => input.value);
+
+        const expectedAddress = `http://127.0.0.1:${scriptsServer.port}`;
+        assert.strictEqual(inputValue, expectedAddress);
+
+        const storageValue = await page.evaluate(() => {
+            return new Promise(resolve => {
+                chrome.storage.local.get('server-address', result => {
+                    resolve(result['server-address']);
+                });
+            });
+        });
+
+        assert.strictEqual(storageValue, expectedAddress);
+
+        const newAddress = "http://new.address:1234";
+        await page.evaluate((address) => {
+            return new Promise((resolve) => {
+                chrome.storage.local.set({ 'server-address': address }, resolve);
+            });
+        }, newAddress);
+
+        await page.reload();
+
+        await page.waitForSelector('#server-address');
+        const newInputValue = await page.$eval('#server-address', input => input.value);
+        assert.strictEqual(newInputValue, newAddress);
     });
 
     it("check JavaScript injection", async function () {
