@@ -1,7 +1,7 @@
 {
   "name": "Witchcraft: JS/CSS injector",
   "short_name": "Witchcraft",
-  "manifest_version": 2,
+  "manifest_version": 3,
   "version": "3.0.0",
   "description": "Witchcraft loads custom Javascript and CSS directly from a folder in your file system. Think GreaseMonkey for developers.",
   "icons": {
@@ -11,7 +11,7 @@
     "64": "witch-64.png",
     "128": "witch-128.png"
   },
-  "browser_action": {
+  "action": {
     "default_icon": {
       "16": "witch-16.png",
       "24": "witch-24.png",
@@ -23,14 +23,19 @@
     "default_popup": "popup/popup.html"
   },
   "background": {
-    "page": "background.html",
-    "persistent": false
+    "service_worker": "background.js",
+    "type": "module"
   },
   "permissions": [
     "tabs",
     "webNavigation",
     "storage",
-    "*://*/*"
+    "activeTab",
+    "scripting"
   ],
-  "content_security_policy": "script-src 'self' 'unsafe-eval' https://www.google-analytics.com; object-src 'self'"
+  "host_permissions": ["http://*/*", "https://*/*"],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  },
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAjzqrpSUv6MTDsg0iay4oaGSBy/hErXo0W+vDixY0nrsptpVVzgd9bta0OepfLqEJxDLWLrp7XR7Q85DMy1gsY8VmCdowIPW+JQMxnogk8SIzwMMeonLZVyfqoaNn4/vzReMjn0iIRKcf6wznQ53podXZcCSGKBHah3Be0FSBaDXkzzIPq1WNpZa04OWwEcIc+V/bF4NvN9ySl45c+9dpt7hd2ly9gLf7Q6lZXVJHr4Z9EQr00dQnsmotDseHiuLq1GkhmiG3N9PdxxCbQ+yXjoSIsbEFK+prQQhGN4jr58nrXkZHF9PvFgpLaikrTtr0EDAbR56Flhh2pGJSQFVYVwIDAQAB"
 }

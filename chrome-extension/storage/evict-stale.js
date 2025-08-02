@@ -31,7 +31,7 @@ async function lookForKeysToEvict() {
 
 async function tryEvictFrameKey(key, tabId, frameId) {
     if (!(await doesFrameExist(tabId, frameId))) {
-        console.info(`Removing key ${key}...`);
+        // console.info(`Removing key ${key}...`);
         await storage.removeFrame(tabId, frameId);
         return true;
     }
@@ -40,7 +40,7 @@ async function tryEvictFrameKey(key, tabId, frameId) {
 
 async function tryEvictTabScriptCountKey(key, tabId) {
     if (!(await doesFrameExist(tabId, 0))) {
-        console.info(`Removing key ${key}...`);
+        // console.info(`Removing key ${key}...`);
         await storage.removeTabScriptCount(tabId);
         return true;
     }

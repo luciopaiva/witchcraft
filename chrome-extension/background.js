@@ -13,11 +13,11 @@ browser.api.onSuspend(async () => {
     console.info("Extension suspended");
     analytics.event.suspended();
 });
-browser.api.onNewFrame(async details => {
+browser.api.onCommitted(async details => {
     const { url, tabId, frameId } = details;
     const metrics = await loader.loadScripts(url, tabId, frameId);
     metrics.hasData && analytics.event.scriptsLoaded(metrics);
     await storage.evictStale();
 });
 
-await icon.initialize();
+icon.initialize().then();

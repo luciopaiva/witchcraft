@@ -6,23 +6,16 @@ import {util} from "../util/index.js";
 
 const GA_ENDPOINT = 'https://www.google-analytics.com/mp/collect';
 
-const credentials = await util.loadJson("/credentials.json");
-if (credentials) {
-    console.info("GA is enabled.");
-} else {
-    console.info("Could not load GA credentials - analytics disabled.");
-}
-
 const DEFAULT_ENGAGEMENT_TIME_MSEC = 100;
 
 // Duration of inactivity after which a new session is created
 const SESSION_EXPIRATION_IN_MIN = 30;
 
 export class Agent {
-    constructor(measurementId, apiSecret, debug = true) {
-        this.measurementId = measurementId;
-        this.apiSecret = apiSecret;
-        this.hasCredentials = measurementId && apiSecret;
+    constructor(credentialsPromise, debug = false) {
+        this.credentialsPromise = credentialsPromise;
+        this.measurementId = null;
+        this.apiSecret = null;
         this.debug = debug;
     }
 
@@ -78,7 +71,7 @@ export class Agent {
 
     // Fires an event with optional params. Event names must only include letters and underscores.
     async fireEvent(name, params = {}) {
-        if (!this.hasCredentials) {
+        if (!(await this.hasCredentials())) {
             this.debug && console.info("Skipping GA event");
             return;
         }
@@ -98,7 +91,9 @@ export class Agent {
 
         this.debug && console.info(`GA event`, name, params);
 
-        const url = `${GA_ENDPOINT}?measurement_id=${this.measurementId}&api_secret=${this.apiSecret}`;
+        const measurementId = await this.getMeasurementId();
+        const apiSecret = await this.getApiSecret();
+        const url = `${GA_ENDPOINT}?measurement_id=${measurementId}&api_secret=${apiSecret}`;
         try {
             const response = await fetch(url, {
                     method: 'POST',
@@ -119,6 +114,26 @@ export class Agent {
         }
     }
 
+    async getMeasurementId() {
+        if (!this.measurementId) {
+            const credentials = await this.credentialsPromise;
+            this.measurementId = credentials?.measurementId;
+        }
+        return this.measurementId;
+    }
+
+    async getApiSecret() {
+        if (!this.apiSecret) {
+            const credentials = await this.credentialsPromise;
+            this.apiSecret = credentials?.apiSecret;
+        }
+        return this.apiSecret;
+    }
+
+    async hasCredentials() {
+        return await this.getMeasurementId() && await this.getApiSecret();
+    }
+
     // Fire a page view event.
     async firePageViewEvent(pageLocation, pageTitle, additionalParams = {}) {
         return this.fireEvent('page_view', {
@@ -129,5 +144,7 @@ export class Agent {
     }
 }
 
-const singleton = new Agent(credentials?.measurementId, credentials?.apiSecret);
+const credentialsPromise = util.loadJson("/credentials.json");
+
+const singleton = new Agent(credentialsPromise, true);
 export default singleton;

@@ -1,0 +1,233 @@
+import {describe, it} from "mocha";
+import DummyWebServer from './utils/dummy-web-server.js';
+import DummyScriptServer from './utils/dummy-script-server.js';
+import {setScriptServerAddress, startBrowser, toggleDevModeOn} from "./utils/browser-test-utils.js";
+import {loadResource} from "./utils/resource-utils.js";
+import assert from "node:assert";
+import {DEFAULT_SERVER_ADDRESS} from "../../chrome-extension/constants.js";
+
+describe("Integration", function () {
+    let browser;
+    let webServer;
+    let scriptsServer;
+
+    beforeEach(async function () {
+
+        webServer = new DummyWebServer();
+        await webServer.start();
+
+        scriptsServer = new DummyScriptServer();
+        await scriptsServer.start();
+
+        browser = await startBrowser(true);
+        await toggleDevModeOn(browser);
+
+        await setScriptServerAddress(browser, `http://127.0.0.1:${scriptsServer.port}`);
+    });
+
+    afterEach(async function () {
+        await browser.close();
+        browser = undefined;
+
+        await webServer.stop();
+        webServer = undefined;
+
+        await scriptsServer.stop();
+        scriptsServer = undefined;
+    });
+
+    it("check that popup lists all loaded scripts", async function () {
+        webServer.addPage("/hello.html", "<html><body><h1>Hello World</h1></body></html>");
+
+        scriptsServer.addScript("/foo.bar.js", () => "");
+        scriptsServer.addScript("/bar.js", () => "");
+        scriptsServer.addScript("/foo.bar.css", () => "")
+
+        const page = await browser.newPage();
+        await page.goto(`http://foo.bar:${webServer.port}/hello.html`);
+
+        // Get the tab ID by querying Chrome tabs API from extension context
+        const popup = await browser.newPage();
+        await popup.goto(`chrome-extension://hokcepcfcicnhalinladgknhaljndhpc/popup/popup.html`);
+
+        // Get the tab ID of our test page using Chrome tabs API
+        const activeTabId = await popup.evaluate(async (testUrl) => {
+            return new Promise(resolve => {
+                chrome.tabs.query({}, tabs => {
+                    const testTab = tabs.find(tab => tab.url === testUrl);
+                    resolve(testTab ? testTab.id : null);
+                });
+            });
+        }, `http://foo.bar:${webServer.port}/hello.html`);
+
+        // Now reload the popup with the correct tab ID
+        await popup.goto(`chrome-extension://hokcepcfcicnhalinladgknhaljndhpc/popup/popup.html?activeTabId=${activeTabId}`);
+
+        await popup.waitForSelector('#scripts-table');
+        const scripts = await popup.$$eval('#scripts-table tr:not(.page-frame)', rows => {
+            return rows.map(row => {
+                const cells = row.querySelectorAll('td');
+                return {
+                    name: cells[0]?.innerText,
+                    type: cells[1]?.innerText
+                };
+            });
+        });
+        assert.strictEqual(scripts.length, 3, "There should be 3 scripts listed in the popup");
+
+        // Sort scripts by name to make the test order-independent
+        const sortedScripts = scripts.sort((a, b) => a.name.localeCompare(b.name));
+        const expectedScripts = [
+            {name: "bar.js", type: "JS"},
+            {name: "foo.bar.css", type: "CSS"},
+            {name: "foo.bar.js", type: "JS"}
+        ];
+
+        assert.deepStrictEqual(sortedScripts, expectedScripts, "Scripts should be listed correctly in the popup");
+    });
+
+    it("check that popup loads server address correctly", async function () {
+        const page = await browser.newPage();
+        await page.goto(`chrome-extension://hokcepcfcicnhalinladgknhaljndhpc/popup/popup.html`);
+
+        await page.waitForSelector('#server-address');
+
+        const inputValue = await page.$eval('#server-address', input => input.value);
+
+        // check that the popup is showing the correct server address
+
+        const expectedAddress = `http://127.0.0.1:${scriptsServer.port}`;
+        assert.strictEqual(inputValue, expectedAddress);
+
+        const storageValue = await page.evaluate(() => {
+            return new Promise(resolve => {
+                chrome.storage.local.get('server-address', result => {
+                    resolve(result['server-address']);
+                });
+            });
+        });
+
+        assert.strictEqual(storageValue, expectedAddress);
+
+        // check that changes in the server address are reflected in the popup
+
+        const newAddress = "http://new.address:1234";
+        await page.evaluate((address) => {
+            return new Promise((resolve) => {
+                chrome.storage.local.set({ 'server-address': address }, resolve);
+            });
+        }, newAddress);
+
+        await page.reload();
+
+        await page.waitForSelector('#server-address');
+        const newInputValue = await page.$eval('#server-address', input => input.value);
+        assert.strictEqual(newInputValue, newAddress);
+
+        // now check that the reset button works
+
+        await page.click('#server-address-reset');
+
+        const resetInputValue = await page.$eval('#server-address', input => input.value);
+        assert.strictEqual(resetInputValue, DEFAULT_SERVER_ADDRESS);
+
+        const resetStorageValue = await page.evaluate(() => {
+            return new Promise(resolve => {
+                chrome.storage.local.get('server-address', result => {
+                    resolve(result['server-address']);
+                });
+            });
+        });
+        assert.strictEqual(resetStorageValue, DEFAULT_SERVER_ADDRESS);
+    });
+
+    it("check JavaScript injection", async function () {
+        webServer.addPage("/hello.html", "<html><body><h1>Hello World</h1></body></html>");
+
+        scriptsServer.addScript("/witchcraft.js", await loadResource("test.js"));
+
+        const page = await browser.newPage();
+
+        page.on('console', msg => console.log(`[CHROME CONSOLE] ${msg.type()}: ${msg.text()}`));
+
+        await page.goto(`http://test.witchcraft:${webServer.port}/hello.html`);
+
+        await page.waitForFunction(
+            () => document.querySelector('h1').innerText === "Goodbye World",
+            { timeout: 5000 }
+        );
+    });
+
+    it("check CSS injection", async function () {
+        webServer.addPage("/hello.html", "<html><body><h1>Hello World</h1></body></html>");
+
+        scriptsServer.addScript("/witchcraft.css", await loadResource("test.css"));
+
+        const page = await browser.newPage();
+
+        page.on('console', msg => console.log(`[CHROME CONSOLE] ${msg.type()}: ${msg.text()}`));
+
+        await page.goto(`http://test.witchcraft:${webServer.port}/hello.html`);
+
+        await page.waitForFunction(
+            () => window.getComputedStyle(document.querySelector('h1')).color === "rgb(0, 0, 255)",
+            { timeout: 5000 }
+        );
+    });
+
+    it("check if all scripts are loaded and in order", async function () {
+        webServer.addPage("/hi/hello.html", "<html><body><h1>Hello World</h1></body></html>");
+
+        scriptsServer.addScript("/_global.js", () => document.querySelector('h1').innerText = '1');
+        scriptsServer.addScript("/bar.js", () => document.querySelector('h1').innerText += '2');
+        scriptsServer.addScript("/foo.bar.js", () => document.querySelector('h1').innerText += '3');
+        scriptsServer.addScript("/foo.bar/hi/hello.html.js", () => document.querySelector('h1').innerText += '4');
+
+        const page = await browser.newPage();
+
+        page.on('console', msg => console.log(`[CHROME CONSOLE] ${msg.type()}: ${msg.text()}`));
+
+        await page.goto(`http://foo.bar:${webServer.port}/hi/hello.html`);
+
+        await page.waitForFunction(
+            () => document.querySelector('h1').innerText === "1234",
+            { timeout: 5000 }
+        );
+
+        assert(scriptsServer.requests.toString(), [
+            "/_global.js,HIT",
+            "/_global.css,MISS",
+            "/bar.js,HIT",
+            "/bar.css,MISS",
+            "/foo.bar.js,HIT",
+            "/foo.bar.css,MISS",
+            "/foo.bar/hi.js,MISS",
+            "/foo.bar/hi.css,MISS",
+            "/foo.bar/hi/hello.html.js,HIT",
+            "/foo.bar/hi/hello.html.css,MISS"
+        ].join(","));
+    });
+
+    it("check script loaded in iframe", async function () {
+        webServer.addPage("/iframe.html", "<html><body>Burn the witch!</body></html>");
+        webServer.addPage("/hello.html", '<html><body><iframe src="iframe.html"></iframe></body></html>');
+
+        scriptsServer.addScript("/foo.bar/iframe.html.js", () => {
+            document.querySelector('body').innerText = 'Save the witch!';
+        });
+
+        const page = await browser.newPage();
+
+        page.on('console', msg => console.log(`[CHROME CONSOLE] ${msg.type()}: ${msg.text()}`));
+
+        await page.goto(`http://foo.bar:${webServer.port}/hello.html`);
+
+        const iframeElement = await page.waitForSelector('iframe');
+        const frame = await iframeElement.contentFrame();
+
+        await frame.waitForFunction(
+            () => document.querySelector('body').innerText === "Save the witch!",
+            { timeout: 5000 }
+        );
+    });
+});
