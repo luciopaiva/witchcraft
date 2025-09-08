@@ -3,6 +3,7 @@ import {storage} from "../storage/index.js";
 import {DEFAULT_SERVER_ADDRESS} from "../constants.js";
 import Debouncer from "../util/debouncer.js";
 import {analytics} from "../analytics/index.js";
+import {retrieveServerStatus} from "../storage/retrieve-server-status.js";
 
 class Popup {
 
@@ -12,7 +13,7 @@ class Popup {
         this.makeButtonFromAnchor("docs");
         this.makeButtonFromAnchor("report-issue");
         this.showVersion();
-        this.showServerStatus();
+        this.showServerStatus().then();
         this.renderScripts();
         this.makeAdvancedPanel();
         this.listenToStorageChanges();
@@ -39,10 +40,9 @@ class Popup {
         });
     }
 
-    showServerStatus() {
+    async showServerStatus() {
         document.getElementById("server-status")
-            // .classList.toggle("offline", !this.witchcraft.isServerReachable);
-            .classList.toggle("offline", false);
+            .classList.toggle("online", await retrieveServerStatus());
     }
 
     /** @return {void} */

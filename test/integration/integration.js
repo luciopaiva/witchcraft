@@ -36,6 +36,23 @@ describe("Integration", function () {
         scriptsServer = undefined;
     });
 
+    it("check that popup shows server status correctly", async function () {
+        // Open the popup
+        const popup = await browser.newPage();
+        await popup.goto(`chrome-extension://hokcepcfcicnhalinladgknhaljndhpc/popup/popup.html`);
+
+        // Wait for the server status element to be present
+        await popup.waitForSelector('#server-status');
+
+        // Check that the server status element does not have the 'offline' class
+        const hasOnlineClass = await popup.evaluate(() => {
+            const serverStatusElement = document.getElementById('server-status');
+            return serverStatusElement.classList.contains('online');
+        });
+
+        assert.strictEqual(hasOnlineClass, true, "Server status should have the 'online' class when server is running");
+    });
+
     it("check that popup lists all loaded scripts", async function () {
         webServer.addPage("/hello.html", "<html><body><h1>Hello World</h1></body></html>");
 
