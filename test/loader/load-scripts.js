@@ -49,12 +49,12 @@ describe("Load scripts", function () {
         sinon.assert.calledWith(sendScript, sinon.match({
             path: '_global.js',
             type: 'js',
-            url: 'http://localhost:5743/_global.js'
+            url: `${DEFAULT_SERVER_ADDRESS}/_global.js`
         }), tabId, frameId);
         sinon.assert.calledWith(sendScript, sinon.match({
             path: 'google.com.js',
             type: 'js',
-            url: 'http://localhost:5743/google.com.js'
+            url: `${DEFAULT_SERVER_ADDRESS}/google.com.js`
         }), tabId, frameId);
     });
 });

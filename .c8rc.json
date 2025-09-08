@@ -1,6 +1,0 @@
-{
-  "all": true,
-  "include": [
-    "chrome-extension/**/*.js"
-  ]
-}
