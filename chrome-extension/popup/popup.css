@@ -147,12 +147,12 @@ div.css {
     height: 4px;
     width: 4px;
     border-radius: 3px;
-    border: 1px solid var(--server-online-stroke);
-    background-color: var(--server-online-fill);
+    border: 1px solid var(--server-offline-stroke);
+    background-color: var(--server-offline-fill);
     display: inline-block;
 }
 
-#server-status.offline {
-    border: 1px solid var(--server-offline-stroke);
-    background-color: var(--server-offline-fill);
+#server-status.online {
+    border: 1px solid var(--server-online-stroke);
+    background-color: var(--server-online-fill);
 }
