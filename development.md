@@ -10,21 +10,6 @@ Then you're ready to run the tests with coverage:
 
     npm test
 
-Coverage also works in Webstorm seamlessly thanks to [`c8-as-nyc`](https://youtrack.jetbrains.com/issue/IDEA-315826/missing-c8-coverage-tool-support#focus=Comments-27-6999383.0-0).
-
-## Analytics
-
-Analytics is not required, but can be optionally set via the following instructions.
-
-To set up GA, the file `./chrome-extension/credentials.json` must be created. Its format should be:
-
-    {
-        "measurementId": "G-XXXXXXXXXX",
-        "apiSecret": "0123456789012345678901"
-    }
-
-Where `measurementId` and `apiSecret` are values obtained from the Google Analytics dashboard. Witchcraft is currently using GA4.
-
 ## Running integration tests on WSL2
 
 It's possible to run integration tests on WSL2, but it requires some setup. [This SO answer](https://stackoverflow.com/a/78776116/778272) nails it:
@@ -52,3 +37,17 @@ EOF
 node index.js
 # prints "Google"
 ```
+
+## Analytics
+
+Analytics is not required, but can be optionally set via the following instructions.
+
+To set up GA, the file `./chrome-extension/credentials.json` must be created. Its format should be:
+
+    {
+        "measurementId": "G-XXXXXXXXXX",
+        "apiSecret": "0123456789012345678901"
+    }
+
+Where `measurementId` and `apiSecret` are values obtained from the Google Analytics console. Witchcraft is currently set up to use GA4.
+

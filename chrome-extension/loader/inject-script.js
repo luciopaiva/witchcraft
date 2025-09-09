@@ -18,6 +18,8 @@ export async function injectScript(script, tabId, frameId) {
 
 function injectJs(url, contents, tabId, frameId) {
     browser.api.injectJs(util.embedScript(contents), tabId, frameId);
+    // ToDo this is simpler and apparently works just as well, but needs testing:
+    // browser.api.injectJs(contents, tabId, frameId);
     logInjection(tabId, frameId, "JS", url);
 }
 
