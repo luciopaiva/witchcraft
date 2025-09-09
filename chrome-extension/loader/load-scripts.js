@@ -9,6 +9,7 @@ export async function loadScripts(scriptUrl, tabId, frameId) {
     // clear any info about previously-loaded scripts
     await storage.removeFrame(tabId, frameId);
     if (frameId === 0) {
+        await storage.clearAllFrames(tabId);
         await badge.clear(tabId);
     }
 
@@ -25,10 +26,13 @@ export async function loadScripts(scriptUrl, tabId, frameId) {
     const scriptNames = scripts
         .filter(script => script.hasContents)
         .map(script => script.path);
-    await storage.storeFrame(tabId, frameId, scriptNames);
 
-    // update the icon badge for this tab
-    await badge.increment(tabId, scriptNames.length);
+    if (scriptNames.length > 0) {
+        await storage.storeFrame(tabId, frameId, scriptNames);
+
+        // update the icon badge for this tab
+        await badge.registerScripts(tabId, frameId, scriptNames);
+    }
 
     return metrics;
 }

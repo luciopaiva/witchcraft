@@ -7,21 +7,39 @@ import {retrieveServerStatus} from "../storage/retrieve-server-status.js";
 
 class Popup {
 
+    currentTabId = 0;
+
     constructor () {
+        this.start().then();
+    }
+
+    async start() {
+        this.currentTabId = await this.getActiveTabId();
+
         analytics.page("/popup", "popup");
 
         this.makeButtonFromAnchor("docs");
         this.makeButtonFromAnchor("report-issue");
         this.showVersion();
-        this.showServerStatus().then();
-        this.renderScripts();
-        this.makeAdvancedPanel();
+        await this.showServerStatus();
+        await this.renderScripts();
+        await this.makeAdvancedPanel();
         this.listenToStorageChanges();
     }
 
     listenToStorageChanges() {
         const scriptsDebouncer = new Debouncer(100);
-        const callback = () => scriptsDebouncer.debounce(() => this.renderScripts());
+        const callback = (changes, area) => {
+            console.info("Storage changed in area", area, "changes:", changes);
+
+            const keys = Object.keys(changes);
+            if (!keys.some(key => key.startsWith(`frame-scripts:${this.currentTabId}:`))) {
+                // not relevant to current tab
+                return;
+            }
+
+            scriptsDebouncer.debounce(() => this.renderScripts());
+        }
         const removeListener = browser.api.onStorageChanged(callback);
         // otherwise we'll have a registered listener for every time the popup opened:
         window.addEventListener("beforeunload", removeListener);
@@ -54,9 +72,15 @@ class Popup {
         const serverAddress = await storage.retrieveServerAddress();
 
         let gotAnyScripts = false;
-        const currentTabId = await this.getActiveTabId();
-        for (const frameId of await browser.api.getAllFrames(currentTabId)) {
-            const frameInfo = await storage.retrieveFrame(currentTabId, frameId);
+
+        const frames = await storage.retrieveAllFrames(this.currentTabId);
+
+        for (const [,frameInfo] of Object.entries(frames)) {
+            const frameId = frameInfo?.frameId;
+            if (typeof frameId !== "number") {
+                continue;
+            }
+
             const scriptNames = frameInfo?.scriptNames ?? [];
 
             if (scriptNames.length > 0) {

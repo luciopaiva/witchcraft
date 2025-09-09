@@ -41,7 +41,7 @@ async function tryEvictFrameKey(key, tabId, frameId) {
 async function tryEvictTabScriptCountKey(key, tabId) {
     if (!(await doesFrameExist(tabId, 0))) {
         // console.info(`Removing key ${key}...`);
-        await storage.removeTabScriptCount(tabId);
+        await storage.removeTabScriptSet(tabId);
         return true;
     }
     return false;

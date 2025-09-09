@@ -2,7 +2,6 @@
 import {chromeApi} from "./index.js";
 
 export async function retrieveAllEntries() {
-    return new Promise(resolve => {
-        chromeApi.chrome().storage.local.get(result => resolve(Object.entries(result)));
-    });
+    const result = await chromeApi.chrome().storage.local.get();
+    return Object.entries(result);
 }

@@ -146,5 +146,5 @@ export class Agent {
 
 const credentialsPromise = util.loadJson("/credentials.json");
 
-const singleton = new Agent(credentialsPromise, true);
+const singleton = new Agent(credentialsPromise, false);
 export default singleton;
