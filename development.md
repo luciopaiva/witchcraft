@@ -10,6 +10,11 @@ Then you're ready to run the tests with coverage:
 
     npm test
 
+You can also run test with Docker:
+
+    docker build -t witchcraft-tests .
+    docker run --rm witchcraft-tests
+
 ## Running integration tests on WSL2
 
 It's possible to run integration tests on WSL2, but it requires some setup. [This SO answer](https://stackoverflow.com/a/78776116/778272) nails it:
