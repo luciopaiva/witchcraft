@@ -14,7 +14,7 @@ export async function startBrowser(headless = true) {
             `--load-extension=${EXTENSION_PATH}`,
             "--enable-extension-developer-mode",
             "--host-resolver-rules=MAP * 127.0.0.1",  // this allows tests to fake requests to various domains
-            "--no-sandbox",
+            "--no-sandbox",  // necessary to run in Docker
         ],
     });
 }
