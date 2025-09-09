@@ -37,9 +37,6 @@ export class Agent {
     // Returns the current session id, or creates a new one if one doesn't exist or
     // the previous one has expired.
     async getOrCreateSessionId() {
-        // Use storage.session because it is only in memory
-        // ToDo use storage.session after migrating to manifest v3
-        // let { sessionData } = await chrome.storage.session.get('sessionData');
         let sessionData = await browser.api.retrieveKey("ga-session-data");
         const currentTimeInMs = Date.now();
         // Check if session exists and is still valid
