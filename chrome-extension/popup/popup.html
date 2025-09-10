@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Witchcraft</title>
+    <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+
+<div class="header">
+    Current tab
+</div>
+
+<div class="container">
+    <div id="no-scripts" class="row center">No scripts found</div>
+    <table id="scripts-table" class="scripts"></table>
+</div>
+
+<div class="header">
+    <div>Server</div><div id="server-status"></div>
+</div>
+
+<div id="advanced-panel" class="container">
+    <div class="row">
+        <label for="server-address">Address:</label>
+        <input type="text" value="host" id="server-address">
+    </div>
+    <div class="row right">
+        <a id="server-address-reset" href="">Reset to default</a>
+    </div>
+</div>
+
+<div class="header">
+    <div class="title">Witchcraft <span id="version"></span></div>
+</div>
+
+<div class="container">
+    <div class="row">
+        <a id="docs" href="https://luciopaiva.com/witchcraft">Docs</a>
+        <a id="report-issue" href="https://github.com/luciopaiva/witchcraft/issues">Report issue</a>
+    </div>
+</div>
+
+<script src="popup.js" type="module"></script>
+</body>
+</html>
