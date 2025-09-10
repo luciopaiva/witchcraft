@@ -44,7 +44,14 @@ describe("Integration", function () {
         // Wait for the server status element to be present
         await popup.waitForSelector('#server-status');
 
-        // Check that the server status element does not have the 'offline' class
+        // Wait for the server status to be updated with the 'online' class
+        // This can take up to 1 second as the extension pings the server to determine status
+        await popup.waitForFunction(() => {
+            const serverStatusElement = document.getElementById('server-status');
+            return serverStatusElement && serverStatusElement.classList.contains('online');
+        }, { timeout: 5000 });
+
+        // Double-check that the element has the online class
         const hasOnlineClass = await popup.evaluate(() => {
             const serverStatusElement = document.getElementById('server-status');
             return serverStatusElement.classList.contains('online');
@@ -144,6 +151,13 @@ describe("Integration", function () {
         // now check that the reset button works
 
         await page.click('#server-address-reset');
+
+        // wait until the input value is reset
+        await page.waitForFunction(
+            (defaultAddress) => document.getElementById('server-address').value === defaultAddress,
+            { timeout: 5000 },
+            DEFAULT_SERVER_ADDRESS
+        );
 
         const resetInputValue = await page.$eval('#server-address', input => input.value);
         assert.strictEqual(resetInputValue, DEFAULT_SERVER_ADDRESS);
