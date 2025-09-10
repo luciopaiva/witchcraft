@@ -27,7 +27,6 @@
     "type": "module"
   },
   "permissions": [
-    "tabs",
     "webNavigation",
     "storage",
     "activeTab",
