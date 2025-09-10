@@ -10,10 +10,16 @@ Then you're ready to run the tests with coverage:
 
     npm test
 
-You can also run test with Docker:
+You can also run tests with Docker:
 
     docker build -t witchcraft-tests .
     docker run --rm witchcraft-tests
+
+## Note about integration tests
+
+Integration tests use `puppeteer` to run a headless Chrome instance. One of the tests checks if the scripts server is reachable from the browser context, but Witchcraft only checks for the server once every 5 seconds, which is too slow for the test. To work around this, I've added a build step that simply copies all the code into `./dist` while also changing constants.js to make Witchcraft check for the server more frequently. This is done in `npm run build`, which is run automatically when running `npm test:integration`.
+
+I tried to use other methods of verifying whether Chrome was running by an automated test, but it ended up being simpler to just change the code for the tests. If you have a better idea, a PR is welcome.
 
 ## Running integration tests on WSL2
 

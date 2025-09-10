@@ -4,7 +4,7 @@ import DummyScriptServer from './utils/dummy-script-server.js';
 import {setScriptServerAddress, startBrowser, toggleDevModeOn} from "./utils/browser-test-utils.js";
 import {loadResource} from "./utils/resource-utils.js";
 import assert from "node:assert";
-import {DEFAULT_SERVER_ADDRESS} from "../../chrome-extension/constants.js";
+import {DEFAULT_SERVER_ADDRESS} from "../../dist/constants.js";
 
 describe("Integration", function () {
     let browser;

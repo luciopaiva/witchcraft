@@ -3,7 +3,7 @@
  */
 import puppeteer from "puppeteer";
 
-const EXTENSION_PATH = "./chrome-extension";
+const EXTENSION_PATH = "./dist";
 const EXTENSION_ID = "hokcepcfcicnhalinladgknhaljndhpc";
 
 export async function startBrowser(headless = true) {

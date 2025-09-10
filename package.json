@@ -7,8 +7,9 @@
     "doc": "docs"
   },
   "scripts": {
+    "build": "node build.js",
     "test:unit": "c8 -r lcov -r text mocha 'test/**/*.js' --ignore 'test/integration/**' --recursive",
-    "test:integration": "mocha test/integration/integration.js --timeout 30000",
+    "test:integration": "npm run build && mocha test/integration/integration.js --timeout 30000",
     "test": "npm run test:unit && npm run test:integration"
   },
   "repository": {
