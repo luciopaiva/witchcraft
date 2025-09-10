@@ -1,0 +1,38 @@
+
+import {path} from "../path/index.js";
+import {storage} from "../storage/index.js";
+import {script} from "../script/index.js";
+import {loader} from "./index.js";
+import {badge} from "../browser/badge/index.js";
+
+export async function loadScripts(scriptUrl, tabId, frameId) {
+    // clear any info about previously-loaded scripts
+    await storage.removeFrame(tabId, frameId);
+    if (frameId === 0) {
+        await storage.clearAllFrames(tabId);
+        await badge.clear(tabId);
+    }
+
+    const serverAddress = await storage.retrieveServerAddress();
+    /** @type {ScriptContext[]} */
+    const scripts = path.generatePotentialScriptNames(scriptUrl)
+        .flatMap(path.mapToJsAndCss)
+        .map(path.pathTupleToScriptContext)
+        .map(script.prependServerOrigin.bind(null, serverAddress));
+
+    const metrics = await loader.fetchAndInject(scripts, tabId, frameId);
+
+    // persist so the popup window can read it when needed
+    const scriptNames = scripts
+        .filter(script => script.hasContents)
+        .map(script => script.path);
+
+    if (scriptNames.length > 0) {
+        await storage.storeFrame(tabId, frameId, scriptNames);
+
+        // update the icon badge for this tab
+        await badge.registerScripts(tabId, frameId, scriptNames);
+    }
+
+    return metrics;
+}

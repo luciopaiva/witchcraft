@@ -36,33 +36,29 @@
 
         <ol>
             <li>Install Witchcraft Chrome extension: get it <a href="//chrome.google.com/webstore/detail/witchcraft-inject-js-and/hokcepcfcicnhalinladgknhaljndhpc" target="_blank">here</a></li>
-            <li>Install Web Server Chrome app: get it <a href="//chrome.google.com/webstore/detail/web-server-for-chrome/ofhbbkphhbklhfoeikjpcbhemlocgigb" target="_blank">here</a></li>
-            <li>Choose a folder where your scripts will live. For instance, <span class="code">~/witchcraft-scripts</span> (create it now if it doesn't exist yet)</li>
-            <li>Open Web Server Chrome app configuration window. Go to the chrome://apps/ window and open it. It looks like this: <br>
-                <img class="screenshot" src="web-server-icon.png" alt="Web Server icon">
+            <li>Choose a folder where your scripts will be stored. For instance, <span class="code">~/witchcraft-scripts</span> (create it now if it doesn't exist yet)</li>
+            <li>Start a local web server from your scripts folder. Possible solutions:
+                <ul>
+                    <li><span class="code">python -m http.server 5743</span></li>
+                    <li>Node.js + <a href="https://github.com/http-party/http-server">http-server</a></li>
+                    <li>A comprehensive list of solutions can be found <a href="https://gist.github.com/willurd/5720255">here</a></li>
+                </ul>
             </li>
-            <li>Configure Web Server Chrome app
-                <img class="screenshot" src="web-server-configuration.png" alt="Web Server Chrome app configuration window">
-                <ol>
-                    <li>Click the <span class="code">CHOOSE FOLDER</span> button and select the folder you chose in step 3</li>
-                    <li>Toggle on the server if it isn't yet (should say <i>Web Server: STARTED</i>)</li>
-                    <li>Mark <i>Run in background</i></li>
-                    <li>Mark <i>Start on login</i></li>
-                    <li>On <i>Enter Port</i>, write <span class="code">5743</span></li>
-                </ol>
-            </li>
-            <li>Restart Chrome for the changes to apply and Witchcraft should be working now. Head to <a href="http://localhost:5743/" target="_blank">http://localhost:5743/</a> and you should see your list of scripts (or an empty folder if you haven't added any scripts yet!)</li>
         </ol>
 
-        <p>To test it, create some script, put it in the selected folder and try it!</p>
+        <p>As soon as Witchcraft is able to reach the server, its will show a green light:</p>
+
+        <img src="server-online.png" alt="server online" style="width: 550px" class="screenshot">
+
+        <p>You can now create a script in your scripts folder and open the corresponding web page to see it in action.</p>
         
-        <p>Note: if the instructions didn't work for any reason, you can get help by posting you problem <a href="https://github.com/luciopaiva/witchcraft/issues" target="_blank">here</a>.</p>
+        <p>If you encounter any problems, ask for help <a href="https://github.com/luciopaiva/witchcraft/issues" target="_blank">here</a>.</p>
 
     </article>
 
     <hr>
 
-    <p class="footnote right">Made by <a href="//luciopaiva.com" target="_blank">Lucio Paiva</a> - July 2018</p>
+    <p class="footnote right">Made by <a href="//luciopaiva.com" target="_blank">Lucio Paiva</a> - July 2025</p>
     <p class="footnote left">View <a href="//github.com/luciopaiva/witchcraft" target="_blank">source</a> on GitHub</p>
 </div>
 
