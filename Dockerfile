@@ -1,4 +1,4 @@
-FROM node:18.16.0-slim AS app
+FROM node:24.7.0-slim AS app
 
 # We don't need the standalone Chromium
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
