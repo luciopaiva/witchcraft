@@ -13,6 +13,7 @@ export function generatePotentialScriptNames(url) {
     const paths = Array.from(iteratePathSegments(pathName));
     if (paths.length > 0) {
         result.push(...paths.map(path => hostName + path))
+        result.push(...paths.map(path => GLOBAL_SCRIPT_NAME + path))
     }
     return result;
 }
