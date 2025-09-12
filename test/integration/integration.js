@@ -213,6 +213,7 @@ describe("Integration", function () {
         scriptsServer.addScript("/bar.js", () => document.querySelector('h1').innerText += '2');
         scriptsServer.addScript("/foo.bar.js", () => document.querySelector('h1').innerText += '3');
         scriptsServer.addScript("/foo.bar/hi/hello.html.js", () => document.querySelector('h1').innerText += '4');
+        scriptsServer.addScript("/_global/hi/hello.html.js", () => document.querySelector('h1').innerText += '5');
 
         const page = await browser.newPage();
 
@@ -221,22 +222,33 @@ describe("Integration", function () {
         await page.goto(`http://foo.bar:${webServer.port}/hi/hello.html`);
 
         await page.waitForFunction(
-            () => document.querySelector('h1').innerText === "1234",
+            () => document.querySelector('h1').innerText === "12345",
             { timeout: 5000 }
         );
 
-        assert(scriptsServer.requests.toString(), [
-            "/_global.js,HIT",
-            "/_global.css,MISS",
-            "/bar.js,HIT",
-            "/bar.css,MISS",
-            "/foo.bar.js,HIT",
-            "/foo.bar.css,MISS",
-            "/foo.bar/hi.js,MISS",
-            "/foo.bar/hi.css,MISS",
-            "/foo.bar/hi/hello.html.js,HIT",
-            "/foo.bar/hi/hello.html.css,MISS"
-        ].join(","));
+        const sortByPath = (a, b) => a[0].localeCompare(b[0]);
+
+        const actual = scriptsServer.requests.filter(request => request[0] !== "/");  // ignore ping requests
+        actual.sort(sortByPath); // sort requests to make the test order-independent
+
+        const expected = [
+            ["/_global.js", "HIT"],
+            ["/_global.css", "MISS"],
+            ["/_global/hi.js", "MISS"],
+            ["/_global/hi.css", "MISS"],
+            ["/_global/hi/hello.html.js", "HIT"],
+            ["/_global/hi/hello.html.css", "MISS"],
+            ["/bar.js", "HIT"],
+            ["/bar.css", "MISS"],
+            ["/foo.bar.js", "HIT"],
+            ["/foo.bar.css", "MISS"],
+            ["/foo.bar/hi.js", "MISS"],
+            ["/foo.bar/hi.css", "MISS"],
+            ["/foo.bar/hi/hello.html.js", "HIT"],
+            ["/foo.bar/hi/hello.html.css", "MISS"],
+        ].sort(sortByPath);
+
+        assert.deepEqual(actual, expected);
     });
 
     it("check script loaded in iframe", async function () {
