@@ -2,4 +2,45 @@
 title: How to install
 ---
 
-How to install.
+import { Image } from 'astro:assets';
+import { Steps } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';import serverOnlineImage from "../../assets/server-online.png";
+
+Follow these steps:
+
+<Steps>
+
+1. Install Witchcraft Chrome extension: get it [here](https://chrome.google.com/webstore/detail/witchcraft-inject-js-and/hokcepcfcicnhalinladgknhaljndhpc)
+
+2. Choose a local folder where your scripts will be stored. For instance, `~/witchcraft-scripts` (create it now if it doesn't exist yet)
+
+3. Start a local web server to serve that folder. You can use any web server you like, but here are some simple options:
+
+   - Python 3 (if you have Python installed):
+
+     ```bash
+     python3 -m http.server 5743
+     ```
+
+   - Node.js (if you have Node.js installed):
+
+     ```bash
+     npm install -g http-server
+     http-server -p 5743
+     ```
+
+   <Aside type="caution">
+       By default, Witchcraft uses port `5743`. If you choose a different port, make sure to change it in the extension's settings by clicking on the Witchcraft icon in the Chrome toolbar and updating the server address field.
+   </Aside>
+
+   A comprehensive list of options can be found [here](https://gist.github.com/willurd/5720255).
+
+</Steps>
+
+As soon as Witchcraft is able to reach the server, the status indicator will turn green:
+
+<Image src={serverOnlineImage} alt="Witchcraft server online indicator" />
+
+You can now create a script in your scripts folder and open the corresponding web page to see it in action.
+
+If you encounter any problems, feel free to ask for help [here](https://github.com/luciopaiva/witchcraft/issues).
