@@ -6,7 +6,10 @@ import starlight from '@astrojs/starlight';
 export default defineConfig({
 	integrations: [
 		starlight({
-			title: 'My Docs',
+			title: '',
+            logo: {
+                src: "./src/assets/title.png",
+            },
 			social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/luciopaiva/witchcraft' }],
 			sidebar: [
 				{
