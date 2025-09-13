@@ -20,10 +20,10 @@ export default defineConfig({
                 { label: 'Introduction', slug: 'introduction' },
                 { label: 'How to install', slug: 'how-to-install' },
                 { label: 'New in version 3', slug: 'new-in-v3' },
-                { label: 'Features', slug: 'features' },
+                { label: 'User guide', slug: 'user-guide' },
                 { label: 'Examples', slug: 'examples' },
                 { label: 'FAQ', slug: 'faq' },
-                { label: 'Scripts server', slug: 'scripts-server' },
+                { label: 'About', slug: 'about' },
 				// {
 				// 	label: 'Guides',
 				// 	items: [
