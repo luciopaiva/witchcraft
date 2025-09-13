@@ -210,10 +210,11 @@ describe("Integration", function () {
         webServer.addPage("/hi/hello.html", "<html><body><h1>Hello World</h1></body></html>");
 
         scriptsServer.addScript("/_global.js", () => document.querySelector('h1').innerText = '1');
-        scriptsServer.addScript("/bar.js", () => document.querySelector('h1').innerText += '2');
-        scriptsServer.addScript("/foo.bar.js", () => document.querySelector('h1').innerText += '3');
-        scriptsServer.addScript("/foo.bar/hi/hello.html.js", () => document.querySelector('h1').innerText += '4');
-        scriptsServer.addScript("/_global/hi/hello.html.js", () => document.querySelector('h1').innerText += '5');
+        scriptsServer.addScript("/_global/hi/hello.html.js", () => document.querySelector('h1').innerText += '2');
+        scriptsServer.addScript("/bar.js", () => document.querySelector('h1').innerText += '3');
+        scriptsServer.addScript("/bar/hi.js", () => document.querySelector('h1').innerText += '4');
+        scriptsServer.addScript("/foo.bar.js", () => document.querySelector('h1').innerText += '5');
+        scriptsServer.addScript("/foo.bar/hi/hello.html.js", () => document.querySelector('h1').innerText += '6');
 
         const page = await browser.newPage();
 
@@ -221,10 +222,17 @@ describe("Integration", function () {
 
         await page.goto(`http://foo.bar:${webServer.port}/hi/hello.html`);
 
-        await page.waitForFunction(
-            () => document.querySelector('h1').innerText === "12345",
-            { timeout: 5000 }
-        );
+        try {
+            await page.waitForFunction(
+                () => document.querySelector('h1').innerText === "123456",
+                { timeout: 5000 }
+            );
+        } catch (error) {
+            if (error.name === 'TimeoutError') {
+                const h1Text = await page.$eval('h1', el => el.innerText);
+                throw new Error(`Test failed: expected h1 text to be "123456", but got "${h1Text}"`);
+            }
+        }
 
         const sortByPath = (a, b) => a[0].localeCompare(b[0]);
 
@@ -240,6 +248,10 @@ describe("Integration", function () {
             ["/_global/hi/hello.html.css", "MISS"],
             ["/bar.js", "HIT"],
             ["/bar.css", "MISS"],
+            ["/bar/hi.js", "HIT"],
+            ["/bar/hi.css", "MISS"],
+            ["/bar/hi/hello.html.js", "MISS"],
+            ["/bar/hi/hello.html.css", "MISS"],
             ["/foo.bar.js", "HIT"],
             ["/foo.bar.css", "MISS"],
             ["/foo.bar/hi.js", "MISS"],

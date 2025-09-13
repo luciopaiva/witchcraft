@@ -17,15 +17,21 @@ describe("Script name generator", function () {
         const levels = [...generatePotentialScriptNames("https://www.luciopaiva.com/foo/bar/index.html")];
         assert.deepStrictEqual(levels, [
             GLOBAL_SCRIPT_NAME,
+            `${GLOBAL_SCRIPT_NAME}/foo`,
+            `${GLOBAL_SCRIPT_NAME}/foo/bar`,
+            `${GLOBAL_SCRIPT_NAME}/foo/bar/index.html`,
             "com",
+            `com/foo`,
+            `com/foo/bar`,
+            `com/foo/bar/index.html`,
             "luciopaiva.com",
+            `luciopaiva.com/foo`,
+            `luciopaiva.com/foo/bar`,
+            `luciopaiva.com/foo/bar/index.html`,
             "www.luciopaiva.com",
             "www.luciopaiva.com/foo",
             "www.luciopaiva.com/foo/bar",
             "www.luciopaiva.com/foo/bar/index.html",
-            `${GLOBAL_SCRIPT_NAME}/foo`,
-            `${GLOBAL_SCRIPT_NAME}/foo/bar`,
-            `${GLOBAL_SCRIPT_NAME}/foo/bar/index.html`,
         ]);
     });
 
