@@ -1,0 +1,3 @@
+img {
+    filter: sepia(100%) saturate(2000%) brightness(70%) hue-rotate(90deg);
+}

@@ -1,0 +1,24 @@
+---
+title: Introduction
+description: Introduction to Witchcraft
+---
+
+import { Image } from 'astro:assets';
+import { Code } from '@astrojs/starlight/components';
+import exampleImage from "../../assets/screenshot.png";
+import exampleJs from "../../assets/google.com.js?raw";
+import exampleCss from "../../assets/google.com.css?raw";
+
+Witchcraft is a Google Chrome extension for loading custom JavaScript and CSS directly from a folder on your local machine, injecting them into web pages that match specified URL patterns.
+
+Pattern-matching is done using the page's URL. You can target specific pages, partial or entire domains. For example, navigating to `https://google.com` will match `google.com.js` and `google.com.css`:
+
+<Image src={exampleImage} alt="Witchcraft screenshot" />
+
+For the screenshot above, the following scripts were used:
+
+<Code code={exampleJs} lang="javascript" title="google.com.js" />
+
+<Code code={exampleCss} lang="javascript" title="google.com.css" />
+
+Actual practical uses include getting rid of nasty ads, automating clicks and improving page layouts with your own CSS rules. You're only limited by what Javascript and CSS can do.
