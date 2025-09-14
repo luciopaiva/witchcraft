@@ -1,0 +1,44 @@
+---
+title: WSL2 Python server
+---
+
+import { Code } from '@astrojs/starlight/components';
+import witchCraftServerScript from "../../assets/witchcraft-server.sh?raw";
+
+If you're on Windows and have WSL2 installed, you can use the following bash script to start a Python HTTP server that serves your Witchcraft scripts folder. You can then use Windows Task Scheduler to run this script automatically at startup.
+
+Let's start by creating the script:
+
+<Code lang="bash" title="witchcraft-server.sh" code={witchCraftServerScript} />
+
+Make it executable:
+
+```bash
+chmod +x witchcraft-server.sh
+```
+
+And you can now test it to bring the server up and then down:
+
+```bash
+./witchcraft-server.sh start
+./witchcraft-server.sh stop
+```
+
+With that working, you can now create a task in Windows Task Scheduler to run this script at startup:
+
+1. Open Task Scheduler (you can find it by searching in the Start menu).
+2. Click on "Create Task..." (not "basic") in the right-hand pane.
+3. In the "General" tab:
+    - Name your task (e.g., "Witchcraft Server")
+    - Configure for "Windows 10/11" or your version of Windows
+4. In the "Triggers" tab:
+    - Click "New..."
+    - Set "Begin the task" to "At log on"
+    - Uncheck "Stop task if it runs longer than..."
+5. In the "Actions" tab:
+    - Click "New..."
+    - Set "Action" to "Start a program"
+    - In the "Program/script" field, enter `C:\Windows\System32\wsl.exe`
+    - In the "Add arguments (optional)" field, enter this: `-d Ubuntu -- bash -lc '~/witchcraft-server.sh start'` (but double-check the script path to make sure it matches where you saved it in WSL2)
+
+And that's it. You can now manually run the task to test it, or simply restart your computer and check if the Witchcraft server is running by looking at the extension's status indicator.

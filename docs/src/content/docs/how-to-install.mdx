@@ -3,8 +3,7 @@ title: How to install
 ---
 
 import { Image } from 'astro:assets';
-import { Steps } from '@astrojs/starlight/components';
-import { Aside } from '@astrojs/starlight/components';import serverOnlineImage from "../../assets/server-online.png";
+import { Steps, Tabs, TabItem } from '@astrojs/starlight/components';import serverOnlineImage from "../../assets/server-online.png";
 
 Follow these steps:
 
@@ -16,30 +15,54 @@ Follow these steps:
 
 3. Start a local web server to serve that folder. You can use any web server you like, but here are some simple options:
 
-   - Python 3 (if you have Python installed):
+    <Tabs>
+        <TabItem value="python" label="Python" icon="seti:python">
+            ```bash
+            python3 -m http.server 5743
+            ```
+        </TabItem>
+        <TabItem value="nodejs" label="Node.js" icon="node">
+            ```bash
+            npx http-server . -p 5743
+            ```
+        </TabItem>
+        <TabItem value="wsl2" label="WSL2" icon="seti:windows">
+            A WSL2 bash script + Windows Task Scheduler to auto-start it. See details [here](/wsl2-python-server).
+        </TabItem>
+        <TabItem value="homelab" label="Docker" icon="seti:docker">
+            ```yml title="docker-compose.yml" ins="./witchcraft-scripts"
+            version: "3.9"
+            services:
+              web:
+                image: nginx:alpine
+                container_name: simple-web
+                ports:
+                  - "5743:80"
+                volumes:
+                  - ./witchcraft-scripts:/usr/share/nginx/html:ro
+            ```
 
-     ```bash
-     python3 -m http.server 5743
-     ```
+            Just make sure to change `./witchcraft-scripts` to the correct path of your scripts folder.
 
-   - Node.js (if you have Node.js installed):
+            <details>
+                <summary>Homelab alternative</summary>
+                A wild idea is to run a Docker container in your homelab (in case you have one) and then mount the remote scripts folder as a local volume on your machine, this way you can have a single scripts folder that is shared across multiple devices on your network. Just make sure to set Witchcraft to point to the correct server address instead of the default `127.0.0.1`.
+            </details>
 
-     ```bash
-     npm install -g http-server
-     http-server -p 5743
-     ```
-
-   <Aside type="caution">
-       By default, Witchcraft uses port `5743`. If you choose a different port, make sure to change it in the extension's settings by clicking on the Witchcraft icon in the Chrome toolbar and updating the server address field.
-   </Aside>
-
-   A comprehensive list of options can be found [here](https://gist.github.com/willurd/5720255).
-
+        </TabItem>
+        <TabItem value="other" label="More" icon="rocket">
+            A comprehensive list of ways to start a web server can be found [here](https://gist.github.com/willurd/5720255).
+        </TabItem>
+    </Tabs>
 </Steps>
+
+## Checking that everything is working
 
 As soon as Witchcraft is able to reach the server, the status indicator will turn green:
 
 <Image src={serverOnlineImage} alt="Witchcraft server online indicator" />
+
+If it doesn't, check that the server address is correct. Witchcraft will look for the server at `http://127.0.0.1:5743`. If you choose a different port (or start the server in a different machine), make sure to configure it accordingly in the extension's settings by clicking on the Witchcraft icon in the Chrome toolbar and updating the server address field.
 
 You can now [create a script](/introduction) in your scripts folder and open the corresponding web page to see it in action.
 
