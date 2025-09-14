@@ -1,5 +1,5 @@
 
-![Witchcraft](docs/title.png)
+![Witchcraft](docs/src/assets/title.png)
 
 Think Greasemonkey (or Tampermonkey, Violentmonkey) for developers.
 
