@@ -28,10 +28,10 @@ export default defineConfig({
                         { label: 'Credits', slug: 'credits' },
                     ]
                 },
-                {
-                    label: 'Cookbook',
-                    autogenerate: { directory: 'cookbook' },
-                },
+                // {
+                //     label: 'Cookbook',
+                //     autogenerate: { directory: 'cookbook' },
+                // },
 			],
 		}),
 	],
