@@ -17,23 +17,21 @@ export default defineConfig({
 				'./src/styles/global.css',
 			],
 			sidebar: [
-                { label: 'Introduction', slug: 'introduction' },
-                { label: 'How to install', slug: 'how-to-install' },
-                { label: 'New in version 3', slug: 'new-in-v3' },
-                { label: 'User guide', slug: 'user-guide' },
-                { label: 'Examples', slug: 'examples' },
-                { label: 'FAQ', slug: 'faq' },
-                { label: 'Credits', slug: 'credits' },
-				// {
-				// 	label: 'Guides',
-				// 	items: [
-				// 		{ label: 'Example Guide', slug: 'guides/example' },
-				// 	],
-				// },
-				// {
-				// 	label: 'Reference',
-				// 	autogenerate: { directory: 'reference' },
-				// },
+                {
+                    label: 'Guide',
+                    items: [
+                        { label: 'Introduction', slug: 'introduction' },
+                        { label: 'How to install', slug: 'how-to-install' },
+                        { label: 'How to use', slug: 'user-guide' },
+                        { label: 'New in version 3', slug: 'new-in-v3' },
+                        { label: 'FAQ', slug: 'faq' },
+                        { label: 'Credits', slug: 'credits' },
+                    ]
+                },
+                {
+                    label: 'Cookbook',
+                    autogenerate: { directory: 'cookbook' },
+                },
 			],
 		}),
 	],
