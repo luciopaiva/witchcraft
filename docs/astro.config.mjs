@@ -23,7 +23,7 @@ export default defineConfig({
                 { label: 'User guide', slug: 'user-guide' },
                 { label: 'Examples', slug: 'examples' },
                 { label: 'FAQ', slug: 'faq' },
-                { label: 'About', slug: 'about' },
+                { label: 'Credits', slug: 'credits' },
 				// {
 				// 	label: 'Guides',
 				// 	items: [
