@@ -1,0 +1,71 @@
+---
+title: FAQ
+---
+
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Code } from '@astrojs/starlight/components';
+
+These are some of the most frequently asked questions.
+
+<Aside type="note">
+If your question is not answered below, feel free to ask it [here](https://github.com/luciopaiva/witchcraft/issues).
+</Aside>
+
+{/* <Badge text="Tip" variant="tip" /> If your question is not answered below, feel free to ask it [here](https://github.com/luciopaiva/witchcraft/issues). */}
+
+## Where should I put my Witchcraft scripts?
+
+You can choose any folder on your local machine to store your scripts. Just make sure to start a local web server to serve that folder (see [How to install](./how-to-install)).
+
+## Why do I need a local web server?
+
+Chrome extensions are not allowed to read files directly from your file system for security reasons. By using a local web server, Witchcraft can fetch your scripts over HTTP, which is a secure and supported way to load resources in a browser extension.
+
+Witchcraft performs GET requests to your local web server to check if a script exists for the current page. If the script is found, it is injected into the page.
+
+## How to add third-party libraries to my scripts?
+
+Use the `@include` directive as described [here](./user-guide#including-other-scripts). You can either download the library and include it locally or reference it via a CDN URL. Example:
+
+<Code lang="js" code="// @include https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.13/dayjs.min.js" title="include-3rd-party.js" />
+
+## Can't Witchcraft spawn its own local web server?
+
+Unfortunately, no. See question above.
+
+## When exactly my script gets loaded?
+
+As of v3.0, it is loaded when the <a href="https://developer.chrome.com/docs/extensions/reference/api/webNavigation#event-onCommitted">chrome.webNavigation.onCommitted</a> event is fired. The method <a href="https://developer.chrome.com/docs/extensions/reference/api/scripting#method-executeScript">chrome.scripting.executeScript</a> is then called to inject the JavaScript file into the current page with the option `injectImmediately` set.
+
+This means that the script is expected to be injected in the page before the <a href="https://developer.mozilla.org/en-US/docs/Web/Events/DOMContentLoaded"><span class="code">DOMContentLoaded</span></a> event is fired. Unfortunately, tests show that this is not the case. Your script should not rely on being injected before that event.
+
+## My script seems to be loading multiple times. What is wrong?
+
+Your page probably has frames/iframes in it. By design, Witchcraft loads itself into every frame it can find. If you want to run your script in a specific frame, you need to enforce that inside your script. For instance, you may want your script to run only in the top frame. In that case, just check if `window.self === window.top`. More details <a href="https://github.com/luciopaiva/witchcraft/issues/23">here</a>.
+
+## How to load Witchcraft only in the topmost window?
+
+See question above.
+
+## How do I inject scripts into `localhost`?
+
+In case you are developing a web page and testing it using a local web server, you can inject code in it by naming your script `localhost.js`/`localhost.css`. If you're running multiple web servers on different ports and need to tell them apart, do it by checking the port inside your script (check the `location.port` property). See an example <a href="https://github.com/luciopaiva/witchcraft/issues/18">here</a>.
+
+## Can I install Witchcraft from sources instead?
+
+Yes, you can install Witchcraft directly from sources instead of downloading it from the Chrome store. Look for the extension source under the folder `/chrome-extension` and manually load it as an unpacked extension. Check the Chrome documentation [here](https://developer.chrome.com/docs/extensions/get-started/tutorial/hello-world#load-unpacked).
+
+## Is Google Analytics being used? Why?
+
+Yes. It is being used to track actions performed inside the Witchcraft pop-up window (.e.g: "user clicked the report issue button") and to collect anonymous statistics (e.g.: how many times was a JS include directive triggered) in order to help improve the extension.
+
+Code is carefully tailored to make sure no user-identifiable information is sent to GA. For instance, URLs being accessed and script names are not sent to GA in any way. People are encouraged to verify the code themselves and also load the extension right from the sources if they don't trust the Chrome Web Store package.
+
+## How can I load other resources in my scripts, like images?
+
+There are three proposed ways to do it <a href="https://github.com/luciopaiva/witchcraft/issues/34#issuecomment-782858968">here</a>.
+
+## Why is my script not updating when I reload the page?
+
+Reloading the page should be enough to update the script. If that's not the case, check if your HTTP server might be caching it on the server side. Try some of the [recommended ways to run a local web server](./how-to-install) to see if it solves the problem.

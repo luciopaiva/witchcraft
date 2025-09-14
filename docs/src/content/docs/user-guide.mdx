@@ -1,0 +1,89 @@
+---
+title: How to use
+---
+
+import { Code } from '@astrojs/starlight/components';
+import includeJsExample from "../../assets/include.js?raw";
+import includeCssExample from "../../assets/include.css?raw";
+import includeRemoteExample from "../../assets/include-remote.js?raw";
+
+Once your Witchcraft is [set up](./how-to-install), you can start creating scripts. This guide will help you understand how Witchcraft looks for scripts and how to name them properly.
+
+To give you a basic idea of how it works, let's use as an example the page `https://gist.github.com`. Once you navigate to that page, Witchcraft will kick in and look for scripts to inject. This is what it will look for, in order:
+
+- `_global.js` (see "Global scripts" below)
+- `_global.css`
+- `com.js`
+- `com.css`
+- `github.com.js`
+- `github.com.css`
+- `gist.github.com.js`
+- `gist.github.com.css`
+
+For each candidate script above, Witchcraft will make a request to your local server (the one you set up in the [installation guide](./how-to-install)) to see if the script exists. If it does, it will be injected into the page. If it doesn't, Witchcraft will move on to the next candidate script.
+
+## Path segments
+
+Witchcraft also tries to match path segments. For example, if you navigate to https://example.com/foo/bar.html, the following paths will be looked up, after being concatenated with each of the domain-based candidates above:
+
+- `foo.js`
+- `foo.css`
+- `foo/bar.html.js`
+- `foo/bar.html.css`
+
+## Global scripts
+
+Witchcraft also looks for two special global scripts that are injected into every page, regardless of the domain or path:
+
+- `_global.js`
+- `_global.css`
+
+Moreover, if you have a folder named `_global` in your scripts directory, Witchcraft will look for scripts inside that folder as well, trying to match them against the path segments. For example, if you navigate to `https://example.com/foo/bar.html`, the following paths will be looked up inside the `_global` folder:
+
+- `_global/foo.js`
+- `_global/foo.css`
+- `_global/foo/bar.html.js`
+- `_global/foo/bar.html.css`
+
+## Script lookup order
+
+Now that we went through all the different types of scripts Witchcraft looks for, let's summarize the full lookup order when navigating to a page. Let's use `https://example.com/foo/bar.html` as an example again. The full lookup order will be:
+
+1. `_global.js`
+2. `_global.css`
+3. `_global/foo.js`
+4. `_global/foo.css`
+5. `_global/foo/bar.html.js`
+6. `_global/foo/bar.html.css`
+7. `com.js`
+8. `com.css`
+9. `com/foo.js`
+10. `com/foo.css`
+11. `com/foo/bar.html.js`
+12. `com/foo/bar.html.css`
+13. `example.com.js`
+14. `example.com.css`
+15. `example.com/foo.js`
+16. `example.com/foo.css`
+17. `example.com/foo/bar.html.js`
+18. `example.com/foo/bar.html.css`
+
+## Including other scripts
+
+Witchcraft supports including other scripts using the `@include` directive. This works for both JavaScript and CSS files:
+
+<Code code={includeJsExample} title="include-example.js" lang="javascript" />
+
+<Code code={includeCssExample} title="include-example.css" lang="css" />
+
+You may add multiple directives to the same script. If your script name contains spaces, you can use double quotes to refer to it, like in the example above.
+
+It is possible to include remote scripts as well:
+
+<Code code={includeRemoteExample} title="include-remote-example.js" lang="javascript" />
+
+Useful for loading scripts from gists, for example.
+
+Included scripts can also `@include` scripts of their own; the parser will recursively iterate through them. Dependency cycles (e.g., `foo.js` includes `bar.js`, which includes `foo.js`) are automatically resolved.
+
+This directive may be useful for including third-party libraries.

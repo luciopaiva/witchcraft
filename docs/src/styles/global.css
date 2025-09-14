@@ -1,0 +1,16 @@
+/* Global styles for Witchcraft documentation */
+
+/* margin variables */
+:root {
+    --vertical-margin: 2rem;
+}
+
+.sl-markdown-content img {
+    width: 80%;
+    display: block;
+    margin: var(--vertical-margin) auto;
+}
+
+.expressive-code {
+    margin: var(--vertical-margin) auto;
+}
