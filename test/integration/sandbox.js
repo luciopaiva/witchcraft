@@ -1,5 +1,5 @@
 import DummyScriptServer from "./utils/dummy-script-server.js";
-import {setScriptServerAddress, startBrowser, toggleDevModeOn} from "./utils/browser-test-utils.js";
+import {setScriptServerAddress, startBrowser, toggleDevModeOn, toggleUserScripts} from "./utils/browser-test-utils.js";
 import DummyWebServer from "./utils/dummy-web-server.js";
 
 (async () => {
@@ -29,6 +29,8 @@ import DummyWebServer from "./utils/dummy-web-server.js";
     // await helloPage.goto(`http://127.0.0.1:${dummyWebServer.port}/hello.html`)
     // await helloPage.goto(`http://foo.bar:${dummyWebServer.port}/hello.html`)
     await helloPage.goto(`chrome-extension://hokcepcfcicnhalinladgknhaljndhpc/popup/popup.html`);
+
+    await toggleUserScripts(browser);
 
     await new Promise(() => {}); // Keeps the browser open indefinitely
     await browser.close()
