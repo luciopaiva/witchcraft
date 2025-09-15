@@ -60,3 +60,14 @@ export async function setScriptServerAddress(browser, serverAddress) {
 
     await extensionPage.close();
 }
+
+export async function toggleUserScripts(browser) {
+    const extPage = await browser.newPage();
+    await extPage.goto(`chrome://extensions/?id=${EXTENSION_ID}`);
+
+    await extPage.waitForSelector("body > extensions-manager");
+    const userScriptsToggle = await extPage.evaluateHandle(
+        'document.querySelector("body > extensions-manager").shadowRoot.querySelector("#viewManager > extensions-detail-view").shadowRoot.querySelector("#allow-user-scripts").shadowRoot.querySelector("#crToggle")'
+    );
+    await userScriptsToggle.click();
+}

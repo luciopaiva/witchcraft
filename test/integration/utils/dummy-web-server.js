@@ -5,10 +5,16 @@ class DummyWebServer {
         this.server = null;
         this.port = null;
         this.pages = new Map();
+        this.cspPolicy = null; // Add CSP policy support
     }
 
     addPage(pagePath, pageContents) {
         this.pages.set(pagePath, pageContents);
+    }
+
+    // Add method to set CSP policy
+    setCSPPolicy(policy) {
+        this.cspPolicy = policy;
     }
 
     async start() {
@@ -20,7 +26,14 @@ class DummyWebServer {
                         contentType = 'text/css';
                     }
 
-                    res.writeHead(200, { 'Content-Type': contentType });
+                    const headers = { 'Content-Type': contentType };
+
+                    // Add CSP header if policy is set
+                    if (this.cspPolicy) {
+                        headers['Content-Security-Policy'] = this.cspPolicy;
+                    }
+
+                    res.writeHead(200, headers);
                     res.end(this.pages.get(req.url));
                 } else {
                     res.writeHead(404, { 'Content-Type': 'text/plain' });
