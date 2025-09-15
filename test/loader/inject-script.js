@@ -48,7 +48,7 @@ describe("Inject script", function () {
             if (type === EXT_JS) {
                 assert(mockBrowser.injectCss.notCalled);
                 assert(mockBrowser.injectJs.calledOnce);
-                assert(mockBrowser.injectJs.calledWithExactly(util.embedScript(script.contents), tabId, frameId));
+                assert(mockBrowser.injectJs.calledWithExactly(script.contents, tabId, frameId));
             } else if (type === EXT_CSS) {
                 assert(mockBrowser.injectJs.notCalled);
                 assert(mockBrowser.injectCss.calledOnce);
