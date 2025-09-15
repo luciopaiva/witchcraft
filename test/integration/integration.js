@@ -309,7 +309,7 @@ describe("Integration", function () {
 
         // Collect console messages to check for CSP errors
         let gotError = false;
-        page1.on("pageerror", error => {
+        page1.on("pageerror", error => {  // https://stackoverflow.com/a/59919144/778272
             console.log(`[PAGE ERROR] ${error.toString()}`);
             if (!gotError && error.toString().includes("'unsafe-eval' is not an allowed source")) {
                 gotError = true;
