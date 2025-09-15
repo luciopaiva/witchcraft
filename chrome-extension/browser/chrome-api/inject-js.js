@@ -5,9 +5,7 @@ function isUserScriptsEnabled() {
 }
 
 export function injectJs(contents, tabId, frameId) {
-    const enabled = isUserScriptsEnabled();
-    console.info(`DEBUG: injectJs using ${enabled ? "userScripts" : "scripting"}`);
-    if (enabled) {
+    if (isUserScriptsEnabled()) {
         chrome.userScripts.execute({
             injectImmediately: true,
             target: { tabId: tabId, frameIds: [frameId] },
