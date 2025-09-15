@@ -287,6 +287,22 @@ describe("Integration", function () {
     });
 
     it("check userScript mode", async function () {
+        webServer.addPage("/hello.html", "<html><body><h1>Hello World</h1></body></html>");
+
+        scriptsServer.addScript("/witchcraft.js", await loadResource("test.js"));
+
+        const page = await browser.newPage();
+
+        page.on('console', msg => console.log(`[CHROME CONSOLE] ${msg.type()}: ${msg.text()}`));
+
+        await page.goto(`http://test.witchcraft:${webServer.port}/hello.html`);
+
+        await page.waitForFunction(
+            () => document.querySelector('h1').innerText === "Goodbye World",
+            { timeout: 5000 }
+        );
+
+
         // load simple script, verify it got loaded via scripting
 
         // click on allow user scripts button
