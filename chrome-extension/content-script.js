@@ -1,0 +1,2 @@
+
+chrome.runtime.sendMessage(location);

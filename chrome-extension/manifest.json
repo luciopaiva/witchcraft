@@ -22,6 +22,15 @@
     "default_title": "Witchcraft",
     "default_popup": "popup/popup.html"
   },
+  "content_scripts": [
+    {
+      "world": "ISOLATED",
+      "all_frames": true,
+      "run_at": "document_start",
+      "matches": ["<all_urls>"],
+      "js": ["content-script.js"]
+    }
+  ],
   "background": {
     "service_worker": "background.js",
     "type": "module"
