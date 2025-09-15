@@ -1,10 +1,11 @@
 import {describe, it} from "mocha";
 import DummyWebServer from './utils/dummy-web-server.js';
 import DummyScriptServer from './utils/dummy-script-server.js';
-import {setScriptServerAddress, startBrowser, toggleDevModeOn} from "./utils/browser-test-utils.js";
+import {setScriptServerAddress, startBrowser, toggleDevModeOn, toggleUserScripts} from "./utils/browser-test-utils.js";
 import {loadResource} from "./utils/resource-utils.js";
 import assert from "node:assert";
 import {DEFAULT_SERVER_ADDRESS} from "../../dist/constants.js";
+import {until} from "../../chrome-extension/util/until.js";
 
 describe("Integration", function () {
     let browser;
@@ -286,28 +287,68 @@ describe("Integration", function () {
         );
     });
 
-    it("check userScript mode", async function () {
-        webServer.addPage("/hello.html", "<html><body><h1>Hello World</h1></body></html>");
+    it("check content security policy and userScripts", async function () {
+        //
+        // 0. Setup
+        //
 
+        webServer.addPage("/hello.html", "<html><body><h1>Hello World</h1></body></html>");
+        // Set a strict CSP policy that blocks scripts from external domains
+        webServer.setCSPPolicy("script-src 'self'; object-src 'none';");
         scriptsServer.addScript("/witchcraft.js", await loadResource("test.js"));
 
-        const page = await browser.newPage();
+        //
+        // 1. First try to inject a script and assert it fails due to CSP
+        //
 
-        page.on('console', msg => console.log(`[CHROME CONSOLE] ${msg.type()}: ${msg.text()}`));
+        const page1 = await browser.newPage();
 
-        await page.goto(`http://test.witchcraft:${webServer.port}/hello.html`);
+        page1.on('console', msg => {
+            console.log(`[CHROME CONSOLE] ${msg.type()}: ${msg.text()}`);
+        });
 
-        await page.waitForFunction(
+        // Collect console messages to check for CSP errors
+        let gotError = false;
+        page1.on("pageerror", error => {
+            console.log(`[PAGE ERROR] ${error.toString()}`);
+            if (!gotError && error.toString().includes("'unsafe-eval' is not an allowed source")) {
+                gotError = true;
+            }
+        });
+
+        await page1.goto(`http://test.witchcraft:${webServer.port}/hello.html`);
+
+        await until(() => gotError, 5000);
+
+        assert(gotError, "Should have CSP violation errors in console when script is blocked");
+
+        // Verify that the script did NOT execute (h1 should still be "Hello World")
+        const h1Text = await page1.$eval('h1', el => el.innerText);
+        assert.strictEqual(h1Text, "Hello World", "Script should not execute due to CSP policy");
+
+        //
+        // 2. Now allow user scripts and reload the extension
+        //
+
+        await toggleUserScripts(browser);
+
+        //
+        // 3. Try to inject the script again and assert it now succeeds
+        //
+
+        const page2 = await browser.newPage();
+
+        page2.on('console', msg => {
+            console.log(`[CHROME CONSOLE] ${msg.type()}: ${msg.text()}`);
+        }).on("pageerror", error => {
+            console.log(`[PAGE ERROR] ${error.toString()}`);
+        });
+
+        await page2.goto(`http://test.witchcraft:${webServer.port}/hello.html`);
+
+        await page2.waitForFunction(
             () => document.querySelector('h1').innerText === "Goodbye World",
             { timeout: 5000 }
         );
-
-
-        // load simple script, verify it got loaded via scripting
-
-        // click on allow user scripts button
-        // reload the extension
-
-        // load simple script, verify it now gets loaded via userScript
     });
 });
