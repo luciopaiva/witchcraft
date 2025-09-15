@@ -30,7 +30,8 @@
     "webNavigation",
     "storage",
     "activeTab",
-    "scripting"
+    "scripting",
+    "userScripts"
   ],
   "host_permissions": ["http://*/*", "https://*/*"],
   "content_security_policy": {
