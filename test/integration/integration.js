@@ -285,4 +285,13 @@ describe("Integration", function () {
             { timeout: 5000 }
         );
     });
+
+    it("check userScript mode", async function () {
+        // load simple script, verify it got loaded via scripting
+
+        // click on allow user scripts button
+        // reload the extension
+
+        // load simple script, verify it now gets loaded via userScript
+    });
 });
