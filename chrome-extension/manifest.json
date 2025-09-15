@@ -2,7 +2,7 @@
   "name": "Witchcraft: JS/CSS injector",
   "short_name": "Witchcraft",
   "manifest_version": 3,
-  "version": "3.1.0",
+  "version": "3.2.0",
   "description": "Witchcraft loads custom Javascript and CSS directly from a folder in your file system. Think GreaseMonkey for developers.",
   "icons": {
     "16": "witch-16.png",
