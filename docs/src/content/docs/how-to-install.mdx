@@ -11,9 +11,22 @@ Follow these steps:
 
 1. Install Witchcraft Chrome extension: get it [here](https://chrome.google.com/webstore/detail/witchcraft-inject-js-and/hokcepcfcicnhalinladgknhaljndhpc)
 
-2. Choose a local folder where your scripts will be stored. For instance, `~/witchcraft-scripts` (create it now if it doesn't exist yet)
+1. Right-click on the extension icon in the Chrome toolbar and choose "Manage extension"
 
-3. Start a local web server to serve that folder. You can use any web server you like, but here are some simple options:
+    ![Witchcraft extension in Chrome toolbar](../../assets/manage-extension.png)
+
+1. Enable the "Allow user scripts" option
+
+    ![Allow user scripts option](../../assets/allow-user-scripts.png)
+
+    :::note
+    If you don't see this option, make sure you are using the latest Chrome version.
+
+    Alternatively, you can skip this step and Witchcraft will fall back to using an older method for loading scripts, but it won't work for sites that use strict Content Security Policies (CSP).
+
+1. Choose a local folder where your scripts will be stored. For instance, `~/witchcraft-scripts` (create it now if it doesn't exist yet)
+
+1. Start a local web server to serve that folder. You can use any web server you like, but here are some simple options:
 
     <Tabs>
         <TabItem value="python" label="Python" icon="seti:python">
