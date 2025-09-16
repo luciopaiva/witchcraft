@@ -13,11 +13,17 @@ browser.api.onSuspend(async () => {
     console.info("Extension suspended");
     analytics.event.suspended();
 });
-browser.api.onCommitted(async details => {
-    const { url, tabId, frameId } = details;
-    const metrics = await loader.loadScripts(url, tabId, frameId);
-    metrics.hasData && analytics.event.scriptsLoaded(metrics);
-    await storage.evictStale();
+
+chrome.runtime.onMessage.addListener(async (message, sender) => {
+    const url = message.href;
+    const tabId = sender.tab?.id;
+    const frameId = sender.frameId;
+
+    if (typeof url === "string" && typeof tabId === "number" && typeof frameId === "number") {
+        const metrics = await loader.loadScripts(url, tabId, frameId);
+        metrics.hasData && analytics.event.scriptsLoaded(metrics);
+        await storage.evictStale();
+    }
 });
 
 icon.initialize().then();

@@ -1,4 +1,8 @@
 
+# 3.3.0
+
+- use content scripts to inject scripts at `document_start`
+
 # 3.2.0
 
 - prefer `userScripts` over `scripting` (#71)
