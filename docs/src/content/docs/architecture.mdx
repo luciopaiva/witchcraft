@@ -48,7 +48,7 @@ This is how it worked:
 
 The background script would keep an in-memory cache of what scripts were loaded for which tab/frame, mainly used to show the counter in the extension icon and the list of scripts in the popup window.
 
-## Problems with v2
+### Problems with v2
 
 The first problem appeared when Chrome changed behavior and started unloading extensions at its own will. Extensions that relied on caching data in memory would lose information and stop working - and that affected Witchcraft v2, which started showing erratic behavior. See more about this [here](https://developer.chrome.com/docs/extensions/develop/migrate/to-service-workers?utm_source=chatgpt.com#persist-states).
 
@@ -56,7 +56,7 @@ The second (and most important) problem was that Google [announced](https://deve
 
 ## Version 3
 
-This was a major rewrite of the extension to comply with Chrome's manifest v3. The extension now has a service worker instead of a background page, and uses the new `chrome.scripting` API to inject scripts into pages.
+This was a major rewrite of the extension to comply with Chrome's manifest v3. The extension now has a service worker instead of a background page, and uses the new `chrome.scripting` API to inject scripts into pages - not the [ideal solution](https://github.com/Tampermonkey/tampermonkey/issues/644#issuecomment-1140110430), but works for sites that don't have strict Content Security Policies (CSPs).
 
 The content script was dropped and the service worker now handles the loading and injecting of scripts directly, listening for `chrome.webNavigation.onCommitted` events to know when to inject scripts.
 
