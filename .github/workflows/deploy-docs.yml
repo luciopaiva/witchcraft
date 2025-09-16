@@ -1,4 +1,4 @@
-name: Deploy Docs to GitHub Pages
+name: Build docs
 
 on:
   # Runs on pushes targeting the default branch
