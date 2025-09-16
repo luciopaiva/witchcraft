@@ -26,8 +26,8 @@ Follow these steps:
 
 1. Choose a local folder where your scripts will be stored. For instance, `~/witchcraft-scripts` (create it now if it doesn't exist yet)
 
+    <div id="web-servers" />
 1. Start a local web server to serve that folder. You can use any web server you like, but here are some simple options:
-
     <Tabs>
         <TabItem value="python" label="Python" icon="seti:python">
             ```bash
@@ -40,7 +40,7 @@ Follow these steps:
             ```
         </TabItem>
         <TabItem value="wsl2" label="WSL2" icon="seti:windows">
-            A WSL2 bash script + Windows Task Scheduler to auto-start it. See details [here](./wsl2-python-server).
+            A WSL2 bash script + Windows Task Scheduler to auto-start it. See details [here](/wsl2-python-server).
         </TabItem>
         <TabItem value="homelab" label="Docker" icon="seti:docker">
             ```yml title="docker-compose.yml" ins="./witchcraft-scripts"
@@ -77,6 +77,6 @@ As soon as Witchcraft is able to reach the server, the status indicator will tur
 
 If it doesn't, check that the server address is correct. Witchcraft will look for the server at `http://127.0.0.1:5743`. If you choose a different port (or start the server in a different machine), make sure to configure it accordingly in the extension's settings by clicking on the Witchcraft icon in the Chrome toolbar and updating the server address field.
 
-You can now [create a script](./introduction) in your scripts folder and open the corresponding web page to see it in action.
+You can now [create a script](/introduction) in your scripts folder and open the corresponding web page to see it in action.
 
 If you encounter any problems, feel free to ask for help [here](https://github.com/luciopaiva/witchcraft/issues).

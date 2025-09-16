@@ -7,7 +7,7 @@ import includeJsExample from "../../assets/include.js?raw";
 import includeCssExample from "../../assets/include.css?raw";
 import includeRemoteExample from "../../assets/include-remote.js?raw";
 
-Once your Witchcraft is [set up](./how-to-install), you can start creating scripts. This guide will help you understand how Witchcraft looks for scripts and how to name them properly.
+Once your Witchcraft is [set up](/how-to-install), you can start creating scripts. This guide will help you understand how Witchcraft looks for scripts and how to name them properly.
 
 To give you a basic idea of how it works, let's use as an example the page `https://gist.github.com`. Once you navigate to that page, Witchcraft will kick in and look for scripts to inject. This is what it will look for, in order:
 
@@ -20,11 +20,11 @@ To give you a basic idea of how it works, let's use as an example the page `http
 - `gist.github.com.js`
 - `gist.github.com.css`
 
-For each candidate script above, Witchcraft will make a request to your local server (the one you set up in the [installation guide](./how-to-install)) to see if the script exists. If it does, it will be injected into the page. If it doesn't, Witchcraft will move on to the next candidate script.
+For each candidate script above, Witchcraft will make a request to your local server (the one you set up in the [installation guide](/how-to-install)) to see if the script exists. If it does, it will be injected into the page. If it doesn't, Witchcraft will move on to the next candidate script.
 
 ## Path segments
 
-Witchcraft also tries to match path segments. For example, if you navigate to https://example.com/foo/bar.html, the following paths will be looked up, after being concatenated with each of the domain-based candidates above:
+Witchcraft also tries to match path segments. For example, if you navigate to `https://example.com/foo/bar.html`, the following paths will be looked up, after being concatenated with each of the domain-based candidates above:
 
 - `foo.js`
 - `foo.css`
