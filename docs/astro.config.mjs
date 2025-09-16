@@ -79,12 +79,18 @@ export default defineConfig({
                     items: [
                         { label: 'Introduction', slug: 'introduction' },
                         { label: 'How to install', slug: 'how-to-install' },
-                        { label: 'How to use', slug: 'user-guide' },
+                        { label: 'How to use', slug: 'how-to-use' },
                         { label: 'New in version 3', slug: 'new-in-v3' },
                         { label: 'FAQ', slug: 'faq' },
                         { label: 'Credits', slug: 'credits' },
                     ]
                 },
+                {
+                    label: 'Technical notes',
+                    items: [
+                        { label: 'Architecture', slug: 'architecture' },
+                    ]
+                }
                 // {
                 //     label: 'Cookbook',
                 //     autogenerate: { directory: 'cookbook' },
