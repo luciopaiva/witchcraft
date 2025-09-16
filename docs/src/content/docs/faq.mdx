@@ -2,7 +2,6 @@
 title: FAQ
 ---
 
-import { Badge } from '@astrojs/starlight/components';
 import { Aside } from '@astrojs/starlight/components';
 import { Code } from '@astrojs/starlight/components';
 
@@ -36,9 +35,18 @@ Unfortunately, no. See question above.
 
 ## When exactly my script gets loaded?
 
-As of v3.0, it is loaded when the <a href="https://developer.chrome.com/docs/extensions/reference/api/webNavigation#event-onCommitted">chrome.webNavigation.onCommitted</a> event is fired. The method <a href="https://developer.chrome.com/docs/extensions/reference/api/scripting#method-executeScript">chrome.scripting.executeScript</a> is then called to inject the JavaScript file into the current page with the option `injectImmediately` set.
+As of v3.3.0, it is loaded at `document_start` via a content script. This is the earliest moment you can inject a script into a page. At this point, the DOM is not fully built yet, so your script should not rely on DOM elements being present. If you need to wait for the DOM to be ready, you can listen for the `DOMContentLoaded` event inside your script, but first check `document.readyState` to see if the event has already fired:
 
-This means that the script is expected to be injected in the page before the <a href="https://developer.mozilla.org/en-US/docs/Web/Events/DOMContentLoaded"><span class="code">DOMContentLoaded</span></a> event is fired. Unfortunately, tests show that this is not the case. Your script should not rely on being injected before that event.
+```js
+if (document.readyState === 'loading') {
+    // DOM is still loading, so let's wait for it
+    document.addEventListener('DOMContentLoaded', () => {
+        // DOM is ready now
+    });
+} else {
+    // DOM is already ready
+}
+```
 
 ## My script seems to be loading multiple times. What is wrong?
 
