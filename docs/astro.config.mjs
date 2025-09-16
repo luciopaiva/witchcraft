@@ -4,14 +4,17 @@ import starlightThemeRapide from "starlight-theme-rapide";
 
 /** Quick and dirty plugin that:
  *  - Throws an error if relative links are found
- *  - Prepends /witchcraft to all absolute links (starting with /)
+ *  - Prepends the configured base to all absolute links (starting with /)
  */
-function remarkAbsoluteLinksSimple() {
+function remarkAbsoluteLinksSimple(base = '/') {
     const prefix = `[absolute-links]`;
     let indentLevel = 0;
     const indent = () => indentLevel += 2;
     const dedent = () => indentLevel -= 2;
     const log = (msg) => console.info(`${prefix}${"  ".repeat(indentLevel)} ${msg}`);
+
+    const normalizedBase = base.endsWith('/') ? base.slice(0, -1) : base;
+
     return (tree, file) => {
         log(`Processing file: ${file.path}`);
 
@@ -32,7 +35,7 @@ function remarkAbsoluteLinksSimple() {
 
                 // prepend base to all absolute links (doesn't touch external links)
                 if (node.url.startsWith('/')) {
-                    node.url = `/witchcraft${node.url}`;
+                    node.url = `${normalizedBase}${node.url}`;
                 }
             }
 
@@ -46,12 +49,14 @@ function remarkAbsoluteLinksSimple() {
     }
 }
 
+const astroBase = process.env.ASTRO_BASE || '/witchcraft/';
+
 // https://astro.build/config
 export default defineConfig({
 	site: process.env.ASTRO_SITE || 'https://luciopaiva.com',
-	base: process.env.ASTRO_BASE || '/witchcraft/',
+	base: astroBase,
 	markdown: {
-        remarkPlugins: [remarkAbsoluteLinksSimple],
+        remarkPlugins: [[remarkAbsoluteLinksSimple, astroBase]],
 	},
 	integrations: [
 		starlight({
