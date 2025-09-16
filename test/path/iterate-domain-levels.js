@@ -31,6 +31,13 @@ describe("Iterate domain levels", function () {
         ]);
     });
 
+    it("IP address", function () {
+        const levels = [...iterateDomainLevels("10.0.1.2")];
+        assert.deepStrictEqual(levels, [
+            "2", "1.2", "0.1.2", "10.0.1.2"
+        ]);
+    });
+
     it("empty domain", function () {
         const levels = [...iterateDomainLevels("")];
         assert.strictEqual(levels.length, 0);

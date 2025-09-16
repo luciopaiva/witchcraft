@@ -60,6 +60,10 @@ See question above.
 
 In case you are developing a web page and testing it using a local web server, you can inject code in it by naming your script `localhost.js`/`localhost.css`. If you're running multiple web servers on different ports and need to tell them apart, do it by checking the port inside your script (check the `location.port` property). See an example <a href="https://github.com/luciopaiva/witchcraft/issues/18">here</a>.
 
+## How can I inject scripts when accessing a website via an IP address instead of a domain name?
+
+Just name your script using the IP address. For instance, if you want to load a script when accessing `http://10.0.0.1`, name your script `10.0.0.1.js`.
+
 ## Can I install Witchcraft from sources instead?
 
 Yes, you can install Witchcraft directly from sources instead of downloading it from the Chrome store. Look for the extension source under the folder `/chrome-extension` and manually load it as an unpacked extension. Check the Chrome documentation [here](https://developer.chrome.com/docs/extensions/get-started/tutorial/hello-world#load-unpacked).
