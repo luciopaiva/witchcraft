@@ -16,7 +16,7 @@ If your question is not answered below, feel free to ask it [here](https://githu
 
 ## Where should I put my Witchcraft scripts?
 
-You can choose any folder on your local machine to store your scripts. Just make sure to start a local web server to serve that folder (see [How to install](./how-to-install)).
+You can choose any folder on your local machine to store your scripts. Just make sure to start a local web server to serve that folder (see [How to install](/how-to-install)).
 
 ## Why do I need a local web server?
 
@@ -26,7 +26,7 @@ Witchcraft performs GET requests to your local web server to check if a script e
 
 ## How to add third-party libraries to my scripts?
 
-Use the `@include` directive as described [here](./user-guide#including-other-scripts). You can either download the library and include it locally or reference it via a CDN URL. Example:
+Use the `@include` directive as described [here](/user-guide#including-other-scripts). You can either download the library and include it locally or reference it via a CDN URL. Example:
 
 <Code lang="js" code="// @include https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.13/dayjs.min.js" title="include-3rd-party.js" />
 
@@ -68,4 +68,4 @@ There are three proposed ways to do it <a href="https://github.com/luciopaiva/wi
 
 ## Why is my script not updating when I reload the page?
 
-Reloading the page should be enough to update the script. If that's not the case, check if your HTTP server might be caching it on the server side. Try some of the [recommended ways to run a local web server](./how-to-install) to see if it solves the problem.
+Reloading the page should be enough to update the script. If that's not the case, check if your HTTP server might be caching it on the server side. Try some of the [recommended ways to run a local web server](/how-to-install#web-servers) to see if it solves the problem.
