@@ -33,6 +33,10 @@ function remarkAbsoluteLinksSimple(base = '/') {
                     throw new Error(`Relative links starting with './' are not supported. Please use root-relative links starting with '/' instead. Found in file ${file.path}: ${node.url}`);
                 }
 
+                if (node.url.startsWith(base)) {
+                    throw new Error(`Do not include the base ('${base}') in links. Links should be root-relative starting with '/'. Found in file ${file.path}: ${node.url}`);
+                }
+
                 // prepend base to all absolute links (doesn't touch external links)
                 if (node.url.startsWith('/')) {
                     node.url = `${normalizedBase}${node.url}`;
