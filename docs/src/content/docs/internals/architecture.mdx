@@ -1,0 +1,117 @@
+---
+title: Architecture
+---
+
+This technical documents talks a bit about the different architectures Witchcraft has had over time, the problems faced and how they were solved.
+
+## Version 2
+
+Up until Witchcraft v2, the architecture was composed of a background script, a content script and the popup window. These are the relevant parts of the manifest file:
+
+```json title="manifest.json (excerpt)"
+  "content_scripts": [{
+    "all_frames": true,
+    "run_at":     "document_start",
+    "matches":    ["http://*/*", "https://*/*"],
+    "js":         ["content-script.js"]
+  }],
+  "background": {
+    "page": "background.html",
+    "persistent": false
+  },
+  "content_security_policy": "script-src 'self'; object-src 'self'"
+```
+
+This is how it worked:
+
+1. The content script was injected into every frame of every tab (the `content_scripts.matches` property)
+
+2. at `document_start`, the content script sent a message to the background script passing `window.location` as argument:
+
+    ```js title="content-script.js (excerpt)"
+    chrome.runtime.sendMessage(location);
+    ```
+
+3. the background would listen for these messages (via `chrome.runtime.onMessage.addListener()`), receive the message and fetch all the scripts that could be applied to that URL
+
+4. the background script would then send each loaded script as text to the content script at, using `chrome.tabs.sendMessage()`, targeting the specific tab and frame
+
+5. the content script would then run the script like so:
+
+    ```js title="content-script.js (excerpt, simplified version)"
+    chrome.runtime.onMessage.addListener(scriptContents => {
+        Function(scriptContents)();
+    });
+    ```
+
+    *(CSS worked similarly, but instead of using `Function()`, it would create a `<style>` element and append it to the document's `<head>`)*
+
+The background script would keep an in-memory cache of what scripts were loaded for which tab/frame, mainly used to show the counter in the extension icon and the list of scripts in the popup window.
+
+## Problems with v2
+
+The first problem appeared when Chrome changed behavior and started unloading extensions at its own will. Extensions that relied on caching data in memory would lose information and stop working - and that affected Witchcraft v2, which started showing erratic behavior. See more about this [here](https://developer.chrome.com/docs/extensions/develop/migrate/to-service-workers?utm_source=chatgpt.com#persist-states).
+
+The second (and most important) problem was that Google [announced](https://developer.chrome.com/docs/extensions/develop/migrate/mv2-deprecation-timeline) that Manifest v2 was being deprecated and that all extensions should migrate to Manifest v3. Migrating to Manifest v3 was not a simple task, because it introduced a few breaking changes that directly affected Witchcraft.
+
+## Version 3
+
+This was a major rewrite of the extension to comply with Chrome's manifest v3. The extension now has a service worker instead of a background page, and uses the new `chrome.scripting` API to inject scripts into pages.
+
+The content script was dropped and the service worker now handles the loading and injecting of scripts directly, listening for `chrome.webNavigation.onCommitted` events to know when to inject scripts.
+
+```js title="background.js (excerpt, simplified)"
+chrome.webNavigation.onCommitted(async details => {
+    const { url, tabId, frameId } = details;
+    await loader.loadScripts(url, tabId, frameId);
+});
+```
+
+And then eventually:
+
+```js title="inject-js.js (excerpt, simplified)"
+chrome.scripting.executeScript({
+    injectImmediately: true,
+    target: { tabId: tabId, frameIds: [frameId] },
+    func: (contents) => Function(contents)(),
+    args: [contents],
+    world: "MAIN"
+});
+```
+
+A breaking change is that now scripts are injected into the "main world" of the page, which means that they have direct access to the page's JavaScript context. This wasn't like that in v2, where scripts were injected into an "isolated world", which meant that they didn't have direct access to the page's JavaScript context and had to manually inject script tags into the page to run code in the page's context.
+
+## Version 3.2
+
+One interesting problem is that `chrome.scripting.executeScript()` respects the Content Security Policy (CSP) of the page, which means that if a page has a CSP that disallows `eval()` (or similar), scripts that use `Function()` or `eval()` will fail to run. The same is also true for pages that disallow the injection of `<script>` tags via the CSP rule `script-src 'self'`.
+
+To solve this, in v3.2 the architecture was changed to use the very recent API `chrome.userScripts.execute()`, which allows injecting scripts into pages without being affected by the page's CSP. The only gotcha is that now the user has to explicitly enable the "Allow user scripts" permission in the extension's settings.
+
+Since few pages are affected by CSP rules (most sites nowadays doesn't seem to enforce strict CSPs), the change was made that if the user hasn't enabled the "Allow user scripts" permission, the extension will fall back to using `chrome.scripting.executeScript()`:
+
+```js title="inject-js.js (excerpt, simplified)"
+    if (isUserScriptsEnabled()) {
+        chrome.userScripts.execute({
+            injectImmediately: true,
+            target: { tabId: tabId, frameIds: [frameId] },
+            js: [{
+                code: contents,
+            }],
+            world: "MAIN"
+        });
+    } else {
+        chrome.scripting.executeScript({
+            injectImmediately: true,
+            target: { tabId: tabId, frameIds: [frameId] },
+            func: (contents) => Function(contents)(),
+            args: [contents],
+            world: "MAIN"
+        });
+    }
+```
+
+## Version 3.3
+
+Another outsanding problem with v3 is that scripts are being injected too late when compared to v2. In v2, scripts were injected at `document_start` - before `DOMContentLoaded` - which is the earliest possible moment to run scripts in a page. In v3, `DOMContentLoaded` has already fired by the time the service worker receives the `onCommitted` event.
+
+To fix that, v3.3 brings back the content script that used to exist in v2. That way, we can now be notified at `document_start` and have the chance to load scripts earlier. The difference is that back in v2, the content script was responsible for loading and injecting scripts, while now it just notifies the service worker that a new frame has loaded and the service worker is the one that loads and injects scripts.

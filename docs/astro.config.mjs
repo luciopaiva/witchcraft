@@ -85,6 +85,12 @@ export default defineConfig({
                         { label: 'Credits', slug: 'credits' },
                     ]
                 },
+                {
+                    label: 'Advanced',
+                    items: [
+                        { label: 'Architecture', slug: 'internals/architecture' },
+                    ]
+                }
                 // {
                 //     label: 'Cookbook',
                 //     autogenerate: { directory: 'cookbook' },
