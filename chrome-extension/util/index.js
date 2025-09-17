@@ -57,7 +57,7 @@ function typedArrayToBase64(data) {
 
 async function loadJson(jsonFileName, fetchFn = fetch) {
     try {
-        const response = await fetchFn(browser.api.getFileUrl(jsonFileName));
+        const response = await fetchFn(browser.getFileUrl(jsonFileName));
         if (response.ok) {
             return await response.json();
         }

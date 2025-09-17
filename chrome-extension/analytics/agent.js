@@ -24,12 +24,12 @@ export class Agent {
     // the extension is installed.
     async getOrCreateClientId() {
         // let { clientId } = await chrome.storage.local.get('clientId');
-        let clientId = await browser.api.retrieveKey("ga-client-id");
+        let clientId = await browser.retrieveKey("ga-client-id");
         if (!clientId) {
             // Generate a unique client ID, the actual value is not relevant
             clientId = self.crypto.randomUUID();
             // await chrome.storage.local.set({ clientId });
-            await browser.api.storeKey("ga-client-id", clientId);
+            await browser.storeKey("ga-client-id", clientId);
         }
         return clientId;
     }
@@ -37,7 +37,7 @@ export class Agent {
     // Returns the current session id, or creates a new one if one doesn't exist or
     // the previous one has expired.
     async getOrCreateSessionId() {
-        let sessionData = await browser.api.retrieveKey("ga-session-data");
+        let sessionData = await browser.retrieveKey("ga-session-data");
         const currentTimeInMs = Date.now();
         // Check if session exists and is still valid
         if (sessionData && sessionData.timestamp) {
@@ -51,7 +51,7 @@ export class Agent {
                 // Update timestamp to keep session alive
                 sessionData.timestamp = currentTimeInMs;
                 // await chrome.storage.session.set({ sessionData });
-                await browser.api.storeKey("ga-session-data", sessionData);
+                await browser.storeKey("ga-session-data", sessionData);
             }
         }
         if (!sessionData) {
@@ -61,7 +61,7 @@ export class Agent {
                 timestamp: currentTimeInMs.toString()
             };
             // await chrome.storage.session.set({ sessionData });
-            await browser.api.storeKey("ga-session-data", sessionData);
+            await browser.storeKey("ga-session-data", sessionData);
         }
         return sessionData.session_id;
     }
@@ -84,7 +84,7 @@ export class Agent {
         if (this.debug) {
             params.debug_mode = true;
         }
-        params.app_version = browser.api.getAppVersion();
+        params.app_version = browser.getAppVersion();
 
         this.debug && console.info(`GA event`, name, params);
 

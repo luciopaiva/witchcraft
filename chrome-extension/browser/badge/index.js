@@ -19,7 +19,7 @@ async function registerScripts(tabId, frameId, scripts) {
 
 async function setCount(tabId, count) {
     const countStr = count > 999 ? "999+" : (count > 0 ? count.toString() : "");
-    await browser.api.setBadgeText(tabId, countStr);
+    await browser.setBadgeText(tabId, countStr);
 }
 
 export const badge = {

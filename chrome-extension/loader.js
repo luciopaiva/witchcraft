@@ -58,18 +58,18 @@ async function injectScript(script, tabId, frameId) {
 }
 
 function injectJs(url, contents, tabId, frameId) {
-    browser.api.injectJs(contents, tabId, frameId);
+    browser.injectJs(contents, tabId, frameId);
     logInjection(tabId, frameId, "JS", url);
 }
 
 function injectCss(url, contents, tabId, frameId) {
-    browser.api.injectCss(contents, tabId, frameId);
+    browser.injectCss(contents, tabId, frameId);
     logInjection(tabId, frameId, "CSS", url);
 }
 
 function logInjection(tabId, frameId, type, scriptUrl) {
     let tabUrl = "failed to obtain URL";
-    browser.api.getTabUrl(tabId)
+    browser.getTabUrl(tabId)
         .then(retrievedUrl => {
             tabUrl = retrievedUrl ?? "blank URL";
         })

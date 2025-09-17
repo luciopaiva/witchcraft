@@ -40,7 +40,9 @@ describe("Inject script", function () {
         });
 
         async function runTest(mockBrowser) {
-            sinon.replace(browser, "api", mockBrowser);
+            for (const [fn, fake] of Object.entries(mockBrowser)) {
+                sinon.replace(browser, fn, fake);
+            }
 
             await loader.injectScript(script, tabId, frameId);
 

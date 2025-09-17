@@ -5,11 +5,11 @@ import {icon} from "./icon.js";
 import {analytics} from "./analytics/index.js";
 
 analytics.events.backgroundLoaded();
-browser.api.onInstalled(async () => {
+browser.onInstalled(async () => {
     console.info("Extension installed.");
     analytics.events.installed();
 });
-browser.api.onSuspend(async () => {
+browser.onSuspend(async () => {
     console.info("Extension suspended");
     analytics.events.suspended();
 });

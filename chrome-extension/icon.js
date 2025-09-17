@@ -15,7 +15,7 @@ async function createIcons() {
 }
 
 async function loadImage(path) {
-    const response = await fetch(browser.api.getFileUrl(path));
+    const response = await fetch(browser.getFileUrl(path));
     const blob = await response.blob();
     return await createImageBitmap(blob);
 }
@@ -65,7 +65,7 @@ async function loadServerOnIcon() {
 async function updateServerStatus() {
     const isOnline = await util.ping();
     const imageData = isOnline ? await icon.loadServerOnIcon() : await icon.loadServerOffIcon();
-    await browser.api.setIcon(imageData);
+    await browser.setIcon(imageData);
     await storage.storeServerStatus(isOnline);
 }
 

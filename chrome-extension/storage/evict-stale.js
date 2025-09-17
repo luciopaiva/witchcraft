@@ -6,7 +6,7 @@ const EVICTION_PERIOD_IN_MILLIS = 1000 * 60 * 10;  // 10 min
 export async function evictStale() {
     const now = Date.now();
     if (await isItTimeToEvict(now)) {
-        await browser.api.storeKey(storage.EVICTION_TIME_KEY, now + EVICTION_PERIOD_IN_MILLIS);
+        await browser.storeKey(storage.EVICTION_TIME_KEY, now + EVICTION_PERIOD_IN_MILLIS);
         await lookForKeysToEvict();
     }
 }
@@ -15,7 +15,7 @@ async function lookForKeysToEvict() {
     console.info("Looking for old cache entries to evict...");
 
     let removedCount = 0;
-    for (const entry of await browser.api.retrieveAllEntries()) {
+    for (const entry of await browser.retrieveAllEntries()) {
         const [key, value] = entry;
         if (key.startsWith(storage.FRAME_SCRIPTS_KEY_PREFIX)) {
             const {tabId, frameId} = value;
@@ -48,10 +48,10 @@ async function tryEvictTabScriptCountKey(key, tabId) {
 }
 
 async function doesFrameExist(tabId, frameId) {
-    return !!(await browser.api.getFrame(tabId, frameId));
+    return !!(await browser.getFrame(tabId, frameId));
 }
 
 async function isItTimeToEvict(now) {
-    const nextTime = await browser.api.retrieveKey(storage.EVICTION_TIME_KEY);
+    const nextTime = await browser.retrieveKey(storage.EVICTION_TIME_KEY);
     return (nextTime ?? 0) < now;
 }

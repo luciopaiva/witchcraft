@@ -1,7 +1,7 @@
 import assert from "node:assert";
 import {describe, it} from "mocha";
 import sinon from "sinon";
-import {chromeApi} from "../../../chrome-extension/browser/chrome-api/index.js";
+import {browser} from "../../../chrome-extension/browser/index.js";
 
 describe("Chrome API - Get tab URL", function () {
 
@@ -19,10 +19,10 @@ describe("Chrome API - Get tab URL", function () {
                 }),
             }
         };
-        sinon.replace(chromeApi, "chrome", () => chrome);
+        sinon.replace(browser, "chrome", () => chrome);
 
         const tabId = 10;
-        assert.strictEqual(await chromeApi.getTabUrl(tabId), url);
+        assert.strictEqual(await browser.getTabUrl(tabId), url);
         assert(chrome.tabs.get.calledWith(tabId));
     });
 
@@ -41,11 +41,11 @@ describe("Chrome API - Get tab URL", function () {
                 }
             }
         };
-        sinon.replace(chromeApi, "chrome", () => chrome);
+        sinon.replace(browser, "chrome", () => chrome);
 
         const tabId = 10;
         await assert.rejects(async () => {
-            await chromeApi.getTabUrl(tabId);
+            await browser.getTabUrl(tabId);
         });
         assert(chrome.tabs.get.calledWith(tabId));
     });
@@ -56,11 +56,11 @@ describe("Chrome API - Get tab URL", function () {
                 get: sinon.fake.throws(),
             }
         };
-        sinon.replace(chromeApi, "chrome", () => chrome);
+        sinon.replace(browser, "chrome", () => chrome);
 
         const tabId = 10;
         await assert.rejects(async () => {
-            await chromeApi.getTabUrl(tabId);
+            await browser.getTabUrl(tabId);
         });
         assert(chrome.tabs.get.calledWith(tabId));
     });

@@ -1,7 +1,7 @@
 import assert from "node:assert";
 import {describe, it} from "mocha";
 import sinon from "sinon";
-import {chromeApi} from "../../../chrome-extension/browser/chrome-api/index.js";
+import {browser} from "../../../chrome-extension/browser/index.js";
 
 describe("Chrome API - Capture runtime error", function () {
 
@@ -13,13 +13,13 @@ describe("Chrome API - Capture runtime error", function () {
         const chrome = {
             runtime: {}
         };
-        sinon.replace(chromeApi, "chrome", () => chrome);
+        sinon.replace(browser, "chrome", () => chrome);
 
         const logger = {
             error: sinon.stub(),
         };
 
-        assert.strictEqual(chromeApi.captureRuntimeError(logger), false);
+        assert.strictEqual(browser.captureRuntimeError(logger), false);
         assert(logger.error.notCalled);
     });
 
@@ -31,13 +31,13 @@ describe("Chrome API - Capture runtime error", function () {
                 }
             }
         };
-        sinon.replace(chromeApi, "chrome", () => chrome);
+        sinon.replace(browser, "chrome", () => chrome);
 
         const logger = {
             error: sinon.stub(),
         };
 
-        assert.strictEqual(chromeApi.captureRuntimeError(logger), true);
+        assert.strictEqual(browser.captureRuntimeError(logger), true);
         assert(logger.error.calledOnce);
     });
 
@@ -59,13 +59,13 @@ describe("Chrome API - Capture runtime error", function () {
                     },
                 }
             };
-            sinon.replace(chromeApi, "chrome", () => chrome);
+            sinon.replace(browser, "chrome", () => chrome);
 
             const logger = {
                 error: sinon.stub(),
             };
 
-            assert.strictEqual(chromeApi.captureRuntimeError(logger), true);
+            assert.strictEqual(browser.captureRuntimeError(logger), true);
             assert(logger.error.notCalled);
         });
     })
