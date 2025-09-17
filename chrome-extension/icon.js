@@ -1,5 +1,5 @@
 
-import {browser} from "./browser/index.js";
+import {browser} from "./browser.js";
 import {storage} from "./storage/index.js";
 import {SERVER_PING_PERIOD_IN_MILLIS} from "./constants.js";
 import {util} from "./util/index.js";

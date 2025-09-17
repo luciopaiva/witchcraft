@@ -1,6 +1,6 @@
 
 import {storage} from "./storage/index.js";
-import {browser} from "./browser/index.js";
+import {browser} from "./browser.js";
 
 async function clear(tabId) {
     await storage.removeTabScriptSet(tabId);

@@ -1,5 +1,5 @@
 import {evictStale} from "./evict-stale.js";
-import {browser} from "../browser/index.js";
+import {browser} from "../browser.js";
 import {util} from "../util/index.js";
 import {DEFAULT_SERVER_ADDRESS} from "../constants.js";
 

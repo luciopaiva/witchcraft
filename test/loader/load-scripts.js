@@ -4,7 +4,7 @@ import {loader} from "../../chrome-extension/loader.js";
 import {util} from "../../chrome-extension/util/index.js";
 import {FETCH_RESPONSE_OUTCOME} from "../../chrome-extension/util/fetch-script.js";
 import {DEFAULT_SERVER_ADDRESS} from "../../chrome-extension/constants.js";
-import {browser} from "../../chrome-extension/browser/index.js";
+import {browser} from "../../chrome-extension/browser.js";
 
 describe("Load scripts", function () {
 

@@ -1,7 +1,7 @@
 /*
  * Adapted from https://github.com/GoogleChrome/chrome-extensions-samples/blob/main/functional-samples/tutorial.google-analytics/scripts/google-analytics.js
  */
-import {browser} from "../browser/index.js";
+import {browser} from "../browser.js";
 import {util} from "../util/index.js";
 
 const GA_ENDPOINT = 'https://www.google-analytics.com/mp/collect';

@@ -2,7 +2,7 @@ import {script as scripts} from "./script/index.js";
 import {FETCH_RESPONSE_OUTCOME} from "./util/fetch-script.js";
 import {util} from "./util/index.js";
 import {EXT_CSS, EXT_JS} from "./path.js";
-import {browser} from "./browser/index.js";
+import {browser} from "./browser.js";
 import {storage} from "./storage/index.js";
 import path from "./path.js";
 import {badge} from "./badge.js";

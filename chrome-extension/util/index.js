@@ -2,7 +2,7 @@
 import {FETCH_RESPONSE_OUTCOME, fetchScript} from "./fetch-script.js";
 import {embedScript, injector} from "./embed-script.js";
 import {storage} from "../storage/index.js";
-import {browser} from "../browser/index.js";
+import {browser} from "../browser.js";
 
 function base64ToTypedArray(base64Data, TypedArrayType) {
     const decodedString = atob(base64Data);

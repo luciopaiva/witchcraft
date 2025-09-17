@@ -1,6 +1,6 @@
 import {loader} from "./loader.js";
 import {storage} from "./storage/index.js";
-import {browser} from "./browser/index.js";
+import {browser} from "./browser.js";
 import {icon} from "./icon.js";
 import {analytics} from "./analytics/index.js";
 

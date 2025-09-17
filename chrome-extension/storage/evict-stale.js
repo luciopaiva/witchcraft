@@ -1,4 +1,4 @@
-import {browser} from "../browser/index.js";
+import {browser} from "../browser.js";
 import {storage} from "./index.js";
 
 const EVICTION_PERIOD_IN_MILLIS = 1000 * 60 * 10;  // 10 min

@@ -1,7 +1,7 @@
 import assert from "node:assert";
 import {describe, it} from "mocha";
 import sinon from "sinon";
-import {browser} from "../../../chrome-extension/browser/index.js";
+import {browser} from "../../../chrome-extension/browser.js";
 
 describe("Chrome API - Get tab URL", function () {
 
