@@ -1,13 +1,14 @@
-import {script as Script} from "./script/index.js";
+import {script} from "./script/index.js";
 import {FETCH_RESPONSE_OUTCOME} from "./util/fetch-script.js";
 import {util} from "./util/index.js";
 import {EXT_CSS, EXT_JS} from "./path.js";
 import {browser} from "./browser/index.js";
 import {storage} from "./storage/index.js";
 import path from "./path.js";
-import {script} from "./script/index.js";
 import {badge} from "./browser/badge/index.js";
 import Metrics from "./analytics/metrics.js";
+
+const {findIncludeDirective, processIncludeDirective, expandInclude} = script;
 
 /**
  * Fetches scripts from the server and injects those that were found.
@@ -82,12 +83,12 @@ function logInjection(tabId, frameId, type, scriptUrl) {
 }
 
 async function loadIncludes(script, metrics, visitedUrls) {
-    let include = Script.findIncludeDirective(script.contents, script.type);
+    let include = findIncludeDirective(script.contents, script.type);
     while (include) {
-        await Script.processIncludeDirective(script, include, metrics, visitedUrls);
-        Script.expandInclude(script, include);
+        await processIncludeDirective(script, include, metrics, visitedUrls);
+        expandInclude(script, include);
 
-        include = Script.findIncludeDirective(script.contents, script.type);
+        include = findIncludeDirective(script.contents, script.type);
     }
 }
 

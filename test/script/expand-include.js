@@ -18,7 +18,7 @@ describe("Expand include", function () {
         const baseScript = new ScriptContext();
         const includeScript = new ScriptContext();
         const include = new IncludeContext(includeScript);
-        script.expandInclude(baseScript, include);
+        scripts.expandInclude(baseScript, include);
 
         assert.strictEqual(baseScript.contents, "foo");
     });
