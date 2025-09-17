@@ -1,5 +1,5 @@
 
-import {EXT_CSS} from "../path/index.js";
+import {EXT_CSS} from "../path.js";
 import IncludeContext from "./include-context.js";
 import ScriptContext from "./script-context.js";
 

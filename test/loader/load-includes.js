@@ -4,7 +4,7 @@ import sinon from "sinon";
 import {loader} from "../../chrome-extension/loader.js";
 import {script} from "../../chrome-extension/script/index.js";
 import {analytics} from "../../chrome-extension/analytics/index.js";
-import {EXT_JS} from "../../chrome-extension/path/index.js";
+import {EXT_JS} from "../../chrome-extension/path.js";
 
 const {IncludeContext, ScriptContext} = script;
 const {Metrics} = analytics;

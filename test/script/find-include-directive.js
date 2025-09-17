@@ -2,7 +2,7 @@
 import assert from "assert";
 import { describe, it } from "mocha";
 import {script} from "../../chrome-extension/script/index.js";
-import {EXT_CSS, EXT_JS} from "../../chrome-extension/path/index.js";
+import {EXT_CSS, EXT_JS} from "../../chrome-extension/path.js";
 import sinon from "sinon";
 
 describe("Find include directive", function () {
