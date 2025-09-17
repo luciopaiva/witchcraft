@@ -1,6 +1,6 @@
 
 import ScriptContext from "./script/script-context.js";
-import {tryParseUrl} from "./url/try-parse-url.js";
+import {tryParseUrl} from "./url/index.js";
 
 export const GLOBAL_SCRIPT_NAME = "_global";
 export const EXT_JS = "js";
