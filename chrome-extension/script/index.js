@@ -4,6 +4,7 @@ import {url} from "../url/index.js";
 import {loader} from "../loader.js";
 import {EXT_CSS} from "../path.js";
 import ScriptContext from "./script-context.js";
+import IncludeContext from "./include-context.js";
 
 /**
  *
@@ -40,19 +41,6 @@ function findIncludeDirective(script, scriptType) {
         // determine full path to include file
         const scriptFileName = result[1].replace(/^"|"$/g, "");  // remove quotes, if any
         return new IncludeContext(new ScriptContext(scriptFileName, scriptType), startIndex, endIndex);
-    }
-}
-
-class IncludeContext {
-    /** @type {ScriptContext} */
-    script;
-    startIndex = -1;
-    endIndex = -1;
-
-    constructor(script, startIndex, endIndex) {
-        this.script = script;
-        this.startIndex = startIndex;
-        this.endIndex = endIndex;
     }
 }
 

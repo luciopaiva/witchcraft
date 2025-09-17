@@ -1,4 +1,4 @@
-import {script} from "./script/index.js";
+import {script as scripts} from "./script/index.js";
 import {FETCH_RESPONSE_OUTCOME} from "./util/fetch-script.js";
 import {util} from "./util/index.js";
 import {EXT_CSS, EXT_JS} from "./path.js";
@@ -7,8 +7,6 @@ import {storage} from "./storage/index.js";
 import path from "./path.js";
 import {badge} from "./browser/badge/index.js";
 import Metrics from "./analytics/metrics.js";
-
-const {findIncludeDirective, processIncludeDirective, expandInclude} = script;
 
 /**
  * Fetches scripts from the server and injects those that were found.
@@ -83,12 +81,12 @@ function logInjection(tabId, frameId, type, scriptUrl) {
 }
 
 async function loadIncludes(script, metrics, visitedUrls) {
-    let include = findIncludeDirective(script.contents, script.type);
+    let include = scripts.findIncludeDirective(script.contents, script.type);
     while (include) {
-        await processIncludeDirective(script, include, metrics, visitedUrls);
-        expandInclude(script, include);
+        await scripts.processIncludeDirective(script, include, metrics, visitedUrls);
+        scripts.expandInclude(script, include);
 
-        include = findIncludeDirective(script.contents, script.type);
+        include = scripts.findIncludeDirective(script.contents, script.type);
     }
 }
 
@@ -102,15 +100,15 @@ async function loadScripts(scriptUrl, tabId, frameId) {
 
     const serverAddress = await storage.retrieveServerAddress();
     /** @type {ScriptContext[]} */
-    const scripts = path.generatePotentialScriptNames(scriptUrl)
+    const scriptCandidates = path.generatePotentialScriptNames(scriptUrl)
         .flatMap(path.mapToJsAndCss)
         .map(path.pathTupleToScriptContext)
-        .map(script.prependServerOrigin.bind(null, serverAddress));
+        .map(scripts.prependServerOrigin.bind(null, serverAddress));
 
-    const metrics = await loader.fetchAndInject(scripts, tabId, frameId);
+    const metrics = await loader.fetchAndInject(scriptCandidates, tabId, frameId);
 
     // persist so the popup window can read it when needed
-    const scriptNames = scripts
+    const scriptNames = scriptCandidates
         .filter(script => script.hasContents)
         .map(script => script.path);
 
