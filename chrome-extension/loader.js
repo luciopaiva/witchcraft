@@ -1,13 +1,13 @@
-import {script as Script} from "../script/index.js";
-import {FETCH_RESPONSE_OUTCOME} from "../util/fetch-script.js";
-import {util} from "../util/index.js";
-import {EXT_CSS, EXT_JS} from "../path/map-to-js-and-css.js";
-import {browser} from "../browser/index.js";
-import {storage} from "../storage/index.js";
-import {path} from "../path/index.js";
-import {script} from "../script/index.js";
-import {badge} from "../browser/badge/index.js";
-import Metrics from "../analytics/metrics.js";
+import {script as Script} from "./script/index.js";
+import {FETCH_RESPONSE_OUTCOME} from "./util/fetch-script.js";
+import {util} from "./util/index.js";
+import {EXT_CSS, EXT_JS} from "./path/map-to-js-and-css.js";
+import {browser} from "./browser/index.js";
+import {storage} from "./storage/index.js";
+import {path} from "./path/index.js";
+import {script} from "./script/index.js";
+import {badge} from "./browser/badge/index.js";
+import Metrics from "./analytics/metrics.js";
 
 /**
  * Fetches scripts from the server and injects those that were found.

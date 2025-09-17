@@ -1,4 +1,4 @@
-import {loader} from "./loader/index.js";
+import {loader} from "./loader.js";
 import {storage} from "./storage/index.js";
 import {browser} from "./browser/index.js";
 import {icon} from "./icon.js";

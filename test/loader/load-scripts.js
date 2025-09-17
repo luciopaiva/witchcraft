@@ -1,6 +1,6 @@
 import { describe, it } from "mocha";
 import sinon from "sinon";
-import {loader} from "../../chrome-extension/loader/index.js";
+import {loader} from "../../chrome-extension/loader.js";
 import {util} from "../../chrome-extension/util/index.js";
 import {FETCH_RESPONSE_OUTCOME} from "../../chrome-extension/util/fetch-script.js";
 import {DEFAULT_SERVER_ADDRESS} from "../../chrome-extension/constants.js";

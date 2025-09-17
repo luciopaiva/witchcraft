@@ -1,7 +1,7 @@
 
 import assert from "assert";
 import { describe, it } from "mocha";
-import {loader} from "../../chrome-extension/loader/index.js";
+import {loader} from "../../chrome-extension/loader.js";
 import {script} from "../../chrome-extension/script/index.js";
 import sinon from "sinon";
 import {analytics} from "../../chrome-extension/analytics/index.js";

@@ -1,5 +1,5 @@
 
-import {loader} from "../loader/index.js";
+import {loader} from "../loader.js";
 import {url} from "../url/index.js";
 
 /**
