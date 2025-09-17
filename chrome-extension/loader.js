@@ -5,7 +5,7 @@ import {EXT_CSS, EXT_JS} from "./path.js";
 import {browser} from "./browser/index.js";
 import {storage} from "./storage/index.js";
 import path from "./path.js";
-import {badge} from "./browser/badge/index.js";
+import {badge} from "./badge.js";
 import Metrics from "./analytics/metrics.js";
 
 /**
