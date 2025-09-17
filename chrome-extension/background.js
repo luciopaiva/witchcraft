@@ -14,7 +14,7 @@ browser.onSuspend(async () => {
     analytics.events.suspended();
 });
 
-chrome.runtime.onMessage.addListener(async (message, sender) => {
+browser.onMessage(async (message, sender) => {
     const url = message.href;
     const tabId = sender.tab?.id;
     const frameId = sender.frameId;

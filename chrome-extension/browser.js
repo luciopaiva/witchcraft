@@ -92,12 +92,12 @@ function injectCss(contents, tabId, frameId) {
 }
 
 function isUserScriptsEnabled() {
-    return typeof chrome?.userScripts?.execute === "function";
+    return typeof browser.chrome()?.userScripts?.execute === "function";
 }
 
 function injectJs(contents, tabId, frameId) {
     if (isUserScriptsEnabled()) {
-        chrome.userScripts.execute({
+        browser.chrome().userScripts.execute({
             injectImmediately: true,
             target: { tabId: tabId, frameIds: [frameId] },
             js: [{
@@ -122,6 +122,10 @@ function onCommitted(callback) {
 
 function onInstalled(callback) {
     browser.chrome().runtime.onInstalled.addListener(callback);
+}
+
+function onMessage(callback) {
+    browser.chrome().runtime.onMessage.addListener(callback);
 }
 
 function onStorageChanged(callback) {
@@ -182,6 +186,10 @@ async function storeKey(key, value) {
     });
 }
 
+function sendMessage(message) {
+    browser.chrome().runtime.sendMessage(message);
+}
+
 export const browser = {
     captureRuntimeError,
     chrome: () => chrome,  // for mocking purposes
@@ -196,12 +204,14 @@ export const browser = {
     injectCss,
     injectJs,
     onInstalled,
+    onMessage,
     onCommitted,
     onStorageChanged,
     onSuspend,
     removeKey,
     retrieveAllEntries,
     retrieveKey,
+    sendMessage,
     setBadgeText,
     setIcon,
     storeKey,
