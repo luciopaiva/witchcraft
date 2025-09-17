@@ -1,36 +1,95 @@
 import {evictStale} from "./evict-stale.js";
-import {storeFrame} from "./store-frame.js";
-import {frameScriptsKey} from "./frame-scripts-key.js";
-import {removeFrame} from "./remove-frame.js";
-import {storeServerAddress} from "./store-server-address.js";
-import {retrieveServerAddress} from "./retrieve-server-address.js";
-import {makeTabScriptCountKey} from "./make-tab-script-count-key.js";
-import {incrementTabScriptCount} from "./increment-tab-script-count.js";
-import {storeIcon} from "./store-icon.js";
-import {retrieveIcon} from "./retrieve-icon.js";
-import {makeIconKey} from "./make-icon-key.js";
-import {clear} from "./clear.js";
-import {browser} from "../browser/index.js";
+import {browser} from "../browser.js";
+import {util} from "../util/index.js";
+import {DEFAULT_SERVER_ADDRESS} from "../constants.js";
+
+const SERVER_ADDRESS_KEY = "server-address";
+const SERVER_STATUS_KEY = "server-status";
 
 const EVICTION_TIME_KEY = "eviction-time";
 const FRAME_SCRIPTS_KEY_PREFIX = "frame-scripts";
 const TAB_SCRIPT_COUNT_KEY_PREFIX = "tab-script-count";
 const ICON_KEY_PREFIX = "icon";
 
+async function clear() {
+    await browser.clearStorage();
+}
+
+function makeIconKey(iconName) {
+    return `${storage.ICON_KEY_PREFIX}:${iconName}`;
+}
+
+function makeTabScriptCountKey(tabId) {
+    return `${storage.TAB_SCRIPT_COUNT_KEY_PREFIX}:${tabId}`;
+}
+
+async function removeFrame(tabId, frameId) {
+    await browser.removeKey(storage.frameScriptsKey(tabId, frameId));
+}
+
+async function retrieveServerStatus() {
+    return (await browser.retrieveKey(SERVER_STATUS_KEY)) || false;
+}
+
+async function storeIcon(iconName, iconData) {
+    const encoded = util.typedArrayToBase64(iconData);
+    await browser.storeKey(storage.makeIconKey(iconName), encoded);
+}
+
+async function storeServerAddress(address) {
+    await browser.storeKey(SERVER_ADDRESS_KEY, address);
+}
+
+async function storeServerStatus(status) {
+    await browser.storeKey(SERVER_STATUS_KEY, status);
+}
+
+async function storeFrame(tabId, frameId, scriptNames) {
+    await browser.storeKey(storage.frameScriptsKey(tabId, frameId), {
+        tabId,
+        frameId,
+        scriptNames,
+    });
+}
+
+async function retrieveIcon(iconName) {
+    const base64 = await browser.retrieveKey(storage.makeIconKey(iconName));
+    return util.base64ToTypedArray(base64, Uint8ClampedArray);
+}
+
+async function incrementTabScriptCount(tabId, increment) {
+    const key = storage.makeTabScriptCountKey(tabId);
+    const result = await browser.retrieveKey(key);
+    const newCount = (result?.count ?? 0) + increment;
+    await browser.storeKey(key, {
+        tabId,
+        count: newCount,
+    });
+    return newCount;
+}
+
+function frameScriptsKey(tabId, frameId) {
+    return `${storage.FRAME_SCRIPTS_KEY_PREFIX}:${tabId}:${frameId}`;
+}
+
+async function retrieveServerAddress(defaultAddress = DEFAULT_SERVER_ADDRESS) {
+    return (await browser.retrieveKey(SERVER_ADDRESS_KEY)) ?? defaultAddress;
+}
+
 async function removeTabScriptSet(tabId) {
     const tabKey = storage.makeTabScriptCountKey(tabId);
-    await browser.api.removeKey(tabKey);
+    await browser.removeKey(tabKey);
 }
 
 async function addToTabScriptSet(tabId, frameId, scripts) {
     const scriptKeys = scripts.map(script => `${frameId}:${script}`);
     const tabKey = storage.makeTabScriptCountKey(tabId);
-    const tabResult = await browser.api.retrieveKey(tabKey);
+    const tabResult = await browser.retrieveKey(tabKey);
     const existingScripts = tabResult?.scripts ? JSON.parse(tabResult?.scripts) : [];
 
     const updatedScripts = new Set([...existingScripts, ...scriptKeys]);
 
-    await browser.api.storeKey(tabKey, {
+    await browser.storeKey(tabKey, {
         tabId,
         scripts: JSON.stringify(Array.from(updatedScripts)),
     });
@@ -38,11 +97,11 @@ async function addToTabScriptSet(tabId, frameId, scripts) {
 }
 
 async function retrieveFrame(tabId, frameId) {
-    return await browser.api.retrieveKey(storage.frameScriptsKey(tabId, frameId));
+    return await browser.retrieveKey(storage.frameScriptsKey(tabId, frameId));
 }
 
 async function retrieveAllFrames(tabId) {
-    const entries = await browser.api.retrieveAllEntries() ?? [];
+    const entries = await browser.retrieveAllEntries() ?? [];
     const prefix = `${FRAME_SCRIPTS_KEY_PREFIX}:${tabId}:`;
     const results = {};
 
@@ -59,7 +118,7 @@ async function retrieveAllFrames(tabId) {
 async function clearAllFrames(tabId) {
     const keysToRemove = Object.keys(await retrieveAllFrames(tabId));
     for (const key of keysToRemove) {
-        await browser.api.removeKey(key);
+        await browser.removeKey(key);
     }
 }
 
@@ -85,4 +144,6 @@ export const storage = {
     storeIcon,
     storeServerAddress,
     addToTabScriptSet,
+    storeServerStatus,
+    retrieveServerStatus,
 }

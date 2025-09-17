@@ -1,9 +1,8 @@
-import {browser} from "../browser/index.js";
+import {browser} from "../browser.js";
 import {storage} from "../storage/index.js";
 import {DEFAULT_SERVER_ADDRESS} from "../constants.js";
 import Debouncer from "../util/debouncer.js";
 import {analytics} from "../analytics/index.js";
-import {retrieveServerStatus} from "../storage/retrieve-server-status.js";
 
 class Popup {
 
@@ -40,19 +39,19 @@ class Popup {
 
             scriptsDebouncer.debounce(() => this.renderScripts());
         }
-        const removeListener = browser.api.onStorageChanged(callback);
+        const removeListener = browser.onStorageChanged(callback);
         // otherwise we'll have a registered listener for every time the popup opened:
         window.addEventListener("beforeunload", removeListener);
     }
 
     showVersion() {
-        document.getElementById("version").innerText = browser.api.getAppVersion();
+        document.getElementById("version").innerText = browser.getAppVersion();
     }
 
     makeButtonFromAnchor(id) {
         const anchor = typeof id === "string" ? document.getElementById(id) : id;
         anchor.addEventListener("click", async () => {
-            await browser.api.createTab(anchor.getAttribute("href"));
+            await browser.createTab(anchor.getAttribute("href"));
             analytics.page("/popup/" + id, id);
             return false;
         });
@@ -60,7 +59,7 @@ class Popup {
 
     async showServerStatus() {
         document.getElementById("server-status")
-            .classList.toggle("online", await retrieveServerStatus());
+            .classList.toggle("online", await storage.retrieveServerStatus());
     }
 
     /** @return {void} */
@@ -113,7 +112,7 @@ class Popup {
         }
 
         // fall back to browser API if no valid query parameter found
-        return await browser.api.getActiveTabId();
+        return await browser.getActiveTabId();
     }
 
     renderFrame(frameId) {
@@ -175,7 +174,7 @@ class Popup {
             const serverAddressInput = document.getElementById("server-address");
             serverAddressInput.value = await storage.retrieveServerAddress();
             serverAddressInput.addEventListener("input", async event => {
-                await browser.api.storeKey("server-address", event.target.value);
+                await browser.storeKey("server-address", event.target.value);
             });
         }
 
@@ -183,7 +182,7 @@ class Popup {
 
         const resetButton = document.getElementById("server-address-reset");
         resetButton.addEventListener("click", async event => {
-            await browser.api.storeKey("server-address", DEFAULT_SERVER_ADDRESS);
+            await browser.storeKey("server-address", DEFAULT_SERVER_ADDRESS);
             await readServerAddress();
             event.preventDefault();
             return false;

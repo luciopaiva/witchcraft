@@ -1,8 +1,10 @@
 
 import assert from "assert";
 import { describe, it } from "mocha";
-import {mapToJsAndCss} from "../../chrome-extension/path/map-to-js-and-css.js";
+import path from "../../chrome-extension/path.js";
 import sinon from "sinon";
+
+const { mapToJsAndCss } = path;
 
 describe("Map to JS and CSS", function () {
 

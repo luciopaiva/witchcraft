@@ -1,10 +1,10 @@
 import { describe, it } from "mocha";
 import sinon from "sinon";
-import {loader} from "../../chrome-extension/loader/index.js";
+import {loader} from "../../chrome-extension/loader.js";
 import {util} from "../../chrome-extension/util/index.js";
 import {FETCH_RESPONSE_OUTCOME} from "../../chrome-extension/util/fetch-script.js";
 import {DEFAULT_SERVER_ADDRESS} from "../../chrome-extension/constants.js";
-import {browser} from "../../chrome-extension/browser/index.js";
+import {browser} from "../../chrome-extension/browser.js";
 
 describe("Load scripts", function () {
 
@@ -17,7 +17,7 @@ describe("Load scripts", function () {
         const tabId = 123;
         const frameId = 456;
 
-        sinon.replace(browser.api, "retrieveKey", async (key) => {
+        sinon.replace(browser, "retrieveKey", async (key) => {
             switch (key) {
                 case "server-address":
                     return DEFAULT_SERVER_ADDRESS;
@@ -25,9 +25,9 @@ describe("Load scripts", function () {
                     return null;
             }
         });
-        sinon.replace(browser.api, "removeKey", async () => {});
-        sinon.replace(browser.api, "storeKey", async () => {});
-        sinon.replace(browser.api, "setBadgeText", async () => {});
+        sinon.replace(browser, "removeKey", async () => {});
+        sinon.replace(browser, "storeKey", async () => {});
+        sinon.replace(browser, "setBadgeText", async () => {});
 
         const fetchScript = sinon.stub(util, "fetchScript");
         fetchScript

@@ -1,8 +1,10 @@
 
 import assert from "assert";
 import { describe, it } from "mocha";
-import {iterateDomainLevels} from "../../chrome-extension/path/iterate-domain-levels.js";
+import path from "../../chrome-extension/path.js";
 import sinon from "sinon";
+
+const iterateDomainLevels = path.iterateDomainLevels;
 
 describe("Iterate domain levels", function () {
 
