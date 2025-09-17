@@ -2,7 +2,7 @@ import assert from "node:assert";
 import {describe, it, beforeEach} from "mocha";
 import sinon from "sinon";
 import {loader} from "../../chrome-extension/loader.js";
-import {EXT_CSS, EXT_JS} from "../../chrome-extension/path/map-to-js-and-css.js";
+import {EXT_CSS, EXT_JS} from "../../chrome-extension/path/index.js";
 import {browser} from "../../chrome-extension/browser/index.js";
 
 describe("Inject script", function () {

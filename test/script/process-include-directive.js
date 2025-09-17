@@ -6,7 +6,7 @@ import {loader} from "../../chrome-extension/loader.js";
 import {script} from "../../chrome-extension/script/index.js";
 import Metrics from "../../chrome-extension/analytics/metrics.js";
 import {url} from "../../chrome-extension/url/index.js";
-import {EXT_CSS, EXT_JS} from "../../chrome-extension/path/map-to-js-and-css.js";
+import {EXT_CSS, EXT_JS} from "../../chrome-extension/path/index.js";
 
 const IncludeContext = script.IncludeContext;
 const ScriptContext = script.ScriptContext;

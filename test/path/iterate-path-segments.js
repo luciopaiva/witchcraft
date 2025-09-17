@@ -1,8 +1,10 @@
 
 import assert from "assert";
 import { describe, it } from "mocha";
-import { iteratePathSegments } from "../../chrome-extension/path/iterate-path-segments.js";
+import path from "../../chrome-extension/path/index.js";
 import sinon from "sinon";
+
+const iteratePathSegments = path.iteratePathSegments;
 
 describe("Iterate path segments", function () {
 

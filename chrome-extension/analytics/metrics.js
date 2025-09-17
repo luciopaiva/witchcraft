@@ -1,5 +1,5 @@
 
-import {EXT_CSS, EXT_JS} from "../path/map-to-js-and-css.js";
+import {EXT_CSS, EXT_JS} from "../path/index.js";
 
 export default class Metrics {
     #jsHitCount = 0;
