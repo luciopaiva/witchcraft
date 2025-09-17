@@ -8,7 +8,8 @@
   },
   "scripts": {
     "build": "node build.js",
-    "test:unit": "c8 -r lcov -r text mocha 'test/**/*.js' --ignore 'test/integration/**' --recursive",
+    "test:unit": "mocha 'test/**/*.js' --ignore 'test/integration/**' --recursive",
+    "test:coverage": "c8 -r lcov -r text mocha 'test/**/*.js' --ignore 'test/integration/**' --recursive",
     "test:integration": "npm run build && mocha test/integration/integration.js --timeout 30000",
     "test": "npm run test:unit && npm run test:integration"
   },
