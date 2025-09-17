@@ -1,6 +1,6 @@
 
 import {util} from "../util/index.js";
-import {url} from "../url/index.js";
+import {url} from "../url.js";
 import {loader} from "../loader.js";
 import {EXT_CSS} from "../path.js";
 import ScriptContext from "./script-context.js";
