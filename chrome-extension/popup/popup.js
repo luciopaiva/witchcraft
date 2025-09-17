@@ -3,7 +3,6 @@ import {storage} from "../storage/index.js";
 import {DEFAULT_SERVER_ADDRESS} from "../constants.js";
 import Debouncer from "../util/debouncer.js";
 import {analytics} from "../analytics/index.js";
-import {retrieveServerStatus} from "../storage/retrieve-server-status.js";
 
 class Popup {
 
@@ -60,7 +59,7 @@ class Popup {
 
     async showServerStatus() {
         document.getElementById("server-status")
-            .classList.toggle("online", await retrieveServerStatus());
+            .classList.toggle("online", await storage.retrieveServerStatus());
     }
 
     /** @return {void} */

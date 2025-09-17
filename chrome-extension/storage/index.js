@@ -1,21 +1,80 @@
 import {evictStale} from "./evict-stale.js";
-import {storeFrame} from "./store-frame.js";
-import {frameScriptsKey} from "./frame-scripts-key.js";
-import {removeFrame} from "./remove-frame.js";
-import {storeServerAddress} from "./store-server-address.js";
-import {retrieveServerAddress} from "./retrieve-server-address.js";
-import {makeTabScriptCountKey} from "./make-tab-script-count-key.js";
-import {incrementTabScriptCount} from "./increment-tab-script-count.js";
-import {storeIcon} from "./store-icon.js";
-import {retrieveIcon} from "./retrieve-icon.js";
-import {makeIconKey} from "./make-icon-key.js";
-import {clear} from "./clear.js";
 import {browser} from "../browser/index.js";
+import {util} from "../util/index.js";
+import {DEFAULT_SERVER_ADDRESS} from "../constants.js";
+
+const SERVER_ADDRESS_KEY = "server-address";
+const SERVER_STATUS_KEY = "server-status";
 
 const EVICTION_TIME_KEY = "eviction-time";
 const FRAME_SCRIPTS_KEY_PREFIX = "frame-scripts";
 const TAB_SCRIPT_COUNT_KEY_PREFIX = "tab-script-count";
 const ICON_KEY_PREFIX = "icon";
+
+async function clear() {
+    await browser.api.clearStorage();
+}
+
+function makeIconKey(iconName) {
+    return `${storage.ICON_KEY_PREFIX}:${iconName}`;
+}
+
+function makeTabScriptCountKey(tabId) {
+    return `${storage.TAB_SCRIPT_COUNT_KEY_PREFIX}:${tabId}`;
+}
+
+async function removeFrame(tabId, frameId) {
+    await browser.api.removeKey(storage.frameScriptsKey(tabId, frameId));
+}
+
+async function retrieveServerStatus() {
+    return (await browser.api.retrieveKey(SERVER_STATUS_KEY)) || false;
+}
+
+async function storeIcon(iconName, iconData) {
+    const encoded = util.typedArrayToBase64(iconData);
+    await browser.api.storeKey(storage.makeIconKey(iconName), encoded);
+}
+
+async function storeServerAddress(address) {
+    await browser.api.storeKey(SERVER_ADDRESS_KEY, address);
+}
+
+async function storeServerStatus(status) {
+    await browser.api.storeKey(SERVER_STATUS_KEY, status);
+}
+
+async function storeFrame(tabId, frameId, scriptNames) {
+    await browser.api.storeKey(storage.frameScriptsKey(tabId, frameId), {
+        tabId,
+        frameId,
+        scriptNames,
+    });
+}
+
+async function retrieveIcon(iconName) {
+    const base64 = await browser.api.retrieveKey(storage.makeIconKey(iconName));
+    return util.base64ToTypedArray(base64, Uint8ClampedArray);
+}
+
+async function incrementTabScriptCount(tabId, increment) {
+    const key = storage.makeTabScriptCountKey(tabId);
+    const result = await browser.api.retrieveKey(key);
+    const newCount = (result?.count ?? 0) + increment;
+    await browser.api.storeKey(key, {
+        tabId,
+        count: newCount,
+    });
+    return newCount;
+}
+
+function frameScriptsKey(tabId, frameId) {
+    return `${storage.FRAME_SCRIPTS_KEY_PREFIX}:${tabId}:${frameId}`;
+}
+
+async function retrieveServerAddress(defaultAddress = DEFAULT_SERVER_ADDRESS) {
+    return (await browser.api.retrieveKey(SERVER_ADDRESS_KEY)) ?? defaultAddress;
+}
 
 async function removeTabScriptSet(tabId) {
     const tabKey = storage.makeTabScriptCountKey(tabId);
@@ -85,4 +144,6 @@ export const storage = {
     storeIcon,
     storeServerAddress,
     addToTabScriptSet,
+    storeServerStatus,
+    retrieveServerStatus,
 }

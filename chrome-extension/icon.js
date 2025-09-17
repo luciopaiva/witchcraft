@@ -3,7 +3,6 @@ import {browser} from "./browser/index.js";
 import {storage} from "./storage/index.js";
 import {SERVER_PING_PERIOD_IN_MILLIS} from "./constants.js";
 import {util} from "./util/index.js";
-import {storeServerStatus} from "./storage/store-server-status.js";
 
 const ICON_SIZE = 16;
 const ICON_SERVER_ON_NAME = "server-on";
@@ -67,7 +66,7 @@ async function updateServerStatus() {
     const isOnline = await util.ping();
     const imageData = isOnline ? await icon.loadServerOnIcon() : await icon.loadServerOffIcon();
     await browser.api.setIcon(imageData);
-    await storeServerStatus(isOnline);
+    await storage.storeServerStatus(isOnline);
 }
 
 export const icon = {
