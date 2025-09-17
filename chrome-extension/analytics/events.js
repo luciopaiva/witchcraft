@@ -1,9 +1,18 @@
-import {analytics} from "../index.js";
+
+import {analytics} from "./index.js";
+
+function installed() {
+    analytics.agent.fireEvent("installed").then();
+}
+
+function backgroundLoaded() {
+    analytics.agent.fireEvent("background_loaded").then();
+}
 
 /**
  * @param {Metrics} metrics
  */
-export function scriptsLoaded(metrics) {
+function scriptsLoaded(metrics) {
     const params = {
         js_hit_count: metrics.jsHitCount,
         js_include_hit_count: metrics.jsIncludesHitCount,
@@ -16,3 +25,16 @@ export function scriptsLoaded(metrics) {
     };
     analytics.agent.fireEvent("scripts_loaded", params).then();
 }
+
+function suspended() {
+    analytics.agent.fireEvent("suspended").then();
+}
+
+const event = {
+    installed,
+    backgroundLoaded,
+    scriptsLoaded,
+    suspended,
+};
+
+export default event;

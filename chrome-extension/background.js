@@ -4,14 +4,14 @@ import {browser} from "./browser/index.js";
 import {icon} from "./icon/index.js";
 import {analytics} from "./analytics/index.js";
 
-analytics.event.backgroundLoaded();
+analytics.events.backgroundLoaded();
 browser.api.onInstalled(async () => {
     console.info("Extension installed.");
-    analytics.event.installed();
+    analytics.events.installed();
 });
 browser.api.onSuspend(async () => {
     console.info("Extension suspended");
-    analytics.event.suspended();
+    analytics.events.suspended();
 });
 
 chrome.runtime.onMessage.addListener(async (message, sender) => {
@@ -21,7 +21,7 @@ chrome.runtime.onMessage.addListener(async (message, sender) => {
 
     if (typeof url === "string" && typeof tabId === "number" && typeof frameId === "number") {
         const metrics = await loader.loadScripts(url, tabId, frameId);
-        metrics.hasData && analytics.event.scriptsLoaded(metrics);
+        metrics.hasData && analytics.events.scriptsLoaded(metrics);
         await storage.evictStale();
     }
 });
