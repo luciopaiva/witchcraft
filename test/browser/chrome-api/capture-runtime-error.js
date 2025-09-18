@@ -1,7 +1,7 @@
 import assert from "node:assert";
 import {describe, it} from "mocha";
 import sinon from "sinon";
-import {browser} from "../../../chrome-extension/browser.js";
+import {browser} from "../../../src/browser.js";
 
 describe("Chrome API - Capture runtime error", function () {
 

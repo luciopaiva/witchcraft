@@ -2,7 +2,7 @@ import vm from "node:vm";
 import assert from "node:assert";
 import {describe, it} from "mocha";
 import sinon from "sinon";
-import {util} from "../../chrome-extension/util/index.js";
+import {util} from "../../src/util/index.js";
 
 describe("Embed script", function () {
 

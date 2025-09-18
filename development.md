@@ -53,7 +53,7 @@ node index.js
 
 Analytics is not required, but can be optionally set via the following instructions.
 
-To set up GA, the file `./chrome-extension/credentials.json` must be created. Its format should be:
+To set up GA, the file `./assets/credentials.json` must be created. Its format should be:
 
     {
         "measurementId": "G-XXXXXXXXXX",

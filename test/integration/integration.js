@@ -5,7 +5,7 @@ import {setScriptServerAddress, startBrowser, toggleDevModeOn, toggleUserScripts
 import {loadResource} from "./utils/resource-utils.js";
 import assert from "node:assert";
 import {DEFAULT_SERVER_ADDRESS} from "../../dist/constants.js";
-import {util} from "../../chrome-extension/util/index.js";
+import {util} from "../../src/util/index.js";
 
 const {until} = util;
 

@@ -1,8 +1,8 @@
 
 import assert from "assert";
 import { describe, it } from "mocha";
-import {util} from "../../chrome-extension/util/index.js";
-import {FETCH_RESPONSE_OUTCOME} from "../../chrome-extension/util/fetch-script.js";
+import {util} from "../../src/util/index.js";
+import {FETCH_RESPONSE_OUTCOME} from "../../src/util/fetch-script.js";
 import sinon from "sinon";
 
 describe("Fetch script", function () {

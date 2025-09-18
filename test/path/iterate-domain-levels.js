@@ -1,7 +1,7 @@
 
 import assert from "assert";
 import { describe, it } from "mocha";
-import path from "../../chrome-extension/path.js";
+import path from "../../src/path.js";
 import sinon from "sinon";
 
 const iterateDomainLevels = path.iterateDomainLevels;

@@ -1,9 +1,9 @@
 import assert from "node:assert";
 import {describe, it, beforeEach} from "mocha";
 import sinon from "sinon";
-import {loader} from "../../chrome-extension/loader.js";
-import {EXT_CSS, EXT_JS} from "../../chrome-extension/path.js";
-import {browser} from "../../chrome-extension/browser.js";
+import {loader} from "../../src/loader.js";
+import {EXT_CSS, EXT_JS} from "../../src/path.js";
+import {browser} from "../../src/browser.js";
 
 describe("Inject script", function () {
 

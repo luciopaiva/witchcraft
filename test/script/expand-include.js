@@ -2,10 +2,10 @@
 import assert from "assert";
 import { describe, it } from "mocha";
 import sinon from "sinon";
-import ScriptContext from "../../chrome-extension/script/script-context.js";
-import IncludeContext from "../../chrome-extension/script/include-context.js";
-import {util} from "../../chrome-extension/util/index.js";
-import {script} from "../../chrome-extension/script/index.js";
+import ScriptContext from "../../src/script/script-context.js";
+import IncludeContext from "../../src/script/include-context.js";
+import {util} from "../../src/util/index.js";
+import {script} from "../../src/script/index.js";
 
 describe("Expand include", function () {
 

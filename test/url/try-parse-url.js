@@ -1,7 +1,7 @@
 
 import assert from "assert";
 import { describe, it } from "mocha";
-import {tryParseUrl} from "../../chrome-extension/url.js";
+import {tryParseUrl} from "../../src/url.js";
 import sinon from "sinon";
 
 describe("Parse URL", function () {

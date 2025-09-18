@@ -1,7 +1,7 @@
 import {beforeEach} from "mocha";
 import sinon from "sinon";
-import {storage} from "../../chrome-extension/storage/index.js";
-import {browser} from "../../chrome-extension/browser.js";
+import {storage} from "../../src/storage/index.js";
+import {browser} from "../../src/browser.js";
 import assert from "node:assert";
 
 describe("Frame data storage", function () {

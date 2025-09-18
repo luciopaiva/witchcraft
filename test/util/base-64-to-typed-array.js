@@ -1,6 +1,6 @@
 import assert from "assert";
 import { describe, it } from "mocha";
-import {util} from "../../chrome-extension/util/index.js";
+import {util} from "../../src/util/index.js";
 import sinon from "sinon";
 
 describe("Base 64 / Typed Array conversion", function () {

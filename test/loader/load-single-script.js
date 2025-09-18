@@ -1,13 +1,13 @@
 
 import assert from "assert";
 import { describe, it } from "mocha";
-import {loader} from "../../chrome-extension/loader.js";
-import {script} from "../../chrome-extension/script/index.js";
+import {loader} from "../../src/loader.js";
+import {script} from "../../src/script/index.js";
 import sinon from "sinon";
-import {analytics} from "../../chrome-extension/analytics/index.js";
-import {util} from "../../chrome-extension/util/index.js";
-import {FETCH_RESPONSE_OUTCOME} from "../../chrome-extension/util/fetch-script.js";
-import {EXT_CSS, EXT_JS} from "../../chrome-extension/path.js";
+import {analytics} from "../../src/analytics/index.js";
+import {util} from "../../src/util/index.js";
+import {FETCH_RESPONSE_OUTCOME} from "../../src/util/fetch-script.js";
+import {EXT_CSS, EXT_JS} from "../../src/path.js";
 
 const {ScriptContext} = script;
 const {Metrics} = analytics;

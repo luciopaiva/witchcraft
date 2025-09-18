@@ -1,8 +1,8 @@
 
 import assert from "assert";
 import { describe, it } from "mocha";
-import {GLOBAL_SCRIPT_NAME} from "../../chrome-extension/path.js";
-import path from "../../chrome-extension/path.js";
+import {GLOBAL_SCRIPT_NAME} from "../../src/path.js";
+import path from "../../src/path.js";
 import sinon from "sinon";
 
 const {generatePotentialScriptNames} = path;

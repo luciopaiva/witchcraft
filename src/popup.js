@@ -1,8 +1,8 @@
-import {browser} from "../browser.js";
-import {storage} from "../storage/index.js";
-import {DEFAULT_SERVER_ADDRESS} from "../constants.js";
-import Debouncer from "../util/debouncer.js";
-import {analytics} from "../analytics/index.js";
+import {browser} from "./browser.js";
+import {storage} from "./storage/index.js";
+import {DEFAULT_SERVER_ADDRESS} from "./constants.js";
+import Debouncer from "./util/debouncer.js";
+import {analytics} from "./analytics/index.js";
 
 class Popup {
 
