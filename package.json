@@ -9,10 +9,13 @@
   "scripts": {
     "build": "vite build",
     "build:dev": "vite build --mode development",
-    "test:unit": "mocha 'test/**/*.js' --ignore 'test/integration/**' --recursive",
+    "build:test": "vite build --mode test",
+    "test:unit": "npm run build && mocha 'test/**/*.js' --ignore 'test/integration/**' --recursive",
     "test:coverage": "c8 -r lcov -r text mocha 'test/**/*.js' --ignore 'test/integration/**' --recursive",
-    "test:integration": "npm run build && mocha test/integration/integration.js --timeout 30000",
-    "test": "npm run test:unit && npm run test:integration"
+    "test:integration": "npm run build:test && mocha test/integration/integration.js --timeout 30000",
+    "test": "npm run test:unit && npm run test:integration",
+    "test:new": "vitest",
+    "coverage": "vitest run --coverage"
   },
   "repository": {
     "type": "git",
@@ -35,6 +38,7 @@
     "sinon-chrome": "^3.0.1",
     "typescript": "^5.9.2",
     "vite": "^7.1.6",
-    "vite-plugin-static-copy": "^3.1.2"
+    "vite-plugin-static-copy": "^3.1.2",
+    "vitest": "^3.2.4"
   }
 }
